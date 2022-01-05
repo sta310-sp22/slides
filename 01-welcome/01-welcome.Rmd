@@ -39,7 +39,7 @@ class: center, middle
 
 ---
 
-## Class meetings
+## Course logistics
 
 **Lectures**
 
@@ -56,37 +56,55 @@ class: center, middle
 
 ---
 
-## What we're covering this semester
+## Generalized Linear Models
 
-**Generalized Linear Models**: [ADD A DEFINITION]
+*In statistics, a generalized linear model (GLM) is a flexible generalization of ordinary linear regression. The GLM generalizes linear regression by allowing the linear model to be related to the response variable via a link function and by allowing the magnitude of the variance of each measurement to be a function of its predicted value.* 
 
-[ADD TOPICS!]
-
----
-
-class: middle, center
-
-## Get to know each other... [ UPDATE THIS!]
-
+.pull-right[-[Wikipedia](https://en.wikipedia.org/wiki/Generalized_linear_model)]
 
 ---
 
-## icebreaker
+## What we're covering this semester 
 
-[ADD some icebreaker questions!]
+**Generalized Linear Models (Ch 1 - 6)**
 
-- 8 things you have in common activity 
-- No Duke, 
-- NO body parts
-- No clothing
+- Introduce models for non-normal response variables
+- Estimation, interpretation, and inference
+- Mathematical details showing how GLMs are connected
 
-(Do I have this on a lab slide?)
+**Modeling correlated data (Ch 7 - 11)**
+
+- Introduce multilevel models for correlated and longitudinal data
+- Estimation, interpretation, and inference
+- Mathematical details, particularly diving into covariance structures
+---
+
+class: inverse, middle, center
+
+## Meet your classmates!
+
 
 ---
 
-class: middle, center
+## Meet your classmates! (6 minutes)
 
-## More about the course
+- Quick introductions – name and institution
+- Choose a reporter
+  - Need help choosing? Who has a birthday closest to January 5. 
+- Identify 8 things everyone in the group has in common
+  - Not being a Duke student
+  - Not clothes (we're all wearing socks)
+  - Not body parts (we all have a nose)
+
+<br>
+
+**Reporter will share list with the class**
+
+---
+
+class: inverse, middle, center
+
+## More about the course...
 
 ---
 
@@ -98,22 +116,25 @@ class: middle, center
 
 **Background knowledge** 
 
+.pull-left[
 - Statistical content
   - Linear and logistic regression 
   - Statistical inference
-  - Discrete and continuous random variables (general understanding)
+  - Basic understanding of random variables
+]
 
+.pull-right[
 - Computing 
   - Using R for data analysis
   - Writing reports using R Markdown
   - Version control and collaboration using GitHub
-
+]
 ---
 
 ## Course Toolkit
 
 .pull-left[
-- **Course website**
+- **Website**
 [sta310-sp22.netlify.app](https://sta310-sp22.netlify.app/)
   - Central hub for the course
 
@@ -125,7 +146,8 @@ class: middle, center
 .pull-right[
 
 - **GitHub**: [github.com/sta310-sp22](https://github.com/sta310-sp22)
-  - Assignments
+  - Work on assignments
+  - Feedback on project
   
 - **Gradescope**: [gradescope.com](https://www.gradescope.com)
   - Submit assignments
@@ -133,26 +155,29 @@ class: middle, center
 
 ---
 
-## Lectures
+## Class Meetings 
 
-[UPDATE]
+.pull-left[
+**Lectures**
 
----
+- Traditional lecture
+- Short individual and group activities 
+- Bring fully-charged laptop
+]
 
-## Labs
+.pull-right[
+**Labs (start January 13)**
 
-[UPDATE]
+- Work on class assignments with TA support
+- Work on projects with teammates
+]
 
----
+<br>
 
-## Communication 
+.center[
+**Attendance is expected (if you are healthy!)**
+]
 
-- **GitHub Discussion**: Class discussion forum 
-
-- **Sakai Announcements**
-
-- **Email**
-  
 ---
 
 ## Textbook
@@ -174,7 +199,7 @@ class: middle, center
 
 `r emo::ji("one")` Install RStudio on your laptop
   
-  - [Click here](https://github.com/sta310-sp22/install-rstudio/blob/main/README.md) for instructions
+  - [Click here](https://github.com/sta310-sp22/computing/blob/main/README.md) for instructions
 
 
 **or**
@@ -184,7 +209,7 @@ class: middle, center
 
 ---
 
-class: middle, center
+class: inverse, middle, center
 
 ## Activities & Assessments
 
@@ -226,7 +251,7 @@ class: middle, center
 
 **Final project**
 
-- Use any model(s) you've learned to analyze data set
+- Use any model(s) you've learned to analyze data set of your choice
 - Write up
 - Individual project
 
@@ -247,17 +272,17 @@ Final grades will be calculated as follows
 
 <br>
 
-See syllabus for letter grade thresholds.
+See [syllabus](https://sta310-sp22.netlify.app/syllabus/#grading) for letter grade thresholds.
 
 ---
 
-class: middle, center
+class: inverse, middle, center
+
+## Course community & resources
+
+---
 
 ## Course community
-
----
-
-## Course community & Learning environment
 
 - Uphold the Duke Community Standard: 
 > - I will not lie, cheat, or steal in my academic endeavors;
@@ -266,17 +291,12 @@ class: middle, center
 
 <br>
 
-- Respect, honor, and celebrate our diverse community 
+- Commit to respect, honor, and celebrate our diverse community 
 
-- Learning environment that is welcoming and accessible to everyone
+- Commit to being part of a learning environment that is welcoming and accessible to everyone
 
----
 
-## Attending lectures and labs
 
-- You are expected to attend and participate lectures and labs (if you're healthy!)
-
-- For in-person meetings, please wear a mask to help protect your peers and others around you `r emo::ji("mask")` (until further guidance by the university)
 
 ---
 
@@ -288,29 +308,31 @@ class: middle, center
 
 - **Github Discussion** for questions about course logistics, content, and assignments
 
-- Email Prof. Tackett for private questions regarding personal matters or grades. 
+- **Email** Prof. Tackett for private questions regarding personal matters or grades. 
   - Please put **STA 310** in the subject line 
 
-- See [syllabus](https://sta310-sp22.netlify.app/syllabus/#additional-support) and [help](https://sta310-sp22.netlify.app/help/) page for additional academic and mental health and wellness support
+.small[See [syllabus](https://sta310-sp22.netlify.app/syllabus/#additional-support) and [help](https://sta310-sp22.netlify.app/help/) page for additional academic and mental health and wellness support]
 
 ---
 
-class: middle, center
+class: inverse, middle, center
 
 # Questions? 
 
-**"Raise your hand" or post in the Zoom chat**
+### "Raise your hand" or post in the Zoom chat
 
 ---
 
 ## Before Monday
 
-- **No lab on Thursday, January 6**. Lab starts January 13.
+- **No lab on Thursday, January 6. Lab starts January 13.**
 
 - Complete the [All About You survey](https://duke.qualtrics.com/jfe/form/SV_1X1ryORVK6JJwkm)
+  - Will submit your GitHub username on the survey. If you don't have a GitHub account, [click here](https://github.com/sta310-sp22/computing/blob/main/github-username.md) for more info.
 
-- Read the [syllabus](https://sta310-sp22.netlify.app/syllabus/)
+- Read the [syllabus](https://sta310-sp22.netlify.app/syllabus/).
 
 - [Week 01 reading](https://sta310-sp22.netlify.app/readings/#week-01-jan-10---14): BMLR Chapter 1
 
-- Start [installing RStudio](https://github.com/sta310-sp22/install-rstudio/blob/main/README.md) (will need by lab on January 13)
+- Start [installing RStudio and configuring Git](https://github.com/sta310-sp22/computing/blob/main/README.md)    
+  - Will need by January 13 lab

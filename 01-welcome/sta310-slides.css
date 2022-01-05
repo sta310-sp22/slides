@@ -103,13 +103,18 @@ font-size: 75%;
 .pull-right ~ * {
   clear: both;
 }
-ul {
-  list-style-type: square;
-}
 
-li{
+
+ul li {
+  list-style-type: disc;
   margin: 10px 0;
 }
+
+ul li li {
+  list-style-type: circle;
+  margin: 10px 0;
+}
+
 
 .large { font-size: 120% }
 .midi { font-size: 90% }
