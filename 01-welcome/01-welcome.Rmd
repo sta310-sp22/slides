@@ -20,7 +20,7 @@ output:
 library(tidyverse)
 ```
 
-class: center, middle
+class: middle
 
 # Welcome!
 
@@ -79,7 +79,7 @@ class: center, middle
 - Mathematical details, particularly diving into covariance structures
 ---
 
-class: inverse, middle, center
+class: inverse, middle
 
 ## Meet your classmates!
 
@@ -102,7 +102,7 @@ class: inverse, middle, center
 
 ---
 
-class: inverse, middle, center
+class: inverse, middle
 
 ## More about the course...
 
@@ -209,7 +209,7 @@ class: inverse, middle, center
 
 ---
 
-class: inverse, middle, center
+class: inverse, middle
 
 ## Activities & Assessments
 
@@ -276,7 +276,7 @@ See [syllabus](https://sta310-sp22.netlify.app/syllabus/#grading) for letter gra
 
 ---
 
-class: inverse, middle, center
+class: inverse, middle
 
 ## Course community & resources
 
@@ -317,7 +317,7 @@ class: inverse, middle, center
 
 class: inverse, middle, center
 
-# Questions? 
+## Questions? 
 
 ### "Raise your hand" or post in the Zoom chat
 
