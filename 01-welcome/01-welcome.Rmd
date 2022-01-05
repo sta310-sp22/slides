@@ -88,9 +88,9 @@ class: inverse, middle
 
 ## Meet your classmates! (6 minutes)
 
-- Quick introductions – name and institution
+- Quick introductions - Name and year
 - Choose a reporter
-  - Need help choosing? Who has a birthday closest to January 5. 
+  - Need help choosing? Person with birthday closest to January 5. 
 - Identify 8 things everyone in the group has in common
   - Not being a Duke student
   - Not clothes (we're all wearing socks)
@@ -160,7 +160,7 @@ class: inverse, middle
 .pull-left[
 **Lectures**
 
-- Traditional lecture
+- Some traditional lecture
 - Short individual and group activities 
 - Bring fully-charged laptop
 ]
@@ -244,8 +244,8 @@ class: inverse, middle
 
 **Mini-projects**
 
-- Mini-project 01: Focused on modeling non-normal response variables
-- Mini-project 02: Focused on modeling for correlated data
+- Mini-project 01: Focused on models for non-normal response variables
+- Mini-project 02: Focused on models for correlated data
 - Both have presentation & short write up
 - Both are team-based
 
@@ -303,7 +303,7 @@ class: inverse, middle
 ## Resources 
 
 - **Office hours** to meet with a member of the teaching team.
-  - Find the schedule on the [syllabus](https://sta310-sp22.netlify.app/syllabus/)
+  - Find the schedule in the [syllabus](https://sta310-sp22.netlify.app/syllabus/)
   - Regular office hours begin January 18
 
 - **Github Discussion** for questions about course logistics, content, and assignments
