@@ -6,7 +6,7 @@ output:
   xaringan::moon_reader:
     mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
     css: "sta310-slides.css"
-    logo: img/sta210-sticker-icon.png
+    logo: sta310-sticker.png
     lib_dir: libs/font-awesome
     nature:
       highlightStyle: github
