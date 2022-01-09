@@ -352,6 +352,7 @@ tidy(model1) %>% kable(digits = 3)
 ```
 
 **Model fit statistics**
+
 ```{r echo = F}
 glance(model1) %>%
   select(r.squared, adj.r.squared, AIC, BIC) %>%
@@ -423,7 +424,7 @@ glance(model1Cent) %>%
 
 ---
 
-## Check residual plots
+## Model 1: Check model assumptions
 
 ```{r}
 #library(ggfortify)
@@ -509,26 +510,67 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 ~ x_1  + \hat{\beta}_2 ~ x_2 + \hat{\b
 
 **Interpreting the effect of `year`**
 
-[ADD]
+---
 
+## Model 2: Check model assumptions
 
-<font color = "red"> ADD POLL</font>
-
-- interpret the quadratic coefficient
+```{r, echo = F}
+autoplot(model2)
+```
 
 ---
 
-## Interpret interaction term
+## Model 3: Interaction between `year` and `condition`
 
+.panelset.sideways[
+.panel[.panel-name[Output]
+```{r echo = F}
+model3 <- lm(speed ~ starters + year + I(year^2) + condition +
+               year * condition, 
+             data = derby)
+tidy(model2) %>% kable(digits = 3)
+```
+
+**Model fit statistics**
+```{r echo = F}
+glance(model3) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+```
+]
+
+.panel[.panel-name[Code]
+.small[
+```{r model3-code, eval = F}
+model2 <- lm(speed ~ starters + year + I(year^2) + condition +
+               year*condition, 
+             data = derby)
+tidy(model3) %>% kable(digits = 3)
+
+glance(model3) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+```
+]
+]
+]
 
 ---
 
-## check diagnostic plots 
+## Interpreting interaction terms
 
+<font color = "red">ADD POLL</font>
+
+- Interpret coefficient of $year^2$
+
+- What is the effect of year on slow track conditions? 
+- What is the effect of year on fast track conditions? 
+
+- Which is most meaningful in practice?
 
 ---
 
-## How do we know which model to choose? 
+## Which model should we use?
 
 - What stats can we use? 
 
@@ -537,7 +579,6 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 ~ x_1  + \hat{\beta}_2 ~ x_2 + \hat{\b
 ## Model 2 stats + limitations
 
 ## Model 3 stats + limitations 
-
 
 ---
 

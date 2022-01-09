@@ -313,6 +313,7 @@ ggplot(data = derby, aes(x = year, y = speed, color = condition,
 
 **Model fit statistics**
 
+
 | r.squared| adj.r.squared|     AIC|     BIC|
 |---------:|-------------:|-------:|-------:|
 |      0.73|         0.721| 259.478| 276.302|
@@ -390,7 +391,7 @@ derby &lt;- derby %&gt;%
 
 ---
 
-## Check residual plots
+## Model 1: Check model assumptions
 
 
 ```r
@@ -477,26 +478,68 @@ glance(model2) %&gt;%
 
 **Interpreting the effect of `year`**
 
-[ADD]
+---
 
+## Model 2: Check model assumptions
 
-&lt;font color = "red"&gt; ADD POLL&lt;/font&gt;
-
-- interpret the quadratic coefficient
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-13-1.png" width="90%" /&gt;
 
 ---
 
-## Interpret interaction term
+## Model 3: Interaction between `year` and `condition`
 
+.panelset.sideways[
+.panel[.panel-name[Output]
+
+|term          |  estimate| std.error| statistic| p.value|
+|:-------------|---------:|---------:|---------:|-------:|
+|(Intercept)   | -1410.529|   176.471|    -7.993|   0.000|
+|starters      |    -0.025|     0.014|    -1.859|   0.066|
+|year          |     1.472|     0.180|     8.169|   0.000|
+|I(year^2)     |     0.000|     0.000|    -8.041|   0.000|
+|conditiongood |    -0.477|     0.186|    -2.569|   0.011|
+|conditionslow |    -1.393|     0.131|   -10.670|   0.000|
+
+**Model fit statistics**
+
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|     0.844|         0.834| 198.716| 223.953|
+]
+
+.panel[.panel-name[Code]
+.small[
+
+```r
+model2 &lt;- lm(speed ~ starters + year + I(year^2) + condition +
+               year*condition, 
+             data = derby)
+tidy(model3) %&gt;% kable(digits = 3)
+
+glance(model3) %&gt;%
+  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
+  kable(digits = 3)
+```
+]
+]
+]
 
 ---
 
-## check diagnostic plots 
+## Interpreting interaction terms
 
+&lt;font color = "red"&gt;ADD POLL&lt;/font&gt;
+
+- Interpret coefficient of `\(year^2\)`
+
+- What is the effect of year on slow track conditions? 
+- What is the effect of year on fast track conditions? 
+
+- Which is most meaningful in practice?
 
 ---
 
-## How do we know which model to choose? 
+## Which model should we use?
 
 - What stats can we use? 
 
@@ -505,7 +548,6 @@ glance(model2) %&gt;%
 ## Model 2 stats + limitations
 
 ## Model 3 stats + limitations 
-
 
 ---
 
