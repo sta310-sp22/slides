@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Review of multiple linear regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Maria Tackett" />
+    <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Review of multiple linear regression
+### Prof. Maria Tackett
+### 01.10.22
+
+---
+
+
+
+
+
+
+
+
+
+class: middle, center
+
+##[Click for PDF of slides](02-mlr-review-pt1.pdf)
+
+---
+
+## Announcements
+
+- Labs start Thursday
+  - [Install R and configure GitHub](https://github.com/sta310-sp22/computing/blob/main/README.md)    
+- Office hours this week: 
+  - &lt;font color = "red"&gt;[ADD TIMES!]&lt;/font&gt;
+  - Full office hours schedule starts January 18
+
+- Fill out [All About You Survey](https://duke.qualtrics.com/jfe/form/SV_1X1ryORVK6JJwkm)
+
+---
+
+## Office hours poll 
+
+&lt;font color = "red"&gt;[MAKE A POLL AND ADD IT!!]&lt;/font&gt;
+
+## Check in? 
+
+---
+
+class: middle, inverse
+
+## Linear least squares regression (LLSR) vs. 
+## Generalized linear models (GLM) vs.
+## Multilevel models
+
+---
+
+## Assumptions for linear regression
+
+**L**inearity: 
+
+**I**ndependence:
+
+**N**ormality:
+
+**E**qual variance:
+
+---
+
+## Assumptions for linear regression
+
+
+.pull-left[
+&lt;font color = "red"&gt;ADD FIGURE&lt;/font&gt;
+]
+
+.pull-right[
+&lt;font color = "red"&gt;Go through assumptions&lt;/font&gt;
+
+]
+
+---
+
+## Are the assumptions met?
+
+&lt;font color = "red"&gt;Example 1&lt;/font&gt; 
+
+- Set up poll 
+
+---
+
+## Are the assumptions met? 
+
+&lt;font color = "red"&gt;Example 1&lt;/font&gt; 
+
+- Set up poll 
+
+
+---
+
+## Are the assumptions met? 
+
+&lt;font color = "red"&gt;Example 1&lt;/font&gt; 
+
+- Set up poll 
+
+---
+
+## Beyond linear regression 
+
+- GLMS and multilevel models from pg 1 and 2
+
+...More to come on these...
+
+---
+
+class: middle, inverse
+
+## Review of multiple linear regression 
+
+---
+
+## Data: Kentucky Derby Winners
+
+- Intro the data 
+
+- variable names `var`
+
+---
+
+## Data
+
+
+```r
+derby &lt;- read_csv("data/derbyplus.csv")
+```
+
+
+```r
+derby %&gt;%
+  head(5) %&gt;% kable()
+```
+
+
+
+| year|winner        |condition | speed| starters|
+|----:|:-------------|:---------|-----:|--------:|
+| 1896|Ben Brush     |good      | 51.66|        8|
+| 1897|Typhoon II    |slow      | 49.81|        6|
+| 1898|Plaudit       |good      | 51.16|        4|
+| 1899|Manuel        |fast      | 50.00|        5|
+| 1900|Lieut. Gibson |fast      | 52.28|        7|
+
+---
+
+## Data analysis workflow image
+
+[whole workflow figure?]
+
+---
+
+## Exploratory data analysis (EDA)
+
+- Always start with exploratory data analysis!
+- find general patterns, can hedge some issues with data, but don't use to make conclusions!
+
+
+---
+
+## Univariate EDA 
+
+- histograms or density plots, shape, center spread, outliers
+- bar graphs or tables
+
+.panelset.sideways[
+.panel[.panel-name[Plot]
+&lt;img src="02-mlr-review-pt1_files/figure-html/univar-eda-plot-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Code]
+
+.small[
+
+```r
+p1 &lt;- ggplot(data = derby, aes(x = speed)) + 
+  geom_histogram(fill = colors$green, color = "black") + 
+  labs(x = "Winning speed (ft/s)", y = "Count")
+
+p2 &lt;- ggplot(data = derby, aes(x = starters)) + 
+  geom_histogram(fill = colors$green, color = "black") + 
+  labs(x = "Starters", y = "Count")
+
+p3 &lt;- ggplot(data = derby, aes(x = condition)) +
+   geom_bar(fill = colors$green, color = "black", aes(x = ))
+
+p1 + (p2 / p3) + 
+  plot_annotation(title = "Univariate data analysis")
+```
+]
+]
+]
+
+---
+
+## Exploratory data analysis (EDA)
+
+**Bivariate EDA**
+
+- scatterplots, 
+- boxplots, or stacked histograms
+
+.panelset.sideways[
+.panel[.panel-name[Plot]
+
+&lt;img src="02-mlr-review-pt1_files/figure-html/bivar-eda-plot-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Code]
+
+.small[
+
+```r
+p4 &lt;- ggplot(data = derby, aes(x = starters, y = speed)) + 
+  geom_point() + 
+  labs(x = "Starters", y = "Speed (ft / s)")
+
+p5 &lt;- ggplot(data = derby, aes(x = year, y = speed)) + 
+  geom_point() + 
+  labs(x = "Year", y = "Speed (ft / s)")
+
+p6 &lt;- ggplot(data = derby, aes(x = condition, y = speed)) + 
+  geom_boxplot(fill = colors$green, color = "black") + 
+  labs(x = "Conditions", y = "Speed (ft / s)")
+
+(p4 + p5) + p6 +
+  plot_annotation(title = "Bivariate data analysis")
+```
+]
+]
+]
+
+---
+
+## Scatterplot matrix
+
+Scatterplot matrix helps quickly visualize relationship between response and predictors + can see correlation between predictors
+
+.panelset.sideways[
+
+.panel[.panel-name[Plot]
+&lt;img src="02-mlr-review-pt1_files/figure-html/scatterplot-matrix-plot-1.png" width="90%" /&gt;
+]
+
+.panel[.panel-name[Code]
+.small[
+
+```r
+#library(GGally)
+ggpairs(data = derby, 
+        columns = c("condition", "year", "starters", "speed"))
+```
+]
+]
+]
+
+---
+
+## Multivariate data analysis
+
+Assess interactions
+
+.panelset.sideways[
+
+.panel[.panel-name[Plot]
+&lt;img src="02-mlr-review-pt1_files/figure-html/multivar-eda-plot-1.png" width="90%" /&gt;
+]
+
+.panel[.panel-name[Code]
+.small[
+
+```r
+library(viridis)
+ggplot(data = derby, aes(x = year, y = speed, color = condition, 
+                         shape = condition, linetype = condition)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, aes(lty = condition)) + 
+  labs(x = "Year", y = "Speed (ft/s)", color = "Condition",
+       title = "Speed vs. year", 
+       subtitle = "by track condition")
+```
+]
+]
+]
+
+---
+
+## Model 1: Main effects model 
+
+.panelset.sideways[
+.panel[.panel-name[Output]
+
+|term          | estimate| std.error| statistic| p.value|
+|:-------------|--------:|---------:|---------:|-------:|
+|(Intercept)   |    8.197|     4.508|     1.818|   0.072|
+|starters      |   -0.005|     0.017|    -0.299|   0.766|
+|year          |    0.023|     0.002|     9.766|   0.000|
+|conditiongood |   -0.443|     0.231|    -1.921|   0.057|
+|conditionslow |   -1.543|     0.161|    -9.616|   0.000|
+
+**Model fit statistics**
+
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|      0.73|         0.721| 259.478| 276.302|
+]
+
+.panel[.panel-name[Code]
+.small[
+
+```r
+# Fit and display model
+model1 &lt;- lm(speed ~ starters + year + condition, data = derby)
+tidy(model1) %&gt;% 
+  kable(digits = 3)
+
+# Model fit statistics
+glance(model1) %&gt;%
+  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
+  kable(digits = 3)
+```
+]
+]
+]
+
+---
+
+## Interpretation
+
+
+|term          | estimate| std.error| statistic| p.value|
+|:-------------|--------:|---------:|---------:|-------:|
+|(Intercept)   |    8.197|     4.508|     1.818|   0.072|
+|starters      |   -0.005|     0.017|    -0.299|   0.766|
+|year          |    0.023|     0.002|     9.766|   0.000|
+|conditiongood |   -0.443|     0.231|    -1.921|   0.057|
+|conditionslow |   -1.543|     0.161|    -9.616|   0.000|
+
+&lt;font color = "red"&gt;POLL TO INTERPRET NUMERIC, CATEGORICAL, intercept &lt;/font&gt;
+
+---
+
+## Centering 
+
+**Centering**: Subtract a constant from every variable
+  - Do this to make interpretation of model parameters more meaningful (particularly intercept)
+
+- How does centering change the model? 
+
+---
+
+## Centering `year`
+
+.small[
+
+```r
+derby &lt;- derby %&gt;%
+  mutate(yearnew = year - 1896) #1896 = starting year
+```
+]
+
+
+|term          | estimate| std.error| statistic| p.value|
+|:-------------|--------:|---------:|---------:|-------:|
+|(Intercept)   |   52.175|     0.194|   269.079|   0.000|
+|starters      |   -0.005|     0.017|    -0.299|   0.766|
+|yearnew       |    0.023|     0.002|     9.766|   0.000|
+|conditiongood |   -0.443|     0.231|    -1.921|   0.057|
+|conditionslow |   -1.543|     0.161|    -9.616|   0.000|
+
+**Model fit statistics**
+
+
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|      0.73|         0.721| 259.478| 276.302|
+
+---
+
+## Check residual plots
+
+
+```r
+#library(ggfortify)
+autoplot(model1Cent)
+```
+
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-10-1.png" width="90%" /&gt;
+
+&lt;font color = "red"&gt;POLL: What assumption appears to be violated?&lt;/font&gt;
+
+---
+
+## Add quadratic term for `year`?
+
+.panelset.sideways[
+.panel[.panel-name[Plot]
+&lt;img src="02-mlr-review-pt1_files/figure-html/year-quad-plot-1.png" width="90%" /&gt;
+]
+
+.panel[.panel-name[Code]
+.small[
+
+```r
+ggplot(data = derby, aes(x = year, y = speed)) + 
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") + 
+  geom_smooth(se = FALSE, color = "red", linetype = 2) + 
+  labs(x = "Year", y = "Speed (ft/s)", 
+       title = "Speed vs. Year")
+```
+]
+]
+]
+
+---
+
+## Model 2: Add `\(year^2\)`
+
+.panelset.sideways[
+.panel[.panel-name[Output]
+
+|term          |  estimate| std.error| statistic| p.value|
+|:-------------|---------:|---------:|---------:|-------:|
+|(Intercept)   | -1410.529|   176.471|    -7.993|   0.000|
+|starters      |    -0.025|     0.014|    -1.859|   0.066|
+|year          |     1.472|     0.180|     8.169|   0.000|
+|I(year^2)     |     0.000|     0.000|    -8.041|   0.000|
+|conditiongood |    -0.477|     0.186|    -2.569|   0.011|
+|conditionslow |    -1.393|     0.131|   -10.670|   0.000|
+
+**Model fit statistics**
+
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|     0.827|         0.819| 207.429| 227.057|
+]
+
+.panel[.panel-name[Code]
+.small[
+
+```r
+model2 &lt;- lm(speed ~ starters + year + I(year^2) + condition, 
+             data = derby)
+tidy(model2) %&gt;% kable(digits = 3)
+
+glance(model2) %&gt;%
+  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
+  kable(digits = 3)
+```
+]
+]
+]
+
+---
+
+## Interpreting quadratic effects
+
+`$$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 ~ x_1  + \hat{\beta}_2 ~ x_2 + \hat{\beta}_3 ~ x_2^2$$`
+
+**General interpretation**: When `\(x_2\)` increases from a to b, `\(y\)` is expected to change by `\(\hat{\beta}_2(b - a) + \hat{\beta}_3(b^2 - a^2)\)`, holding `\(x_1\)` constant.
+
+--
+
+**Interpreting the effect of `year`**
+
+[ADD]
+
+
+&lt;font color = "red"&gt; ADD POLL&lt;/font&gt;
+
+- interpret the quadratic coefficient
+
+---
+
+## Interpret interaction term
+
+
+---
+
+## check diagnostic plots 
+
+
+---
+
+## How do we know which model to choose? 
+
+- What stats can we use? 
+
+## Model 1 stats + limitations
+
+## Model 2 stats + limitations
+
+## Model 3 stats + limitations 
+
+
+---
+
+## What makes a good final model? 
+
+- from page 24
+
+
+---
+
+## For Wednesday
+
+- Review MLR - inference both normal theory and bootstrap 
+
+- All about you survey
+
+- install R
+
+
+---
+
+## Acknowledgements
+
+These slides are based on content in [BMLR: Chapter 1 - Review of Multiple Linear Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html)
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%",
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
