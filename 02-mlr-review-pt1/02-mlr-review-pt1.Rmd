@@ -528,12 +528,13 @@ autoplot(model2)
 
 .panelset.sideways[
 .panel[.panel-name[Output]
-```{r echo = F}
+```{r echo = F ,out.width = "70%"}
 model3 <- lm(speed ~ starters + year + I(year^2) + condition +
                year * condition, 
              data = derby)
 tidy(model3) %>% kable(digits = 3)
 ```
+]
 
 **Model fit statistics**
 ```{r echo = F}
