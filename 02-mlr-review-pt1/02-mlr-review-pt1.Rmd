@@ -438,9 +438,7 @@ autoplot(model1Cent)
 ]
 
 .panel[.panel-name[Poll]
-<!--<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" height = "100%" width = "100%" frameborder="0" style="min-height: 560px;" title="Poll"</iframe> -->
-
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" width="640" height="542" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" width="640" height="542" frameborder="0" marginheight="0" marginwidth="0"></iframe>
 ]
 ]
 
