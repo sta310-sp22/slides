@@ -227,9 +227,7 @@ p1 + (p2 / p3) +
 
 ---
 
-## Exploratory data analysis (EDA)
-
-**Bivariate EDA**
+## Bivariate EDA
 
 - scatterplots, 
 - boxplots, or stacked histograms
@@ -250,7 +248,7 @@ p6 <- ggplot(data = derby, aes(x = condition, y = speed)) +
   geom_boxplot(fill = colors$green, color = "black") + 
   labs(x = "Conditions", y = "Speed (ft / s)")
 
-(p4 + p5) + p6 +
+(p4 + p5) / p6 +
   plot_annotation(title = "Bivariate data analysis")
 ```
 ]
@@ -315,26 +313,31 @@ Assess interactions
 .panel[.panel-name[Plot]
 ```{r multivar-eda-plot, echo = F}
 library(viridis)
-ggplot(data = derby, aes(x = year, y = speed, color = condition, shape = condition, linetype = condition)) + 
+ggplot(data = derby, aes(x = year, y = speed, color = condition, 
+                         shape = condition, linetype = condition)) + 
   geom_point() + 
-  geom_smooth(method = "lm", se = FALSE, aes(lty = condition)) + 
+  geom_smooth(method = "lm", se = FALSE, aes(linetype = condition)) + 
   labs(x = "Year", y = "Speed (ft/s)", color = "Condition",
        title = "Speed vs. year", 
-       subtitle = "by track condition")
+       subtitle = "by track condition") +
+  guides(lty = FALSE, shape = FALSE) +
+  scale_color_viridis_d(end = 0.9)
 ```
 ]
 
 .panel[.panel-name[Code]
 .small[
 ```{r multivar-eda, eval = F}
-library(viridis)
+#library(viridis)
 ggplot(data = derby, aes(x = year, y = speed, color = condition, 
                          shape = condition, linetype = condition)) + 
   geom_point() + 
-  geom_smooth(method = "lm", se = FALSE, aes(lty = condition)) + 
+  geom_smooth(method = "lm", se = FALSE, aes(linetype = condition)) + 
   labs(x = "Year", y = "Speed (ft/s)", color = "Condition",
        title = "Speed vs. year", 
-       subtitle = "by track condition")
+       subtitle = "by track condition") +
+  guides(lty = FALSE, shape = FALSE) +
+  scale_color_viridis_d(end = 0.9)
 ```
 ]
 ]
@@ -426,7 +429,7 @@ glance(model1Cent) %>%
 
 ## Model 1: Check model assumptions
 
-```{r}
+```{r, out.width = "60%"}
 #library(ggfortify)
 autoplot(model1Cent)
 ```
@@ -508,7 +511,8 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 ~ x_1  + \hat{\beta}_2 ~ x_2 + \hat{\b
 
 --
 
-**Interpreting the effect of `year`**
+**Interpret the effect of `year` for the 5 most recent years (2013 - 2017)**
+
 
 ---
 
@@ -520,7 +524,7 @@ autoplot(model2)
 
 ---
 
-## Model 3: Interaction between `year` and `condition`
+## Model 3: Add interaction term
 
 .panelset.sideways[
 .panel[.panel-name[Output]
@@ -528,7 +532,7 @@ autoplot(model2)
 model3 <- lm(speed ~ starters + year + I(year^2) + condition +
                year * condition, 
              data = derby)
-tidy(model2) %>% kable(digits = 3)
+tidy(model3) %>% kable(digits = 3)
 ```
 
 **Model fit statistics**
@@ -542,7 +546,7 @@ glance(model3) %>%
 .panel[.panel-name[Code]
 .small[
 ```{r model3-code, eval = F}
-model2 <- lm(speed ~ starters + year + I(year^2) + condition +
+model3 <- lm(speed ~ starters + year + I(year^2) + condition +
                year*condition, 
              data = derby)
 tidy(model3) %>% kable(digits = 3)
@@ -557,28 +561,54 @@ glance(model3) %>%
 
 ---
 
-## Interpreting interaction terms
+## Interpreting interactions
 
 <font color = "red">ADD POLL</font>
 
+.pull-left[
+```{r echo = F}
+tidy(model3) %>%
+  select(term, estimate) %>%
+  kable(digits = 3)
+```
+]
+
+.pull-right[
 - Interpret coefficient of $year^2$
 
 - What is the effect of year on slow track conditions? 
 - What is the effect of year on fast track conditions? 
+]
 
-- Which is most meaningful in practice?
+<font color = "red">Which is most meaningful in practice?</font>
 
 ---
 
-## Which model should we use?
+## Which model would you select?
 
-- What stats can we use? 
+**Model 1: Main effects**
 
-## Model 1 stats + limitations
+```{r echo = F}
+glance(model1) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+```
 
-## Model 2 stats + limitations
+**Model 2: Add $year^2$**
 
-## Model 3 stats + limitations 
+```{r echo = F}
+glance(model2) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+```
+
+**Model 3: Add interaction term**
+
+```{r echo = F}
+glance(model3) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+```
 
 ---
 

@@ -207,9 +207,7 @@ p1 + (p2 / p3) +
 
 ---
 
-## Exploratory data analysis (EDA)
-
-**Bivariate EDA**
+## Bivariate EDA
 
 - scatterplots, 
 - boxplots, or stacked histograms
@@ -283,14 +281,16 @@ Assess interactions
 .small[
 
 ```r
-library(viridis)
+#library(viridis)
 ggplot(data = derby, aes(x = year, y = speed, color = condition, 
                          shape = condition, linetype = condition)) + 
   geom_point() + 
-  geom_smooth(method = "lm", se = FALSE, aes(lty = condition)) + 
+  geom_smooth(method = "lm", se = FALSE, aes(linetype = condition)) + 
   labs(x = "Year", y = "Speed (ft/s)", color = "Condition",
        title = "Speed vs. year", 
-       subtitle = "by track condition")
+       subtitle = "by track condition") +
+  guides(lty = FALSE, shape = FALSE) +
+  scale_color_viridis_d(end = 0.9)
 ```
 ]
 ]
@@ -399,7 +399,7 @@ derby &lt;- derby %&gt;%
 autoplot(model1Cent)
 ```
 
-&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-10-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-10-1.png" width="60%" /&gt;
 
 &lt;font color = "red"&gt;POLL: What assumption appears to be violated?&lt;/font&gt;
 
@@ -476,7 +476,8 @@ glance(model2) %&gt;%
 
 --
 
-**Interpreting the effect of `year`**
+**Interpret the effect of `year` for the 5 most recent years (2013 - 2017)**
+
 
 ---
 
@@ -486,19 +487,21 @@ glance(model2) %&gt;%
 
 ---
 
-## Model 3: Interaction between `year` and `condition`
+## Model 3: Add interaction term
 
 .panelset.sideways[
 .panel[.panel-name[Output]
 
-|term          |  estimate| std.error| statistic| p.value|
-|:-------------|---------:|---------:|---------:|-------:|
-|(Intercept)   | -1410.529|   176.471|    -7.993|   0.000|
-|starters      |    -0.025|     0.014|    -1.859|   0.066|
-|year          |     1.472|     0.180|     8.169|   0.000|
-|I(year^2)     |     0.000|     0.000|    -8.041|   0.000|
-|conditiongood |    -0.477|     0.186|    -2.569|   0.011|
-|conditionslow |    -1.393|     0.131|   -10.670|   0.000|
+|term               |  estimate| std.error| statistic| p.value|
+|:------------------|---------:|---------:|---------:|-------:|
+|(Intercept)        | -1426.950|   175.339|    -8.138|   0.000|
+|starters           |    -0.023|     0.013|    -1.782|   0.077|
+|year               |     1.492|     0.179|     8.336|   0.000|
+|I(year^2)          |     0.000|     0.000|    -8.228|   0.000|
+|conditiongood      |     2.137|    12.202|     0.175|   0.861|
+|conditionslow      |   -23.817|     6.464|    -3.685|   0.000|
+|year:conditiongood |    -0.001|     0.006|    -0.219|   0.827|
+|year:conditionslow |     0.012|     0.003|     3.471|   0.001|
 
 **Model fit statistics**
 
@@ -511,7 +514,7 @@ glance(model2) %&gt;%
 .small[
 
 ```r
-model2 &lt;- lm(speed ~ starters + year + I(year^2) + condition +
+model3 &lt;- lm(speed ~ starters + year + I(year^2) + condition +
                year*condition, 
              data = derby)
 tidy(model3) %&gt;% kable(digits = 3)
@@ -526,28 +529,57 @@ glance(model3) %&gt;%
 
 ---
 
-## Interpreting interaction terms
+## Interpreting interactions
 
 &lt;font color = "red"&gt;ADD POLL&lt;/font&gt;
 
+.pull-left[
+
+|term               |  estimate|
+|:------------------|---------:|
+|(Intercept)        | -1426.950|
+|starters           |    -0.023|
+|year               |     1.492|
+|I(year^2)          |     0.000|
+|conditiongood      |     2.137|
+|conditionslow      |   -23.817|
+|year:conditiongood |    -0.001|
+|year:conditionslow |     0.012|
+]
+
+.pull-right[
 - Interpret coefficient of `\(year^2\)`
 
 - What is the effect of year on slow track conditions? 
 - What is the effect of year on fast track conditions? 
+]
 
-- Which is most meaningful in practice?
+&lt;font color = "red"&gt;Which is most meaningful in practice?&lt;/font&gt;
 
 ---
 
-## Which model should we use?
+## Which model would you select?
 
-- What stats can we use? 
+**Model 1: Main effects**
 
-## Model 1 stats + limitations
 
-## Model 2 stats + limitations
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|      0.73|         0.721| 259.478| 276.302|
 
-## Model 3 stats + limitations 
+**Model 2: Add `\(year^2\)`**
+
+
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|     0.827|         0.819| 207.429| 227.057|
+
+**Model 3: Add interaction term**
+
+
+| r.squared| adj.r.squared|     AIC|     BIC|
+|---------:|-------------:|-------:|-------:|
+|     0.844|         0.834| 198.716| 223.953|
 
 ---
 
