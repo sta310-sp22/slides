@@ -7,6 +7,8 @@
     <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
     <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/font-awesome/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/font-awesome/countdown-0.3.5/countdown.js"></script>
     <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
   </head>
   <body>
@@ -36,10 +38,11 @@ class: middle, center
 ## Announcements
 
 - Labs start Thursday
-  - [Install R and configure GitHub](https://github.com/sta310-sp22/computing/blob/main/README.md)    
+  - [Install R and configure GitHub](https://github.com/sta310-sp22/computing/blob/main/README.md)  
+  
 - Office hours this week: 
-  - &lt;font color = "red"&gt;[ADD TIMES!]&lt;/font&gt;
-  - Full office hours schedule starts January 18
+  - Thu 2 - 3pm &amp; Fri 1 - 2pm online (links in Sakai)
+  - Full office hours schedule starts Tue, Jan 19
 
 - Fill out [All About You Survey](https://duke.qualtrics.com/jfe/form/SV_1X1ryORVK6JJwkm)
 
@@ -49,7 +52,6 @@ class: middle, center
 
 &lt;font color = "red"&gt;[MAKE A POLL AND ADD IT!!]&lt;/font&gt;
 
-## Check in? 
 
 ---
 
@@ -63,60 +65,64 @@ class: middle, inverse
 
 ## Assumptions for linear regression
 
-**L**inearity: 
+**L**inearity: Linear relationship between mean response and predictor variable(s) 
 
-**I**ndependence:
+**I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.  lne.
 
-**N**ormality:
+**N**ormality: Response follows a normal distribution at each level of the predictor (or combination of predictors)
 
-**E**qual variance:
+**E**qual variance: Variability (variance or standard deviation) of the response is equal for all levels of the predictor (or combination of predictors)
+
+**Use residual plots to check that the conditions hold before using the model for statistical inference.**
 
 ---
 
 ## Assumptions for linear regression
 
-
 .pull-left[
-&lt;font color = "red"&gt;ADD FIGURE&lt;/font&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+
+.small[Modified from Figure 1.1. in BMLR]
 ]
 
 .pull-right[
-&lt;font color = "red"&gt;Go through assumptions&lt;/font&gt;
+.midi[**L**inearity: Linear relationship between mean of the response `\(Y\)` and the predictor `\(X\)`]
 
+.midi[**I**ndependence: NO connection between how any two points lie above or below the regression line]
+
+.midi[**N**ormality: Response, `\(Y\)`, follows a normal distribution at each level of the predictor, `\(X\)` (indicated by red curves)]
+
+.midi[**E**qual variance: Variance (or standard deviation) of the response, `\(Y\)`, is equal for all levels of the predictor, `\(X\)`]
+]
 ]
 
 ---
 
-## Are the assumptions met?
-
-&lt;font color = "red"&gt;Example 1&lt;/font&gt; 
-
-- Set up poll 
-
----
-
 ## Are the assumptions met? 
 
-&lt;font color = "red"&gt;Example 1&lt;/font&gt; 
+For each scenario, indicate which assumption(s) is violated, if any. 
 
-- Set up poll 
+&lt;font color = "red"&gt;ADD POLL&lt;/font&gt;
 
-
----
-
-## Are the assumptions met? 
-
-&lt;font color = "red"&gt;Example 1&lt;/font&gt; 
-
-- Set up poll 
+<div class="countdown" id="timer_61dc7e75" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 ---
 
 ## Beyond linear regression 
 
-- GLMS and multilevel models from pg 1 and 2
+- When we use linear least squares regression to draw conclusions, we do so under the assumption that L.I.N.E. are all met. 
 
-...More to come on these...
+- **Generalized linear models** require different assumptions and can accommodate violations in L.I.N.E.
+  - Relationship between response and predictor(s) can be nonlinear
+  - Response variable can be non-normal 
+  - Variance in response can differ at each level of predictor(s) 
+
+**But the independence assumption must hold!**
+
+- **Multilevel models** will be used for data with correlated observations
+
 
 ---
 
@@ -128,9 +134,26 @@ class: middle, inverse
 
 ## Data: Kentucky Derby Winners
 
-- Intro the data 
+.midi[
+Today's data is from the Kentucky Derby, an annual 1.25-mile horse race held at the Churchill Downs race track in Louisville, KY. The data is in the file [derbyplus.csv](data/derbyplus.csv) and contains information for races 1896 - 2017. 
+]
 
-- variable names `var`
+.pull-left[
+
+.midi[**Response variable**]
+
+- .midi[`speed`: Average speed of the winner in feet per second (ft/s)]
+
+.midi[**Additional variable**]
+.midi[- `winner`: Winning horse]
+]
+
+.pull-right[
+.midi[**Predictor variables**]
+- .midi[`year`: Year of the race]
+- .midi[`condition`: Condition of the track (good, fast, slow)]
+- .midi[`starters`: Number of horses who raced]
+]
 
 ---
 
@@ -161,22 +184,25 @@ derby %&gt;%
 
 ## Data analysis workflow image
 
-[whole workflow figure?]
+![](img/data-analysis-life-cycle.png)
 
 ---
 
 ## Exploratory data analysis (EDA)
 
-- Always start with exploratory data analysis!
-- find general patterns, can hedge some issues with data, but don't use to make conclusions!
+- Once you're ready for the statistical analysis (explore), the first step should always be **exploratory data analysis**.
 
+- The EDA will help you 
+  - begin to understand the variables and observations
+  - identify outliers or potential data entry errors
+  - begin to see relationships between variables
+  - identify the appropriate model and identify a strategy
+
+- The EDA is exploratory; formal modeling and statistical inference should be used to draw conclusions.
 
 ---
 
-## Univariate EDA 
-
-- histograms or density plots, shape, center spread, outliers
-- bar graphs or tables
+## Plots for univariate EDA
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
@@ -207,10 +233,7 @@ p1 + (p2 / p3) +
 
 ---
 
-## Bivariate EDA
-
-- scatterplots, 
-- boxplots, or stacked histograms
+## Plots for bivariate EDA 
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
@@ -245,7 +268,7 @@ p6 &lt;- ggplot(data = derby, aes(x = condition, y = speed)) +
 
 ## Scatterplot matrix
 
-Scatterplot matrix helps quickly visualize relationship between response and predictors + can see correlation between predictors
+A **scatterplot matrix** helps quickly visualize relationships between many variable pairs. They are paritcularly useful to identify potentially correlated predictors.
 
 .panelset.sideways[
 
@@ -311,12 +334,6 @@ ggplot(data = derby, aes(x = year, y = speed, color = condition,
 |conditiongood |   -0.443|     0.231|    -1.921|   0.057|
 |conditionslow |   -1.543|     0.161|    -9.616|   0.000|
 
-**Model fit statistics**
-
-
-| r.squared| adj.r.squared|     AIC|     BIC|
-|---------:|-------------:|-------:|-------:|
-|      0.73|         0.721| 259.478| 276.302|
 ]
 
 .panel[.panel-name[Code]
@@ -326,11 +343,6 @@ ggplot(data = derby, aes(x = year, y = speed, color = condition,
 # Fit and display model
 model1 &lt;- lm(speed ~ starters + year + condition, data = derby)
 tidy(model1) %&gt;% 
-  kable(digits = 3)
-
-# Model fit statistics
-glance(model1) %&gt;%
-  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
   kable(digits = 3)
 ```
 ]
@@ -382,13 +394,6 @@ derby &lt;- derby %&gt;%
 |conditiongood |   -0.443|     0.231|    -1.921|   0.057|
 |conditionslow |   -1.543|     0.161|    -9.616|   0.000|
 
-**Model fit statistics**
-
-
-| r.squared| adj.r.squared|     AIC|     BIC|
-|---------:|-------------:|-------:|-------:|
-|      0.73|         0.721| 259.478| 276.302|
-
 ---
 
 ## Model 1: Check model assumptions
@@ -405,9 +410,7 @@ autoplot(model1Cent)
 ]
 
 .panel[.panel-name[Poll]
-&lt;!--&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" height = "100%" width = "100%" frameborder="0" style="min-height: 560px;" title="Poll"&lt;/iframe&gt; --&gt;
-
-&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" width="640" height="542" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
+&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" width="640" height="542" frameborder="0" marginheight="0" marginwidth="0"&gt;&lt;/iframe&gt;
 ]
 ]
 
@@ -452,12 +455,6 @@ ggplot(data = derby, aes(x = year, y = speed)) +
 |I(year^2)     |     0.000|     0.000|    -8.041|   0.000|
 |conditiongood |    -0.477|     0.186|    -2.569|   0.011|
 |conditionslow |    -1.393|     0.131|   -10.670|   0.000|
-
-**Model fit statistics**
-
-| r.squared| adj.r.squared|     AIC|     BIC|
-|---------:|-------------:|-------:|-------:|
-|     0.827|         0.819| 207.429| 227.057|
 ]
 
 .panel[.panel-name[Code]
@@ -467,10 +464,6 @@ ggplot(data = derby, aes(x = year, y = speed)) +
 model2 &lt;- lm(speed ~ starters + year + I(year^2) + condition, 
              data = derby)
 tidy(model2) %&gt;% kable(digits = 3)
-
-glance(model2) %&gt;%
-  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
-  kable(digits = 3)
 ```
 ]
 ]
@@ -493,7 +486,7 @@ glance(model2) %&gt;%
 
 ## Model 2: Check model assumptions
 
-&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-13-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-12-1.png" width="90%" /&gt;
 
 ---
 
@@ -514,13 +507,6 @@ glance(model2) %&gt;%
 |year:conditionslow |     0.012|     0.003|     3.471|   0.001|
 ]
 
-**Model fit statistics**
-
-| r.squared| adj.r.squared|     AIC|     BIC|
-|---------:|-------------:|-------:|-------:|
-|     0.844|         0.834| 198.716| 223.953|
-]
-
 .panel[.panel-name[Code]
 .small[
 
@@ -529,10 +515,6 @@ model3 &lt;- lm(speed ~ starters + year + I(year^2) + condition +
                year*condition, 
              data = derby)
 tidy(model3) %&gt;% kable(digits = 3)
-
-glance(model3) %&gt;%
-  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
-  kable(digits = 3)
 ```
 ]
 ]
@@ -571,6 +553,8 @@ glance(model3) %&gt;%
 
 ## Which model would you select?
 
+.panelset.sideways[
+.panel[.panel-name[Output]
 **Model 1: Main effects**
 
 
@@ -591,7 +575,29 @@ glance(model3) %&gt;%
 | r.squared| adj.r.squared|     AIC|     BIC|
 |---------:|-------------:|-------:|-------:|
 |     0.844|         0.834| 198.716| 223.953|
+]
 
+.panel[.panel-name[Code]
+
+
+```r
+# Model 1
+glance(model1Cent) %&gt;%
+  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
+  kable(digits = 3)
+
+# Model2
+glance(model2) %&gt;%
+  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
+  kable(digits = 3)
+
+# Model 3
+glance(model3) %&gt;%
+  select(r.squared, adj.r.squared, AIC, BIC) %&gt;%
+  kable(digits = 3)
+```
+]
+]
 ---
 
 ## What makes a good final model? 

@@ -55,10 +55,11 @@ class: middle, center
 ## Announcements
 
 - Labs start Thursday
-  - [Install R and configure GitHub](https://github.com/sta310-sp22/computing/blob/main/README.md)    
+  - [Install R and configure GitHub](https://github.com/sta310-sp22/computing/blob/main/README.md)  
+  
 - Office hours this week: 
-  - <font color = "red">[ADD TIMES!]</font>
-  - Full office hours schedule starts January 18
+  - Thu 2 - 3pm & Fri 1 - 2pm online (links in Sakai)
+  - Full office hours schedule starts Tue, Jan 19
 
 - Fill out [All About You Survey](https://duke.qualtrics.com/jfe/form/SV_1X1ryORVK6JJwkm)
 
@@ -68,7 +69,6 @@ class: middle, center
 
 <font color = "red">[MAKE A POLL AND ADD IT!!]</font>
 
-## Check in? 
 
 ---
 
@@ -82,60 +82,117 @@ class: middle, inverse
 
 ## Assumptions for linear regression
 
-**L**inearity: 
+**L**inearity: Linear relationship between mean response and predictor variable(s) 
 
-**I**ndependence:
+**I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.  lne.
 
-**N**ormality:
+**N**ormality: Response follows a normal distribution at each level of the predictor (or combination of predictors)
 
-**E**qual variance:
+**E**qual variance: Variability (variance or standard deviation) of the response is equal for all levels of the predictor (or combination of predictors)
+
+**Use residual plots to check that the conditions hold before using the model for statistical inference.**
 
 ---
 
 ## Assumptions for linear regression
 
-
 .pull-left[
-<font color = "red">ADD FIGURE</font>
+```{r echo = F, out.width = "100%"}
+##   Code modified from https://stackoverflow.com/questions/31794876/ggplot2-how-to-curve-small-gaussian-densities-on-a-regression-line?rq=1
+
+## Modified based on BYSH: https://bookdown.org/roback/bookdown-bysh/ch-MLRreview.html#ordinary-least-squares-ols-assumptions
+
+set.seed(0)
+dat <- data.frame(x=(x=runif(10000, 0, 50)),
+                  y=rnorm(10000, 10*x, 100))
+
+## breaks: where you want to compute densities
+breaks <- seq(0, max(dat$x), len=5)
+dat$section <- cut(dat$x, breaks)
+
+## Get the residuals
+dat$res <- residuals(lm(y ~ x, data=dat))
+
+## Compute densities for each section, and flip the axes, and add means of sections
+## Note: the densities need to be scaled in relation to the section size (2000 here)
+dens <- do.call(rbind, lapply(split(dat, dat$section), function(x) {
+    d <- density(x$res, n=50)
+    res <- data.frame(x=max(x$x)- d$y*2000, y=d$x+mean(x$y))
+    res <- res[order(res$y), ]
+    ## Get some data for normal lines as well
+    xs <- seq(min(x$res), max(x$res), len=50)
+    res <- rbind(res, data.frame(y=xs + mean(x$y),
+                                 x=max(x$x) - 2000*dnorm(xs, 0, sd(x$res))))
+    res$type <- rep(c("empirical", "normal"), each=50)
+    res
+}))
+dens$section <- rep(levels(dat$section), each=100)
+
+dens <- dens %>%
+  filter(type == "normal")
+
+## Plot both empirical and theoretical
+ggplot(dat, aes(x, y)) +
+  geom_point(alpha = 0.05, size = 0.2) +
+  geom_smooth(method="lm", fill=NA, se = FALSE, color = "steelblue") +
+  geom_path(data=dens, aes(x, y, group=interaction(section)), color = "red", lwd=1.1) +
+geom_vline(xintercept=breaks, lty=2, color = "grey") +
+  labs(x = "x", 
+       y = "y") +
+  theme_classic() + 
+  annotate("text", x = 10, y = 600, label = latex2exp::TeX("$\\mu_{Y|X} = \\beta_0 + \\beta_1X$"), color = "steelblue", size = 8) +
+  annotate("text", x = 20, y = 400, label = latex2exp::TeX("$\\sigma^2$"), color = "red", size = 8) +
+  theme(axis.title = element_text(size = 16),
+        axis.ticks = element_blank(), 
+        axis.text.x = element_blank(), 
+       axis.text.y = element_blank()
+      )
+  
+```
+
+.small[Modified from Figure 1.1. in BMLR]
 ]
 
 .pull-right[
-<font color = "red">Go through assumptions</font>
+.midi[**L**inearity: Linear relationship between mean of the response $Y$ and the predictor $X$]
 
+.midi[**I**ndependence: NO connection between how any two points lie above or below the regression line]
+
+.midi[**N**ormality: Response, $Y$, follows a normal distribution at each level of the predictor, $X$ (indicated by red curves)]
+
+.midi[**E**qual variance: Variance (or standard deviation) of the response, $Y$, is equal for all levels of the predictor, $X$]
+]
 ]
 
 ---
 
-## Are the assumptions met?
-
-<font color = "red">Example 1</font> 
-
-- Set up poll 
-
----
-
 ## Are the assumptions met? 
 
-<font color = "red">Example 1</font> 
+For each scenario, indicate which assumption(s) is violated, if any. 
 
-- Set up poll 
+<font color = "red">ADD POLL</font>
 
-
----
-
-## Are the assumptions met? 
-
-<font color = "red">Example 1</font> 
-
-- Set up poll 
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
 
 ---
 
 ## Beyond linear regression 
 
-- GLMS and multilevel models from pg 1 and 2
+- When we use linear least squares regression to draw conclusions, we do so under the assumption that L.I.N.E. are all met. 
 
-...More to come on these...
+- **Generalized linear models** require different assumptions and can accommodate violations in L.I.N.E.
+  - Relationship between response and predictor(s) can be nonlinear
+  - Response variable can be non-normal 
+  - Variance in response can differ at each level of predictor(s) 
+
+**But the independence assumption must hold!**
+
+- **Multilevel models** will be used for data with correlated observations
+
 
 ---
 
@@ -147,9 +204,26 @@ class: middle, inverse
 
 ## Data: Kentucky Derby Winners
 
-- Intro the data 
+.midi[
+Today's data is from the Kentucky Derby, an annual 1.25-mile horse race held at the Churchill Downs race track in Louisville, KY. The data is in the file [derbyplus.csv](data/derbyplus.csv) and contains information for races 1896 - 2017. 
+]
 
-- variable names `var`
+.pull-left[
+
+.midi[**Response variable**]
+
+- .midi[`speed`: Average speed of the winner in feet per second (ft/s)]
+
+.midi[**Additional variable**]
+.midi[- `winner`: Winning horse]
+]
+
+.pull-right[
+.midi[**Predictor variables**]
+- .midi[`year`: Year of the race]
+- .midi[`condition`: Condition of the track (good, fast, slow)]
+- .midi[`starters`: Number of horses who raced]
+]
 
 ---
 
@@ -168,22 +242,25 @@ derby %>%
 
 ## Data analysis workflow image
 
-[whole workflow figure?]
+![](img/data-analysis-life-cycle.png)
 
 ---
 
 ## Exploratory data analysis (EDA)
 
-- Always start with exploratory data analysis!
-- find general patterns, can hedge some issues with data, but don't use to make conclusions!
+- Once you're ready for the statistical analysis (explore), the first step should always be **exploratory data analysis**.
 
+- The EDA will help you 
+  - begin to understand the variables and observations
+  - identify outliers or potential data entry errors
+  - begin to see relationships between variables
+  - identify the appropriate model and identify a strategy
+
+- The EDA is exploratory; formal modeling and statistical inference should be used to draw conclusions.
 
 ---
 
-## Univariate EDA 
-
-- histograms or density plots, shape, center spread, outliers
-- bar graphs or tables
+## Plots for univariate EDA
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
@@ -227,10 +304,7 @@ p1 + (p2 / p3) +
 
 ---
 
-## Bivariate EDA
-
-- scatterplots, 
-- boxplots, or stacked histograms
+## Plots for bivariate EDA 
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
@@ -279,7 +353,7 @@ p6 <- ggplot(data = derby, aes(x = condition, y = speed)) +
 
 ## Scatterplot matrix
 
-Scatterplot matrix helps quickly visualize relationship between response and predictors + can see correlation between predictors
+A **scatterplot matrix** helps quickly visualize relationships between many variable pairs. They are paritcularly useful to identify potentially correlated predictors.
 
 .panelset.sideways[
 
@@ -354,13 +428,6 @@ model1 <- lm(speed ~ starters + year + condition, data = derby)
 tidy(model1) %>% kable(digits = 3)
 ```
 
-**Model fit statistics**
-
-```{r echo = F}
-glance(model1) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
-  kable(digits = 3)
-```
 ]
 
 .panel[.panel-name[Code]
@@ -369,11 +436,6 @@ glance(model1) %>%
 # Fit and display model
 model1 <- lm(speed ~ starters + year + condition, data = derby)
 tidy(model1) %>% 
-  kable(digits = 3)
-
-# Model fit statistics
-glance(model1) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
   kable(digits = 3)
 ```
 ]
@@ -415,14 +477,6 @@ derby <- derby %>%
 ```{r echo = F}
 model1Cent <- lm(speed ~ starters + yearnew + condition, data = derby)
 tidy(model1Cent) %>% kable(digits = 3)
-```
-
-**Model fit statistics**
-
-```{r echo = F}
-glance(model1Cent) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
-  kable(digits = 3)
 ```
 
 ---
@@ -485,13 +539,6 @@ model2 <- lm(speed ~ starters + year + I(year^2) + condition,
              data = derby)
 tidy(model2) %>% kable(digits = 3)
 ```
-
-**Model fit statistics**
-```{r echo = F}
-glance(model2) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
-  kable(digits = 3)
-```
 ]
 
 .panel[.panel-name[Code]
@@ -500,10 +547,6 @@ glance(model2) %>%
 model2 <- lm(speed ~ starters + year + I(year^2) + condition, 
              data = derby)
 tidy(model2) %>% kable(digits = 3)
-
-glance(model2) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
-  kable(digits = 3)
 ```
 ]
 ]
@@ -544,14 +587,6 @@ tidy(model3) %>% kable(digits = 3)
 ```
 ]
 
-**Model fit statistics**
-```{r echo = F}
-glance(model3) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
-  kable(digits = 3)
-```
-]
-
 .panel[.panel-name[Code]
 .small[
 ```{r model3-code, eval = F}
@@ -559,10 +594,6 @@ model3 <- lm(speed ~ starters + year + I(year^2) + condition +
                year*condition, 
              data = derby)
 tidy(model3) %>% kable(digits = 3)
-
-glance(model3) %>%
-  select(r.squared, adj.r.squared, AIC, BIC) %>%
-  kable(digits = 3)
 ```
 ]
 ]
@@ -595,10 +626,12 @@ tidy(model3) %>%
 
 ## Which model would you select?
 
+.panelset.sideways[
+.panel[.panel-name[Output]
 **Model 1: Main effects**
 
 ```{r echo = F}
-glance(model1) %>%
+glance(model1Cent) %>%
   select(r.squared, adj.r.squared, AIC, BIC) %>%
   kable(digits = 3)
 ```
@@ -618,7 +651,28 @@ glance(model3) %>%
   select(r.squared, adj.r.squared, AIC, BIC) %>%
   kable(digits = 3)
 ```
+]
 
+.panel[.panel-name[Code]
+
+```{r eval = FALSE}
+# Model 1
+glance(model1Cent) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+
+# Model2
+glance(model2) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+
+# Model 3
+glance(model3) %>%
+  select(r.squared, adj.r.squared, AIC, BIC) %>%
+  kable(digits = 3)
+```
+]
+]
 ---
 
 ## What makes a good final model? 
