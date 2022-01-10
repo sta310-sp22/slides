@@ -48,6 +48,8 @@ class: middle, center
 
 ---
 
+class: middle
+
 ## Questions from last time?
 
 
@@ -63,11 +65,19 @@ class: middle, inverse
 
 ## Assumptions for linear regression
 
+--
+
 **L**inearity: Linear relationship between mean response and predictor variable(s) 
+
+--
 
 **I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.
 
+--
+
 **N**ormality: Response follows a normal distribution at each level of the predictor (or combination of predictors)
+
+--
 
 **E**qual variance: Variability (variance or standard deviation) of the response is equal for all levels of the predictor (or combination of predictors)
 
@@ -86,7 +96,7 @@ class: middle, inverse
 .pull-right[
 .midi[**L**inearity: Linear relationship between mean of the response `\(Y\)` and the predictor `\(X\)`]
 
-.midi[**I**ndependence: NO connection between how any two points lie above or below the regression line]
+.midi[**I**ndependence: No connection between how any two points lie above or below the regression line]
 
 .midi[**N**ormality: Response, `\(Y\)`, follows a normal distribution at each level of the predictor, `\(X\)` (indicated by red curves)]
 
@@ -98,9 +108,9 @@ class: middle, inverse
 
 ## Are the assumptions violated?
 
-&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeX9xVKWHbRjUp6LowgbW4dZg_5ez4RHM53eM_jBEdFxsbvlg/viewform?embedded=true" width="640" height="1739" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
+[Click here](https://forms.gle/N3PftSk2tEJRTxCE6) for poll. 
 
-<div class="countdown" id="timer_61dc919e" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<div class="countdown" id="timer_61dc9802" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -421,7 +431,7 @@ autoplot(model1Cent)
 ]
 
 .panel[.panel-name[Poll]
-&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfuJwzStpgW35WQtGItQeWaCxejt5sc3HiPjdi1loswoa-WSA/viewform?embedded=true" width="640" height="574" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
+[Click here](https://forms.gle/iHfWR1igqpsM7Gr48) for poll.
 ]
 ]
 
@@ -459,12 +469,6 @@ ggplot(data = derby, aes(x = yearnew, y = speed)) +
 ---
 
 ## Model 2: Add `\(yearnew^2\)`
-
-
-`$$\begin{aligned}\widehat{speed} = &amp;51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
-&amp; + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$`
-
-&lt;br&gt; 
 
 .panelset.sideways[
 .panel[.panel-name[Output]
@@ -508,7 +512,7 @@ tidy(model2) %&gt;% kable(digits = 4)
 .question[
 
 `$$\begin{aligned}\widehat{speed} = &amp;51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
-&amp; + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$`
+&amp; - 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$`
 
 Interpret the effect of year for the 5 most recent years (2013 - 2017).
 ]
@@ -574,7 +578,6 @@ tidy(model3) %&gt;% kable(digits = 4)
 
 ## Interpreting interaction effects
 
-.panelset.sideways[.panel[.panel-name[Output]
 
 |term                  | estimate| std.error| statistic| p.value|
 |:---------------------|--------:|---------:|---------:|-------:|
@@ -585,13 +588,15 @@ tidy(model3) %&gt;% kable(digits = 4)
 |conditionslow         |   -2.183|     0.270|    -8.097|   0.000|
 |yearnew:conditiongood |    0.012|     0.008|     1.598|   0.113|
 |yearnew:conditionslow |    0.012|     0.004|     2.866|   0.005|
-]
 
-.panel[.panel-name[Poll]
 
-&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLScLJy2jHC1Sh228tA35f_cReYyNqTwuClNcjcbS4pymJdvhoA/viewform?embedded=true" width="640" height="642" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
-]
-]
+[Click here](https://forms.gle/BrufiFdhQAi4WBWeA) for poll
+
+
+<div class="countdown" id="timer_61dc99e1" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
 ---
 
 ## Which model would you choose?

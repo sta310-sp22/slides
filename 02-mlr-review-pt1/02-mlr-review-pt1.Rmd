@@ -66,6 +66,8 @@ class: middle, center
 
 ---
 
+class: middle
+
 ## Questions from last time?
 
 
@@ -81,11 +83,19 @@ class: middle, inverse
 
 ## Assumptions for linear regression
 
+--
+
 **L**inearity: Linear relationship between mean response and predictor variable(s) 
+
+--
 
 **I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.
 
+--
+
 **N**ormality: Response follows a normal distribution at each level of the predictor (or combination of predictors)
+
+--
 
 **E**qual variance: Variability (variance or standard deviation) of the response is equal for all levels of the predictor (or combination of predictors)
 
@@ -155,7 +165,7 @@ geom_vline(xintercept=breaks, lty=2, color = "grey") +
 .pull-right[
 .midi[**L**inearity: Linear relationship between mean of the response $Y$ and the predictor $X$]
 
-.midi[**I**ndependence: NO connection between how any two points lie above or below the regression line]
+.midi[**I**ndependence: No connection between how any two points lie above or below the regression line]
 
 .midi[**N**ormality: Response, $Y$, follows a normal distribution at each level of the predictor, $X$ (indicated by red curves)]
 
@@ -167,7 +177,7 @@ geom_vline(xintercept=breaks, lty=2, color = "grey") +
 
 ## Are the assumptions violated?
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeX9xVKWHbRjUp6LowgbW4dZg_5ez4RHM53eM_jBEdFxsbvlg/viewform?embedded=true" width="640" height="1739" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+[Click here](https://forms.gle/N3PftSk2tEJRTxCE6) for poll. 
 
 ```{r echo = F}
 library(countdown)
@@ -504,7 +514,7 @@ autoplot(model1Cent)
 ]
 
 .panel[.panel-name[Poll]
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfuJwzStpgW35WQtGItQeWaCxejt5sc3HiPjdi1loswoa-WSA/viewform?embedded=true" width="640" height="574" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+[Click here](https://forms.gle/iHfWR1igqpsM7Gr48) for poll.
 ]
 ]
 
@@ -549,12 +559,6 @@ ggplot(data = derby, aes(x = yearnew, y = speed)) +
 
 ## Model 2: Add $yearnew^2$
 
-
-$$\begin{aligned}\widehat{speed} = &51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
-& + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$
-
-<br> 
-
 .panelset.sideways[
 .panel[.panel-name[Output]
 ```{r echo = F}
@@ -592,7 +596,7 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 ~ x_1  + \hat{\beta}_2 ~ x_2 + \hat{\b
 .question[
 
 $$\begin{aligned}\widehat{speed} = &51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
-& + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$
+& - 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$
 
 Interpret the effect of year for the 5 most recent years (2013 - 2017).
 ]
@@ -668,18 +672,21 @@ autoplot(model3)
 
 ## Interpreting interaction effects
 
-.panelset.sideways[.panel[.panel-name[Output]
 ```{r echo = F}
 tidy(model3) %>%
   kable(digits = 3)
 ```
-]
 
-.panel[.panel-name[Poll]
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScLJy2jHC1Sh228tA35f_cReYyNqTwuClNcjcbS4pymJdvhoA/viewform?embedded=true" width="640" height="642" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-]
-]
+[Click here](https://forms.gle/BrufiFdhQAi4WBWeA) for poll
+
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
+
 ---
 
 ## Which model would you choose?
