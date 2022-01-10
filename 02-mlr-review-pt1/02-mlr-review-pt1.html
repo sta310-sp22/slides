@@ -48,9 +48,7 @@ class: middle, center
 
 ---
 
-## Office hours poll 
-
-&lt;font color = "red"&gt;[MAKE A POLL AND ADD IT!!]&lt;/font&gt;
+## Questions from last time?
 
 
 ---
@@ -67,7 +65,7 @@ class: middle, inverse
 
 **L**inearity: Linear relationship between mean response and predictor variable(s) 
 
-**I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.  lne.
+**I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.
 
 **N**ormality: Response follows a normal distribution at each level of the predictor (or combination of predictors)
 
@@ -80,7 +78,7 @@ class: middle, inverse
 ## Assumptions for linear regression
 
 .pull-left[
-&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 
 .small[Modified from Figure 1.1. in BMLR]
 ]
@@ -98,13 +96,11 @@ class: middle, inverse
 
 ---
 
-## Are the assumptions met? 
+## Are the assumptions violated?
 
-For each scenario, indicate which assumption(s) is violated, if any. 
+&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeX9xVKWHbRjUp6LowgbW4dZg_5ez4RHM53eM_jBEdFxsbvlg/viewform?embedded=true" width="640" height="1739" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
 
-&lt;font color = "red"&gt;ADD POLL&lt;/font&gt;
-
-<div class="countdown" id="timer_61dc7e75" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<div class="countdown" id="timer_61dc919e" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -182,8 +178,6 @@ derby %&gt;%
 
 ---
 
-## Data analysis workflow image
-
 ![](img/data-analysis-life-cycle.png)
 
 ---
@@ -206,7 +200,7 @@ derby %&gt;%
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
-&lt;img src="02-mlr-review-pt1_files/figure-html/univar-eda-plot-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/univar-eda-plot-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 .panel[.panel-name[Code]
 
@@ -238,7 +232,7 @@ p1 + (p2 / p3) +
 .panelset.sideways[
 .panel[.panel-name[Plot]
 
-&lt;img src="02-mlr-review-pt1_files/figure-html/bivar-eda-plot-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/bivar-eda-plot-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 .panel[.panel-name[Code]
 
@@ -268,12 +262,14 @@ p6 &lt;- ggplot(data = derby, aes(x = condition, y = speed)) +
 
 ## Scatterplot matrix
 
-A **scatterplot matrix** helps quickly visualize relationships between many variable pairs. They are paritcularly useful to identify potentially correlated predictors.
+.midi[
+A **scatterplot matrix** helps quickly visualize relationships between many variable pairs. They are particularly useful to identify potentially correlated predictors.
+]
 
 .panelset.sideways[
 
 .panel[.panel-name[Plot]
-&lt;img src="02-mlr-review-pt1_files/figure-html/scatterplot-matrix-plot-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/scatterplot-matrix-plot-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 
 .panel[.panel-name[Code]
@@ -290,14 +286,14 @@ ggpairs(data = derby,
 
 ---
 
-## Multivariate data analysis
+## Plots for multivariate EDA
 
-Assess interactions
+Plot the relationship between the response and a predictor based on levels of another predictor to assess potential interactions. 
 
 .panelset.sideways[
 
 .panel[.panel-name[Plot]
-&lt;img src="02-mlr-review-pt1_files/figure-html/multivar-eda-plot-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/multivar-eda-plot-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 
 .panel[.panel-name[Code]
@@ -349,9 +345,14 @@ tidy(model1) %&gt;%
 ]
 ]
 
+
+
 ---
 
 ## Interpretation
+
+`$$\widehat{speed} = 8.197 - 0.005 ~ starters + 0.023 ~ year - 0.443 ~ good - 1.543 ~ slow$$`
+
 
 
 |term          | estimate| std.error| statistic| p.value|
@@ -362,14 +363,22 @@ tidy(model1) %&gt;%
 |conditiongood |   -0.443|     0.231|    -1.921|   0.057|
 |conditionslow |   -1.543|     0.161|    -9.616|   0.000|
 
-&lt;font color = "red"&gt;POLL TO INTERPRET NUMERIC, CATEGORICAL, intercept &lt;/font&gt;
+--
+
+.question[
+1. Write out the interpretations for `starters` and `conditiongood`. 
+2. Does the intercept have a meaningful interpretation? 
+]
 
 ---
 
 ## Centering 
 
-**Centering**: Subtract a constant from every variable
-  - Do this to make interpretation of model parameters more meaningful (particularly intercept)
+**Centering**: Subtract a constant from each observation of a given variable
+
+- Do this to make interpretation of model parameters more meaningful (particularly intercept)
+
+- In STA 210, we used **mean-centering** where we subtracted the mean from each observation of given variable
 
 - How does centering change the model? 
 
@@ -377,7 +386,7 @@ tidy(model1) %&gt;%
 
 ## Centering `year`
 
-.small[
+.midi[
 
 ```r
 derby &lt;- derby %&gt;%
@@ -394,6 +403,8 @@ derby &lt;- derby %&gt;%
 |conditiongood |   -0.443|     0.231|    -1.921|   0.057|
 |conditionslow |   -1.543|     0.161|    -9.616|   0.000|
 
+`$$\widehat{speed} = 52.175 - 0.005 ~ starters + 0.023 ~ yearnew - 0.443 ~ good - 1.543 ~ slow$$`
+
 ---
 
 ## Model 1: Check model assumptions
@@ -406,64 +417,75 @@ derby &lt;- derby %&gt;%
 autoplot(model1Cent)
 ```
 
-&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-10-1.png" width="100%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 
 .panel[.panel-name[Poll]
-&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" width="640" height="542" frameborder="0" marginheight="0" marginwidth="0"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfuJwzStpgW35WQtGItQeWaCxejt5sc3HiPjdi1loswoa-WSA/viewform?embedded=true" width="640" height="574" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
 ]
 ]
-
-&lt;font color = "red"&gt;POLL: What assumption appears to be violated?&lt;/font&gt;
 
 ---
 
-## Add quadratic term for `year`?
+class: middle, inverse
+
+## Model 2
+
+---
+
+## Add quadratic effect for year?
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
-&lt;img src="02-mlr-review-pt1_files/figure-html/year-quad-plot-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/year-quad-plot-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 
 .panel[.panel-name[Code]
 .small[
 
 ```r
-ggplot(data = derby, aes(x = year, y = speed)) + 
+ggplot(data = derby, aes(x = yearnew, y = speed)) + 
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") + 
   geom_smooth(se = FALSE, color = "red", linetype = 2) + 
-  labs(x = "Year", y = "Speed (ft/s)", 
-       title = "Speed vs. Year")
+  labs(x = "Years since 1896", y = "Speed (ft/s)", 
+       title = "Speed vs. Years since 1896")
 ```
 ]
 ]
 ]
 
+
 ---
 
-## Model 2: Add `\(year^2\)`
+## Model 2: Add `\(yearnew^2\)`
+
+
+`$$\begin{aligned}\widehat{speed} = &amp;51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
+&amp; + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$`
+
+&lt;br&gt; 
 
 .panelset.sideways[
 .panel[.panel-name[Output]
 
-|term          |  estimate| std.error| statistic| p.value|
-|:-------------|---------:|---------:|---------:|-------:|
-|(Intercept)   | -1410.529|   176.471|    -7.993|   0.000|
-|starters      |    -0.025|     0.014|    -1.859|   0.066|
-|year          |     1.472|     0.180|     8.169|   0.000|
-|I(year^2)     |     0.000|     0.000|    -8.041|   0.000|
-|conditiongood |    -0.477|     0.186|    -2.569|   0.011|
-|conditionslow |    -1.393|     0.131|   -10.670|   0.000|
+|term          | estimate| std.error| statistic| p.value|
+|:-------------|--------:|---------:|---------:|-------:|
+|(Intercept)   |  51.4130|    0.1826|  281.5645|  0.0000|
+|starters      |  -0.0253|    0.0136|   -1.8588|  0.0656|
+|yearnew       |   0.0700|    0.0061|   11.4239|  0.0000|
+|I(yearnew^2)  |  -0.0004|    0.0000|   -8.0411|  0.0000|
+|conditiongood |  -0.4770|    0.1857|   -2.5689|  0.0115|
+|conditionslow |  -1.3927|    0.1305|  -10.6701|  0.0000|
 ]
 
 .panel[.panel-name[Code]
 .small[
 
 ```r
-model2 &lt;- lm(speed ~ starters + year + I(year^2) + condition, 
+model2 &lt;- lm(speed ~ starters + yearnew + I(yearnew^2) + condition, 
              data = derby)
-tidy(model2) %&gt;% kable(digits = 3)
+tidy(model2) %&gt;% kable(digits = 4)
 ```
 ]
 ]
@@ -477,104 +499,126 @@ tidy(model2) %&gt;% kable(digits = 3)
 
 **General interpretation**: When `\(x_2\)` increases from a to b, `\(y\)` is expected to change by `\(\hat{\beta}_2(b - a) + \hat{\beta}_3(b^2 - a^2)\)`, holding `\(x_1\)` constant.
 
+&lt;br&gt; 
+
 --
 
-**Interpret the effect of `year` for the 5 most recent years (2013 - 2017)**
+
+
+.question[
+
+`$$\begin{aligned}\widehat{speed} = &amp;51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
+&amp; + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$`
+
+Interpret the effect of year for the 5 most recent years (2013 - 2017).
+]
 
 
 ---
 
 ## Model 2: Check model assumptions
 
-&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-12-1.png" width="90%" /&gt;
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-12-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle, inverse
+
+## Model 3
+---
+
+## Include interaction term?
+
+Recall from the EDA...
+
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 ## Model 3: Add interaction term
 
+`$$\begin{aligned}\widehat{speed} = &amp; 52.387 - 0.003 ~ starters + 0.020 ~ yearnew - 1.070 ~ good - 2.183 ~ slow \\ &amp;+0.012 ~ yearnew \times good + 0.012 ~ yearnew \times slow \end{aligned}$$`
+
 .panelset.sideways[
 .panel[.panel-name[Output]
 
-|term               |  estimate| std.error| statistic| p.value|
-|:------------------|---------:|---------:|---------:|-------:|
-|(Intercept)        | -1426.950|   175.339|    -8.138|   0.000|
-|starters           |    -0.023|     0.013|    -1.782|   0.077|
-|year               |     1.492|     0.179|     8.336|   0.000|
-|I(year^2)          |     0.000|     0.000|    -8.228|   0.000|
-|conditiongood      |     2.137|    12.202|     0.175|   0.861|
-|conditionslow      |   -23.817|     6.464|    -3.685|   0.000|
-|year:conditiongood |    -0.001|     0.006|    -0.219|   0.827|
-|year:conditionslow |     0.012|     0.003|     3.471|   0.001|
+|term                  | estimate| std.error| statistic| p.value|
+|:---------------------|--------:|---------:|---------:|-------:|
+|(Intercept)           |   52.387|     0.200|   262.350|   0.000|
+|starters              |   -0.003|     0.016|    -0.189|   0.850|
+|yearnew               |    0.020|     0.003|     7.576|   0.000|
+|conditiongood         |   -1.070|     0.423|    -2.527|   0.013|
+|conditionslow         |   -2.183|     0.270|    -8.097|   0.000|
+|yearnew:conditiongood |    0.012|     0.008|     1.598|   0.113|
+|yearnew:conditionslow |    0.012|     0.004|     2.866|   0.005|
 ]
 
 .panel[.panel-name[Code]
-.small[
 
 ```r
-model3 &lt;- lm(speed ~ starters + year + I(year^2) + condition +
-               year*condition, 
+model3 &lt;- lm(speed ~ starters + yearnew + condition +
+               yearnew * condition, 
              data = derby)
-tidy(model3) %&gt;% kable(digits = 3)
+tidy(model3) %&gt;% kable(digits = 4)
 ```
 ]
+.panel[.panel-name[Assumptions]
+&lt;img src="02-mlr-review-pt1_files/figure-html/unnamed-chunk-15-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 ]
+
+
+
 
 ---
 
-## Interpreting interactions
+## Interpreting interaction effects
 
-&lt;font color = "red"&gt;ADD POLL&lt;/font&gt;
+.panelset.sideways[.panel[.panel-name[Output]
 
-.pull-left[
-
-|term               |  estimate|
-|:------------------|---------:|
-|(Intercept)        | -1426.950|
-|starters           |    -0.023|
-|year               |     1.492|
-|I(year^2)          |     0.000|
-|conditiongood      |     2.137|
-|conditionslow      |   -23.817|
-|year:conditiongood |    -0.001|
-|year:conditionslow |     0.012|
+|term                  | estimate| std.error| statistic| p.value|
+|:---------------------|--------:|---------:|---------:|-------:|
+|(Intercept)           |   52.387|     0.200|   262.350|   0.000|
+|starters              |   -0.003|     0.016|    -0.189|   0.850|
+|yearnew               |    0.020|     0.003|     7.576|   0.000|
+|conditiongood         |   -1.070|     0.423|    -2.527|   0.013|
+|conditionslow         |   -2.183|     0.270|    -8.097|   0.000|
+|yearnew:conditiongood |    0.012|     0.008|     1.598|   0.113|
+|yearnew:conditionslow |    0.012|     0.004|     2.866|   0.005|
 ]
 
-.pull-right[
-- Interpret coefficient of `\(year^2\)`
+.panel[.panel-name[Poll]
 
-- What is the effect of year on slow track conditions? 
-- What is the effect of year on fast track conditions? 
+&lt;iframe src="https://docs.google.com/forms/d/e/1FAIpQLScLJy2jHC1Sh228tA35f_cReYyNqTwuClNcjcbS4pymJdvhoA/viewform?embedded=true" width="640" height="642" frameborder="0" marginheight="0" marginwidth="0"&gt;Loading…&lt;/iframe&gt;
 ]
-
-&lt;font color = "red"&gt;Which is most meaningful in practice?&lt;/font&gt;
-
+]
 ---
 
-## Which model would you select?
+## Which model would you choose?
 
 .panelset.sideways[
 .panel[.panel-name[Output]
-**Model 1: Main effects**
+
+.midi[**Model 1: Main effects**]
 
 
 | r.squared| adj.r.squared|     AIC|     BIC|
 |---------:|-------------:|-------:|-------:|
 |      0.73|         0.721| 259.478| 276.302|
 
-**Model 2: Add `\(year^2\)`**
+.midi[**Model 2: Main effects + `\(year^2\)`**]
 
 
 | r.squared| adj.r.squared|     AIC|     BIC|
 |---------:|-------------:|-------:|-------:|
 |     0.827|         0.819| 207.429| 227.057|
 
-**Model 3: Add interaction term**
+.midi[**Model 3: Main effects + interaction]**
 
 
 | r.squared| adj.r.squared|     AIC|     BIC|
 |---------:|-------------:|-------:|-------:|
-|     0.844|         0.834| 198.716| 223.953|
+|     0.751|         0.738| 253.584| 276.016|
 ]
 
 .panel[.panel-name[Code]
@@ -598,23 +642,22 @@ glance(model3) %&gt;%
 ```
 ]
 ]
----
-
-## What makes a good final model? 
-
-- from page 24
-
 
 ---
 
-## For Wednesday
+## Characteristics of a "good" final model
 
-- Review MLR - inference both normal theory and bootstrap 
+- Model can be used to answer primary research questions
+- Predictor variables control for important covariates
+- Potential interactions have been investigated
+- Variables are centered, as needed, for more meaningful interpretations 
+- unnecessary terms are removed 
+- Assumptions are met and influential points have been addressed
+- model tells a "persuasive story parsimoniously"
 
-- All about you survey
+&lt;br&gt;
 
-- install R
-
+.small[List from Section 1.6.7 of [BMLR](https://bookdown.org/roback/bookdown-BeyondMLR/)]
 
 ---
 

@@ -23,7 +23,8 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.asp = 0.618, 
                       fig.retina = 3, 
                       dpt = 300, 
-                      out.width = "90%")
+                      out.width = "90%",
+                      fig.align = "center")
 
 ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
 
@@ -65,9 +66,7 @@ class: middle, center
 
 ---
 
-## Office hours poll 
-
-<font color = "red">[MAKE A POLL AND ADD IT!!]</font>
+## Questions from last time?
 
 
 ---
@@ -84,7 +83,7 @@ class: middle, inverse
 
 **L**inearity: Linear relationship between mean response and predictor variable(s) 
 
-**I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.  lne.
+**I**ndependence: Residuals are independent. There is no connection between how far any two points lie above or below regression line.
 
 **N**ormality: Response follows a normal distribution at each level of the predictor (or combination of predictors)
 
@@ -166,11 +165,9 @@ geom_vline(xintercept=breaks, lty=2, color = "grey") +
 
 ---
 
-## Are the assumptions met? 
+## Are the assumptions violated?
 
-For each scenario, indicate which assumption(s) is violated, if any. 
-
-<font color = "red">ADD POLL</font>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeX9xVKWHbRjUp6LowgbW4dZg_5ez4RHM53eM_jBEdFxsbvlg/viewform?embedded=true" width="640" height="1739" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
 
 ```{r echo = F}
 library(countdown)
@@ -239,8 +236,6 @@ derby %>%
 ```
 
 ---
-
-## Data analysis workflow image
 
 ![](img/data-analysis-life-cycle.png)
 
@@ -353,12 +348,14 @@ p6 <- ggplot(data = derby, aes(x = condition, y = speed)) +
 
 ## Scatterplot matrix
 
-A **scatterplot matrix** helps quickly visualize relationships between many variable pairs. They are paritcularly useful to identify potentially correlated predictors.
+.midi[
+A **scatterplot matrix** helps quickly visualize relationships between many variable pairs. They are particularly useful to identify potentially correlated predictors.
+]
 
 .panelset.sideways[
 
 .panel[.panel-name[Plot]
-```{r scatterplot-matrix-plot, echo = F}
+```{r scatterplot-matrix-plot, echo = F, fig.width = 10}
 #library(GGally)
 ggpairs(data = derby, 
         columns = c("condition", "year", "starters", "speed"))
@@ -378,9 +375,9 @@ ggpairs(data = derby,
 
 ---
 
-## Multivariate data analysis
+## Plots for multivariate EDA
 
-Assess interactions
+Plot the relationship between the response and a predictor based on levels of another predictor to assess potential interactions. 
 
 .panelset.sideways[
 
@@ -442,9 +439,14 @@ tidy(model1) %>%
 ]
 ]
 
+
+
 ---
 
 ## Interpretation
+
+$$\widehat{speed} = 8.197 - 0.005 ~ starters + 0.023 ~ year - 0.443 ~ good - 1.543 ~ slow$$
+
 
 ```{r echo = F}
 model1 <- lm(speed ~ starters + year + condition, data = derby)
@@ -452,14 +454,22 @@ tidy(model1) %>%
   kable(digits = 3)
 ```
 
-<font color = "red">POLL TO INTERPRET NUMERIC, CATEGORICAL, intercept </font>
+--
+
+.question[
+1. Write out the interpretations for `starters` and `conditiongood`. 
+2. Does the intercept have a meaningful interpretation? 
+]
 
 ---
 
 ## Centering 
 
-**Centering**: Subtract a constant from every variable
-  - Do this to make interpretation of model parameters more meaningful (particularly intercept)
+**Centering**: Subtract a constant from each observation of a given variable
+
+- Do this to make interpretation of model parameters more meaningful (particularly intercept)
+
+- In STA 210, we used **mean-centering** where we subtracted the mean from each observation of given variable
 
 - How does centering change the model? 
 
@@ -467,7 +477,7 @@ tidy(model1) %>%
 
 ## Centering `year`
 
-.small[
+.midi[
 ```{r}
 derby <- derby %>%
   mutate(yearnew = year - 1896) #1896 = starting year
@@ -479,74 +489,87 @@ model1Cent <- lm(speed ~ starters + yearnew + condition, data = derby)
 tidy(model1Cent) %>% kable(digits = 3)
 ```
 
+$$\widehat{speed} = 52.175 - 0.005 ~ starters + 0.023 ~ yearnew - 0.443 ~ good - 1.543 ~ slow$$
+
 ---
 
 ## Model 1: Check model assumptions
 
 .panelset.sideways[
 .panel[.panel-name[Plots]
-```{r, out.width = "100%"}
+```{r, out.width = "80%"}
 #library(ggfortify)
 autoplot(model1Cent)
 ```
 ]
 
 .panel[.panel-name[Poll]
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwlpV7dgMGnD3UTOqDRr5LQQWg7Tp-OzlPGam4sQfmVycCKA/viewform?embedded=true" width="640" height="542" frameborder="0" marginheight="0" marginwidth="0"></iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfuJwzStpgW35WQtGItQeWaCxejt5sc3HiPjdi1loswoa-WSA/viewform?embedded=true" width="640" height="574" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
 ]
 ]
-
-<font color = "red">POLL: What assumption appears to be violated?</font>
 
 ---
 
-## Add quadratic term for `year`?
+class: middle, inverse
+
+## Model 2
+
+---
+
+## Add quadratic effect for year?
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
 ```{r year-quad-plot, echo = F}
-ggplot(data = derby, aes(x = year, y = speed)) + 
+ggplot(data = derby, aes(x = yearnew, y = speed)) + 
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") + 
   geom_smooth(se = FALSE, color = "red", linetype = 2) + 
-  labs(x = "Year", y = "Speed (ft/s)", 
-       title = "Speed vs. Year")
+  labs(x = "Years since 1896", y = "Speed (ft/s)", 
+       title = "Speed vs. Years since 1896")
 ```
 ]
 
 .panel[.panel-name[Code]
 .small[
 ```{r year-quad, eval = F}
-ggplot(data = derby, aes(x = year, y = speed)) + 
+ggplot(data = derby, aes(x = yearnew, y = speed)) + 
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") + 
   geom_smooth(se = FALSE, color = "red", linetype = 2) + 
-  labs(x = "Year", y = "Speed (ft/s)", 
-       title = "Speed vs. Year")
+  labs(x = "Years since 1896", y = "Speed (ft/s)", 
+       title = "Speed vs. Years since 1896")
 ```
 ]
 ]
 ]
 
+
 ---
 
-## Model 2: Add $year^2$
+## Model 2: Add $yearnew^2$
+
+
+$$\begin{aligned}\widehat{speed} = &51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
+& + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$
+
+<br> 
 
 .panelset.sideways[
 .panel[.panel-name[Output]
 ```{r echo = F}
-model2 <- lm(speed ~ starters + year + I(year^2) + condition, 
+model2 <- lm(speed ~ starters + yearnew + I(yearnew^2) + condition, 
              data = derby)
-tidy(model2) %>% kable(digits = 3)
+tidy(model2) %>% kable(digits = 4)
 ```
 ]
 
 .panel[.panel-name[Code]
 .small[
 ```{r model2-code, eval = F}
-model2 <- lm(speed ~ starters + year + I(year^2) + condition, 
+model2 <- lm(speed ~ starters + yearnew + I(yearnew^2) + condition, 
              data = derby)
-tidy(model2) %>% kable(digits = 3)
+tidy(model2) %>% kable(digits = 4)
 ```
 ]
 ]
@@ -560,75 +583,111 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 ~ x_1  + \hat{\beta}_2 ~ x_2 + \hat{\b
 
 **General interpretation**: When $x_2$ increases from a to b, $y$ is expected to change by $\hat{\beta}_2(b - a) + \hat{\beta}_3(b^2 - a^2)$, holding $x_1$ constant.
 
+<br> 
+
 --
 
-**Interpret the effect of `year` for the 5 most recent years (2013 - 2017)**
+
+
+.question[
+
+$$\begin{aligned}\widehat{speed} = &51.413 - 0.025 ~ starters + 0.070 ~ yearnew \\
+& + 0.0004 ~ yearnew^2 - 0.477 ~ good - 1.393 ~ slow\end{aligned}$$
+
+Interpret the effect of year for the 5 most recent years (2013 - 2017).
+]
 
 
 ---
 
 ## Model 2: Check model assumptions
 
-```{r, echo = F}
+```{r, echo = F, out.width = "70%"}
 autoplot(model2)
+```
+
+---
+
+class: middle, inverse
+
+## Model 3
+---
+
+## Include interaction term?
+
+Recall from the EDA...
+
+```{r echo = F, out.width = "70%"}
+library(viridis)
+ggplot(data = derby, aes(x = year, y = speed, color = condition, 
+                         shape = condition, linetype = condition)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, aes(linetype = condition)) + 
+  labs(x = "Year", y = "Speed (ft/s)", color = "Condition",
+       title = "Speed vs. year", 
+       subtitle = "by track condition") +
+  guides(lty = FALSE, shape = FALSE) +
+  scale_color_viridis_d(end = 0.9)
 ```
 
 ---
 
 ## Model 3: Add interaction term
 
+$$\begin{aligned}\widehat{speed} = & 52.387 - 0.003 ~ starters + 0.020 ~ yearnew - 1.070 ~ good - 2.183 ~ slow \\ &+0.012 ~ yearnew \times good + 0.012 ~ yearnew \times slow \end{aligned}$$
+
 .panelset.sideways[
 .panel[.panel-name[Output]
 ```{r echo = F ,out.width = "70%"}
-model3 <- lm(speed ~ starters + year + I(year^2) + condition +
-               year * condition, 
+model3 <- lm(speed ~ starters + yearnew + condition +
+               yearnew * condition, 
              data = derby)
 tidy(model3) %>% kable(digits = 3)
 ```
 ]
 
 .panel[.panel-name[Code]
-.small[
 ```{r model3-code, eval = F}
-model3 <- lm(speed ~ starters + year + I(year^2) + condition +
-               year*condition, 
+model3 <- lm(speed ~ starters + yearnew + condition +
+               yearnew * condition, 
              data = derby)
-tidy(model3) %>% kable(digits = 3)
+tidy(model3) %>% kable(digits = 4)
+```
+]
+.panel[.panel-name[Assumptions]
+```{r, echo = F}
+autoplot(model3)
 ```
 ]
 ]
-]
+
+
+
 
 ---
 
-## Interpreting interactions
+## Interpreting interaction effects
 
-<font color = "red">ADD POLL</font>
-
-.pull-left[
+.panelset.sideways[.panel[.panel-name[Output]
 ```{r echo = F}
 tidy(model3) %>%
-  select(term, estimate) %>%
   kable(digits = 3)
 ```
 ]
 
-.pull-right[
-- Interpret coefficient of $year^2$
+.panel[.panel-name[Poll]
 
-- What is the effect of year on slow track conditions? 
-- What is the effect of year on fast track conditions? 
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScLJy2jHC1Sh228tA35f_cReYyNqTwuClNcjcbS4pymJdvhoA/viewform?embedded=true" width="640" height="642" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
 ]
-
-<font color = "red">Which is most meaningful in practice?</font>
-
+]
 ---
 
-## Which model would you select?
+## Which model would you choose?
 
 .panelset.sideways[
 .panel[.panel-name[Output]
-**Model 1: Main effects**
+
+.midi[**Model 1: Main effects**]
 
 ```{r echo = F}
 glance(model1Cent) %>%
@@ -636,7 +695,7 @@ glance(model1Cent) %>%
   kable(digits = 3)
 ```
 
-**Model 2: Add $year^2$**
+.midi[**Model 2: Main effects + $year^2$**]
 
 ```{r echo = F}
 glance(model2) %>%
@@ -644,7 +703,7 @@ glance(model2) %>%
   kable(digits = 3)
 ```
 
-**Model 3: Add interaction term**
+.midi[**Model 3: Main effects + interaction]**
 
 ```{r echo = F}
 glance(model3) %>%
@@ -673,23 +732,22 @@ glance(model3) %>%
 ```
 ]
 ]
----
-
-## What makes a good final model? 
-
-- from page 24
-
 
 ---
 
-## For Wednesday
+## Characteristics of a "good" final model
 
-- Review MLR - inference both normal theory and bootstrap 
+- Model can be used to answer primary research questions
+- Predictor variables control for important covariates
+- Potential interactions have been investigated
+- Variables are centered, as needed, for more meaningful interpretations 
+- unnecessary terms are removed 
+- Assumptions are met and influential points have been addressed
+- model tells a "persuasive story parsimoniously"
 
-- All about you survey
+<br>
 
-- install R
-
+.small[List from Section 1.6.7 of [BMLR](https://bookdown.org/roback/bookdown-BeyondMLR/)]
 
 ---
 
