@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Review of multiple linear regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Maria Tackett" />
+    <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/font-awesome/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/font-awesome/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Review of multiple linear regression
+### Prof. Maria Tackett
+### 01.12.22
+
+---
+
+
+
+
+
+
+
+
+
+class: middle, center
+
+##[Click for PDF of slides](03-mlr-review-pt2.pdf)
+
+---
+
+## Announcements
+
+- Lab starts Thu 3:30 - 4:45pm online
+  - Find Zoom link in Sakai
+
+- Office hours this week: 
+  - Thu 2 - 3pm &amp; Fri 1 - 2pm online (links in Sakai)
+  - Full office hours schedule starts Tue, Jan 19
+
+---
+
+class: middle
+
+## Questions?
+
+---
+
+class: middle, inverse
+
+## Recap
+
+---
+
+## Data: Kentucky Derby Winners
+
+.midi[
+Today's data is from the Kentucky Derby, an annual 1.25-mile horse race held at the Churchill Downs race track in Louisville, KY. The data is in the file [derbyplus.csv](data/derbyplus.csv) and contains information for races 1896 - 2017. 
+]
+
+.pull-left[
+
+.midi[**Response variable**]
+
+- .midi[`speed`: Average speed of the winner in feet per second (ft/s)]
+
+.midi[**Additional variable**]
+.midi[- `winner`: Winning horse]
+]
+
+.pull-right[
+.midi[**Predictor variables**]
+- .midi[`year`: Year of the race]
+- .midi[`condition`: Condition of the track (good, fast, slow)]
+- .midi[`starters`: Number of horses who raced]
+]
+
+---
+
+## Data
+
+
+```r
+derby &lt;- read_csv("data/derbyplus.csv") %&gt;%
+  mutate(yearnew = year - 1896)
+```
+
+
+```r
+derby %&gt;%
+  head(5) %&gt;% kable()
+```
+
+
+
+| year|winner        |condition | speed| starters| yearnew|
+|----:|:-------------|:---------|-----:|--------:|-------:|
+| 1896|Ben Brush     |good      | 51.66|        8|       0|
+| 1897|Typhoon II    |slow      | 49.81|        6|       1|
+| 1898|Plaudit       |good      | 51.16|        4|       2|
+| 1899|Manuel        |fast      | 50.00|        5|       3|
+| 1900|Lieut. Gibson |fast      | 52.28|        7|       4|
+
+---
+
+## Model 1: Main effects model (with centering)
+
+
+|term          | estimate| std.error| statistic| p.value|
+|:-------------|--------:|---------:|---------:|-------:|
+|(Intercept)   |   52.175|     0.194|   269.079|   0.000|
+|starters      |   -0.005|     0.017|    -0.299|   0.766|
+|yearnew       |    0.023|     0.002|     9.766|   0.000|
+|conditiongood |   -0.443|     0.231|    -1.921|   0.057|
+|conditionslow |   -1.543|     0.161|    -9.616|   0.000|
+
+---
+
+## Model 2: Include quadratic effect for year
+
+.midi[
+
+|term          | estimate| std.error| statistic| p.value|
+|:-------------|--------:|---------:|---------:|-------:|
+|(Intercept)   |  51.4130|    0.1826|  281.5645|  0.0000|
+|starters      |  -0.0253|    0.0136|   -1.8588|  0.0656|
+|yearnew       |   0.0700|    0.0061|   11.4239|  0.0000|
+|I(yearnew^2)  |  -0.0004|    0.0000|   -8.0411|  0.0000|
+|conditiongood |  -0.4770|    0.1857|   -2.5689|  0.0115|
+|conditionslow |  -1.3927|    0.1305|  -10.6701|  0.0000|
+]
+
+---
+
+## Model 2: Check model assumptions
+
+&lt;img src="03-mlr-review-pt2_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle, inverse
+
+## Model 3
+---
+
+## Include interaction term?
+
+Recall from the EDA...
+
+&lt;img src="03-mlr-review-pt2_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Model 3: Include interaction term
+
+`$$\begin{aligned}\widehat{speed} = &amp; 52.387 - 0.003 ~ starters + 0.020 ~ yearnew - 1.070 ~ good - 2.183 ~ slow \\ &amp;+0.012 ~ yearnew \times good + 0.012 ~ yearnew \times slow \end{aligned}$$`
+
+.panelset.sideways[
+.panel[.panel-name[Output]
+
+|term                  | estimate| std.error| statistic| p.value|
+|:---------------------|--------:|---------:|---------:|-------:|
+|(Intercept)           |   52.387|     0.200|   262.350|   0.000|
+|starters              |   -0.003|     0.016|    -0.189|   0.850|
+|yearnew               |    0.020|     0.003|     7.576|   0.000|
+|conditiongood         |   -1.070|     0.423|    -2.527|   0.013|
+|conditionslow         |   -2.183|     0.270|    -8.097|   0.000|
+|yearnew:conditiongood |    0.012|     0.008|     1.598|   0.113|
+|yearnew:conditionslow |    0.012|     0.004|     2.866|   0.005|
+]
+
+.panel[.panel-name[Code]
+
+```r
+model3 &lt;- lm(speed ~ starters + yearnew + condition +
+               yearnew * condition, 
+             data = derby)
+tidy(model3) %&gt;% kable(digits = 4)
+```
+]
+.panel[.panel-name[Assumptions]
+&lt;img src="03-mlr-review-pt2_files/figure-html/unnamed-chunk-9-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+## Interpreting interaction effects
+
+
+|term                  | estimate| std.error| statistic| p.value|
+|:---------------------|--------:|---------:|---------:|-------:|
+|(Intercept)           |   52.387|     0.200|   262.350|   0.000|
+|starters              |   -0.003|     0.016|    -0.189|   0.850|
+|yearnew               |    0.020|     0.003|     7.576|   0.000|
+|conditiongood         |   -1.070|     0.423|    -2.527|   0.013|
+|conditionslow         |   -2.183|     0.270|    -8.097|   0.000|
+|yearnew:conditiongood |    0.012|     0.008|     1.598|   0.113|
+|yearnew:conditionslow |    0.012|     0.004|     2.866|   0.005|
+
+
+[Click here](https://forms.gle/BrufiFdhQAi4WBWeA) for poll
+
+
+<div class="countdown" id="timer_61dee930" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+## Measures of model performance
+
+- `\(\color{#4187aa}{R^2}\)` Proportion of variability in the response explained by the model.]
+  - .midi[Will always increase as predictors are added, so it shouldn't be used to compare models]
+  
+- `\(\color{#4187aa}{Adj. R^2}\)`: Similar to `\(R^2\)` with a penalty for extra terms
+
+--
+
+- `\(\color{#4187aa}{AIC}\)`: Likelihood-based approach balancing model performance and complexity
+
+- `\(\color{#4187aa}{BIC}\)`: Similar to AIC with stronger penalty for extra terms
+
+--
+
+- **Nested F Test (extra sum of squares F test)**: Generalization of t-test for individual coefficients to perform significance tests on nested models
+
+---
+
+## Which model would you choose?
+
+Use the **`glance`** function to get model statistics.
+
+
+|model  | r.squared| adj.r.squared|     AIC|     BIC|
+|:------|---------:|-------------:|-------:|-------:|
+|Model1 |     0.730|         0.721| 259.478| 276.302|
+|Model2 |     0.827|         0.819| 207.429| 227.057|
+|Model3 |     0.751|         0.738| 253.584| 276.016|
+
+**Which model would you choose?**
+---
+
+## Characteristics of a "good" final model
+
+- Model can be used to answer primary research questions
+- Predictor variables control for important covariates
+- Potential interactions have been investigated
+- Variables are centered, as needed, for more meaningful interpretations 
+- Unnecessary terms are removed 
+- Assumptions are met and influential points have been addressed
+- Model tells a "persuasive story parsimoniously"
+
+&lt;br&gt;
+
+.footnote[List from Section 1.6.7 of [BMLR](https://bookdown.org/roback/bookdown-BeyondMLR/)]
+
+---
+
+## Acknowledgements
+
+These slides are based on content in [BMLR: Chapter 1 - Review of Multiple Linear Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-MLRreview.html)
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%",
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
