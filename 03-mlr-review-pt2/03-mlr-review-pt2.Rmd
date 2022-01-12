@@ -63,7 +63,7 @@ class: middle, center
   - Thu 2 - 3pm & Fri 1 - 2pm online (links in Sakai)
   - Full office hours schedule starts Tue, Jan 19
 
-- Week 02 reading: [BMLR: Chaper 2- Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+- Week 02 reading: [BMLR: Chapter 2- Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
 
 ---
 
@@ -223,8 +223,8 @@ countdown(minutes = 4, seconds = 0,
 
 ## Measures of model performance
 
-- $\color{#4187aa}{R^2}$ Proportion of variability in the response explained by the model.]
-  - .midi[Will always increase as predictors are added, so it shouldn't be used to compare models]
+- $\color{#4187aa}{R^2}$: Proportion of variability in the response explained by the model.
+  -  Will always increase as predictors are added, so it shouldn't be used to compare models
   
 - $\color{#4187aa}{Adj. R^2}$: Similar to $R^2$ with a penalty for extra terms
 
@@ -409,10 +409,10 @@ Conduct inference for $\beta_j$ using a $t$ distribution with $n-p-1$ degrees of
 ## Hypothesis test for $\beta_j$
 
 .pull-left[
-`r emo::ji("one")`: State the hypotheses
+`r emo::ji("one")` State the hypotheses
 
 .eq[
-$$\small{H_0: \beta_j = 0 \text{ vs. }\beta_j \neq 0}$$
+$$\small{H_0: \beta_j = 0 \text{ vs. }H_a: \beta_j \neq 0}$$
 ]
 
 <br> 
@@ -450,7 +450,7 @@ Reject $H_0$ if p-value is sufficiently small.
 The $C$% confidence confidence interval for $\beta_j$ is 
 
 $$\begin{align}&\hat{\beta}_j \pm t^* \times SE_{\hat{\beta}_j}\\[8pt]
-&\hat{\beta}_j \pm t^* \times \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}\end{align}$$
+&\hat{\beta}_j \pm t^* \times \hat{\sigma}\sqrt{\frac{1}{(n-1)s_{x_{j}}^2}}\end{align}$$
 where the critical value $t^* \sim t(n-p-1)$
 ]
 
