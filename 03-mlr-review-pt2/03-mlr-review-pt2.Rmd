@@ -63,7 +63,7 @@ class: middle, center
   - Thu 2 - 3pm & Fri 1 - 2pm online (links in Sakai)
   - Full office hours schedule starts Tue, Jan 19
 
-- <font color = "red">Week 02 reading</font>
+- Week 02 reading: [BMLR: Chaper 2- Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
 
 ---
 
@@ -299,28 +299,192 @@ If L.I.N.E. assumptions are met, we can conduct inference using the $t$ distribu
 
 ---
 
-## Recall the picture and the estimated standard error 
+## Inference for regression
 
+.pull-left[
+
+When L.I.N.E. conditions are met 
+
+```{r echo = F, out.width = "100%"}
+##   Code modified from https://stackoverflow.com/questions/31794876/ggplot2-how-to-curve-small-gaussian-densities-on-a-regression-line?rq=1
+
+## Modified based on BYSH: https://bookdown.org/roback/bookdown-bysh/ch-MLRreview.html#ordinary-least-squares-ols-assumptions
+
+set.seed(0)
+dat <- data.frame(x=(x=runif(10000, 0, 50)),
+                  y=rnorm(10000, 10*x, 100))
+
+## breaks: where you want to compute densities
+breaks <- seq(0, max(dat$x), len=5)
+dat$section <- cut(dat$x, breaks)
+
+## Get the residuals
+dat$res <- residuals(lm(y ~ x, data=dat))
+
+## Compute densities for each section, and flip the axes, and add means of sections
+## Note: the densities need to be scaled in relation to the section size (2000 here)
+dens <- do.call(rbind, lapply(split(dat, dat$section), function(x) {
+    d <- density(x$res, n=50)
+    res <- data.frame(x=max(x$x)- d$y*2000, y=d$x+mean(x$y))
+    res <- res[order(res$y), ]
+    ## Get some data for normal lines as well
+    xs <- seq(min(x$res), max(x$res), len=50)
+    res <- rbind(res, data.frame(y=xs + mean(x$y),
+                                 x=max(x$x) - 2000*dnorm(xs, 0, sd(x$res))))
+    res$type <- rep(c("empirical", "normal"), each=50)
+    res
+}))
+dens$section <- rep(levels(dat$section), each=100)
+
+dens <- dens %>%
+  filter(type == "normal")
+
+## Plot both empirical and theoretical
+ggplot(dat, aes(x, y)) +
+  geom_point(alpha = 0.05, size = 0.2) +
+  geom_smooth(method="lm", fill=NA, se = FALSE, color = "steelblue") +
+  geom_path(data=dens, aes(x, y, group=interaction(section)), color = "red", lwd=1.1) +
+geom_vline(xintercept=breaks, lty=2, color = "grey") +
+  labs(x = "x", 
+       y = "y") +
+  theme_classic() + 
+  annotate("text", x = 10, y = 600, label = latex2exp::TeX("$\\mu_{Y|X} = \\beta_0 + \\beta_1X$"), color = "steelblue", size = 8) +
+  annotate("text", x = 20, y = 400, label = latex2exp::TeX("$\\sigma^2$"), color = "red", size = 8) +
+  theme(axis.title = element_text(size = 16),
+        axis.ticks = element_blank(), 
+        axis.text.x = element_blank(), 
+       axis.text.y = element_blank()
+      )
+  
+```
+]
+
+.pull-right[
+
+- Use least squares regression to get the estimates $\hat{\beta}_0$, $\hat{\beta}_1$, and $\hat{\sigma}^2$
+
+- $\hat{\sigma}$ is the **regression standard error** 
+
+$$\hat{\sigma} = \sqrt{\frac{\sum_{i=1}^n(y_i - \hat{y}_i)^2}{n - p - 1}} = \sqrt{\frac{\sum_{i=1}^n e_i^2}{n-p-1}}$$
+
+where $p$ is the number of non-intercept terms in the model 
+
+(p = 1 in simple linear regression)
+]
 
 ---
 
-## Hypohtesis testing 
+## Inference for $\beta_j$
+
+- Suppose we have the following model:
+
+$$y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \dots + \beta_p x_{pi} + \epsilon_i \hspace{5mm} \epsilon \sim N(0, \sigma^2)$$
+
+--
+
+- We use least squares regression to get estimates for the parameters $\beta_0, \beta_1, \ldots, \beta_p$ and $\sigma^2$. The regression equation is 
+
+$$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x_1 + \hat{\beta}_2 x_2 + \dots + \hat{\beta}_p x_p$$
+
+- When the L.I.N.E. assumptions are met, $\hat{\beta}_j \sim N(\beta_j, SE_{\hat{\beta}_j})$.
+  - The objective of statistical inference is to understand $\beta_j$
+  - Use $\hat{\sigma}$ to estimate $SE_{\hat{\beta}_j}$, the **standard error of $\hat{\beta}_j$**
+
+---
+
+## Inference for $\beta_j$
+
+.eq[
+$$SE_{\hat{\beta}_j} = \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}$$
+]
+
+Conduct inference for $\beta_j$ using a $t$ distribution with $n-p-1$ degrees of freedom (df).  
+
+- $\hat{\beta}_j$ follows a $t$ distribution, because $\hat{\sigma}$ (not $\sigma$) is used to calculate the standard error of $\hat{\beta}_j$.
+
+- The distribution has $n-p-1$ df because we use up $p + 1$ df to calculate $\hat{\sigma}$, so there are $n - p - 1$ df left to understand variability.
+
+---
+
+## Hypothesis test for $\beta_j$
+
+.pull-left[
+`r emo::ji("one")`: State the hypotheses
+
+.eq[
+$$\small{H_0: \beta_j = 0 \text{ vs. }\beta_j \neq 0}$$
+]
+
+<br> 
+
+`r emo::ji("two")` Calculate the test statistic.
+
+.eq[
+$$\small{t = \frac{\hat{\beta}_j - 0}{SE_{\hat{\beta}_j}} = \frac{\hat{\beta}_j - 0}{\hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}}}$$
+]
+]
+
+.pull-right[
+`r emo::ji("three")` Calculate the p-value.
+
+.eq[
+$$\text{p-value} = 2P(T > |t|) \hspace{4mm} T \sim t_{n-p-1}$$
+]
+
+<br>
+
+`r emo::ji("four")` State the conclusion in context of the data.
+
+.eq[
+Reject $H_0$ if p-value is sufficiently small.
+]
+
+]
+
 
 ---
 
 ## Confidence intervals 
 
+.eq[
+The $C$% confidence confidence interval for $\beta_j$ is 
+
+$$\begin{align}&\hat{\beta}_j \pm t^* \times SE_{\hat{\beta}_j}\\[8pt]
+&\hat{\beta}_j \pm t^* \times \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}\end{align}$$
+where the critical value $t^* \sim t(n-p-1)$
+]
+
+**General interpretation:** We are $C$% confident that for every one unit increase in $x_j$, the response is expected to change by LB to UB units, holding all else constant.
+
 ---
 
-## Prediction intervals
+## Inference Activity (~8 minutes)
 
+- Use the Model 3 output on the next slide to conduct a hypothesis test and interpret the 95% confidence interval for your assigned variable. 
+  - You do not have to do the calculations by hand. 
+
+- Choose one person to write your group's response on your slide [slide](https://docs.google.com/presentation/d/14WD6HUhUL4Z_i9tcG94tgfa9VbpDbAYkzprhAPB7O0w/edit?usp=sharing).
+
+- Choose on person to share your group's responses with the class. 
 
 ---
 
-# Muddiest point? 
+## Model 3 output
 
+```{r echo = F}
+tidy(model3, conf.int = TRUE) %>%
+  kable(digits = 3)
+```
 
+---
 
+## Additional review topics 
+
+- [Uncertainty in predictions](https://sta210-fa21.netlify.app/slides/07-slr-prediction.html#1)
+
+- [Variable transformations](https://sta210-fa21.netlify.app/slides/14-transformations.html#1)
+
+- [Comparing models using Nested F tests](https://sta210-fa21.netlify.app/slides/15-model-comparison.html#1)
 
 ---
 

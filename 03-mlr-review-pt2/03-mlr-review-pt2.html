@@ -44,6 +44,8 @@ class: middle, center
   - Thu 2 - 3pm &amp; Fri 1 - 2pm online (links in Sakai)
   - Full office hours schedule starts Tue, Jan 19
 
+- Week 02 reading: [BMLR: Chaper 2- Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
 ---
 
 class: middle
@@ -208,7 +210,7 @@ tidy(model3) %&gt;% kable(digits = 4)
 [Click here](https://forms.gle/BrufiFdhQAi4WBWeA) for poll
 
 
-<div class="countdown" id="timer_61dee930" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<div class="countdown" id="timer_61df1c36" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -260,6 +262,170 @@ Use the **`glance`** function to get model statistics.
 &lt;br&gt;
 
 .footnote[List from Section 1.6.7 of [BMLR](https://bookdown.org/roback/bookdown-BeyondMLR/)]
+
+---
+
+class: middle, inverse
+
+## Inference for multiple linear regression
+
+---
+
+## Inference for regression 
+
+Use statistical inference to 
+
+- Determine if predictors are statistically significant (not necessarily practically significant!)
+- Quantify uncertainty in coefficient estimates
+- Quantify uncertainty in model predictions
+
+&lt;br&gt;
+
+If L.I.N.E. assumptions are met, we can conduct inference using the `\(t\)` distribution and estimated standard errors 
+
+---
+
+## Inference for regression
+
+.pull-left[
+
+When L.I.N.E. conditions are met 
+
+&lt;img src="03-mlr-review-pt2_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+- Use least squares regression to get the estimates `\(\hat{\beta}_0\)`, `\(\hat{\beta}_1\)`, and `\(\hat{\sigma}^2\)`
+
+- `\(\hat{\sigma}\)` is the **regression standard error** 
+
+`$$\hat{\sigma} = \sqrt{\frac{\sum_{i=1}^n(y_i - \hat{y}_i)^2}{n - p - 1}} = \sqrt{\frac{\sum_{i=1}^n e_i^2}{n-p-1}}$$`
+
+where `\(p\)` is the number of non-intercept terms in the model 
+
+(p = 1 in simple linear regression)
+]
+
+---
+
+## Inference for `\(\beta_j\)`
+
+- Suppose we have the following model:
+
+`$$y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \dots + \beta_p x_{pi} + \epsilon_i \hspace{5mm} \epsilon \sim N(0, \sigma^2)$$`
+
+--
+
+- We use least squares regression to get estimates for the parameters `\(\beta_0, \beta_1, \ldots, \beta_p\)` and `\(\sigma^2\)`. The regression equation is 
+
+`$$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x_1 + \hat{\beta}_2 x_2 + \dots + \hat{\beta}_p x_p$$`
+
+- When the L.I.N.E. assumptions are met, `\(\hat{\beta}_j \sim N(\beta_j, SE_{\hat{\beta}_j})\)`.
+  - The objective of statistical inference is to understand `\(\beta_j\)`
+  - Use `\(\hat{\sigma}\)` to estimate `\(SE_{\hat{\beta}_j}\)`, the **standard error of `\(\hat{\beta}_j\)`**
+
+---
+
+## Inference for `\(\beta_j\)`
+
+.eq[
+`$$SE_{\hat{\beta}_j} = \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}$$`
+]
+
+Conduct inference for `\(\beta_j\)` using a `\(t\)` distribution with `\(n-p-1\)` degrees of freedom (df).  
+
+- `\(\hat{\beta}_j\)` follows a `\(t\)` distribution, because `\(\hat{\sigma}\)` (not `\(\sigma\)`) is used to calculate the standard error of `\(\hat{\beta}_j\)`.
+
+- The distribution has `\(n-p-1\)` df because we use up `\(p + 1\)` df to calculate `\(\hat{\sigma}\)`, so there are `\(n - p - 1\)` df left to understand variability.
+
+---
+
+## Hypothesis test for `\(\beta_j\)`
+
+.pull-left[
+1️⃣: State the hypotheses
+
+.eq[
+`$$\small{H_0: \beta_j = 0 \text{ vs. }\beta_j \neq 0}$$`
+]
+
+&lt;br&gt; 
+
+2️⃣ Calculate the test statistic.
+
+.eq[
+`$$\small{t = \frac{\hat{\beta}_j - 0}{SE_{\hat{\beta}_j}} = \frac{\hat{\beta}_j - 0}{\hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}}}$$`
+]
+]
+
+.pull-right[
+3️⃣ Calculate the p-value.
+
+.eq[
+`$$\text{p-value} = 2P(T &gt; |t|) \hspace{4mm} T \sim t_{n-p-1}$$`
+]
+
+&lt;br&gt;
+
+4️⃣ State the conclusion in context of the data.
+
+.eq[
+Reject `\(H_0\)` if p-value is sufficiently small.
+]
+
+]
+
+
+---
+
+## Confidence intervals 
+
+.eq[
+The `\(C\)`% confidence confidence interval for `\(\beta_j\)` is 
+
+`$$\begin{align}&amp;\hat{\beta}_j \pm t^* \times SE_{\hat{\beta}_j}\\[8pt]
+&amp;\hat{\beta}_j \pm t^* \times \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}\end{align}$$`
+where the critical value `\(t^* \sim t(n-p-1)\)`
+]
+
+**General interpretation:** We are `\(C\)`% confident that for every one unit increase in `\(x_j\)`, the response is expected to change by LB to UB units, holding all else constant.
+
+---
+
+## Inference Activity (~8 minutes)
+
+- Use the Model 3 output on the next slide to conduct a hypothesis test and interpret the 95% confidence interval for your assigned variable. 
+  - You do not have to do the calculations by hand. 
+
+- Choose one person to write your group's response on your slide [slide](https://docs.google.com/presentation/d/14WD6HUhUL4Z_i9tcG94tgfa9VbpDbAYkzprhAPB7O0w/edit?usp=sharing).
+
+- Choose on person to share your group's responses with the class. 
+
+---
+
+## Model 3 output
+
+
+|term                  | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:---------------------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept)           |   52.387|     0.200|   262.350|   0.000|   51.991|    52.782|
+|starters              |   -0.003|     0.016|    -0.189|   0.850|   -0.035|     0.029|
+|yearnew               |    0.020|     0.003|     7.576|   0.000|    0.014|     0.025|
+|conditiongood         |   -1.070|     0.423|    -2.527|   0.013|   -1.908|    -0.231|
+|conditionslow         |   -2.183|     0.270|    -8.097|   0.000|   -2.717|    -1.649|
+|yearnew:conditiongood |    0.012|     0.008|     1.598|   0.113|   -0.003|     0.027|
+|yearnew:conditionslow |    0.012|     0.004|     2.866|   0.005|    0.004|     0.020|
+
+---
+
+## Additional review topics 
+
+- [Uncertainty in predictions](https://sta210-fa21.netlify.app/slides/07-slr-prediction.html#1)
+
+- [Variable transformations](https://sta210-fa21.netlify.app/slides/14-transformations.html#1)
+
+- [Comparing models using Nested F tests](https://sta210-fa21.netlify.app/slides/15-model-comparison.html#1)
 
 ---
 
