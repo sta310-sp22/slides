@@ -1,6 +1,6 @@
 ---
 title: "Review of multiple linear regression"
-sutitle: "Cont'd"
+subtitle: "Part 2"
 author: "Prof. Maria Tackett"
 date: "01.12.22"
 output:
