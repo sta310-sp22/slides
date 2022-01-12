@@ -395,7 +395,7 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x_1 + \hat{\beta}_2 x_2 + \dots + \hat
 ## Inference for $\beta_j$
 
 .eq[
-$$SE_{\hat{\beta}_j} = \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}$$
+$$SE_{\hat{\beta}_j} = \hat{\sigma}\sqrt{\frac{1}{(n-1)s_{x_j}^2}}$$
 ]
 
 Conduct inference for $\beta_j$ using a $t$ distribution with $n-p-1$ degrees of freedom (df).  
@@ -420,7 +420,7 @@ $$\small{H_0: \beta_j = 0 \text{ vs. }H_a: \beta_j \neq 0}$$
 `r emo::ji("two")` Calculate the test statistic.
 
 .eq[
-$$\small{t = \frac{\hat{\beta}_j - 0}{SE_{\hat{\beta}_j}} = \frac{\hat{\beta}_j - 0}{\hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}}}$$
+$$\small{t = \frac{\hat{\beta}_j - 0}{SE_{\hat{\beta}_j}} = \frac{\hat{\beta}_j - 0}{\hat{\sigma}\sqrt{\frac{1}{(n-1)s_{x_j}^2}}}}$$
 ]
 ]
 

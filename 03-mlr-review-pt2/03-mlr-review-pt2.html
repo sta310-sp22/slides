@@ -211,7 +211,7 @@ tidy(model3) %&gt;% kable(digits = 4)
 [Click here](https://forms.gle/BrufiFdhQAi4WBWeA) for poll
 
 
-<div class="countdown" id="timer_61df4806" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<div class="countdown" id="timer_61df4b6c" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -331,7 +331,7 @@ where `\(p\)` is the number of non-intercept terms in the model
 ## Inference for `\(\beta_j\)`
 
 .eq[
-`$$SE_{\hat{\beta}_j} = \hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}$$`
+`$$SE_{\hat{\beta}_j} = \hat{\sigma}\sqrt{\frac{1}{(n-1)s_{x_j}^2}}$$`
 ]
 
 Conduct inference for `\(\beta_j\)` using a `\(t\)` distribution with `\(n-p-1\)` degrees of freedom (df).  
@@ -356,7 +356,7 @@ Conduct inference for `\(\beta_j\)` using a `\(t\)` distribution with `\(n-p-1\)
 2️⃣ Calculate the test statistic.
 
 .eq[
-`$$\small{t = \frac{\hat{\beta}_j - 0}{SE_{\hat{\beta}_j}} = \frac{\hat{\beta}_j - 0}{\hat{\sigma}\sqrt{\frac{1}{(n-1)s_x^2}}}}$$`
+`$$\small{t = \frac{\hat{\beta}_j - 0}{SE_{\hat{\beta}_j}} = \frac{\hat{\beta}_j - 0}{\hat{\sigma}\sqrt{\frac{1}{(n-1)s_{x_j}^2}}}}$$`
 ]
 ]
 
