@@ -1,0 +1,47 @@
+---
+title: "Lab 01"
+subtitle: "01.13.22"
+output:
+  xaringan::moon_reader:
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+class: middle, inverse
+
+# Welcome!
+
+
+---
+
+## Introductions
+
+- Meet the TAs!
+- Introduce yourself!
+
+---
+
+## Today's lab 
+
+- Please fill out the [office hour survey](https://forms.gle/j7nF9fx8syrADuK77)
+
+- Make sure you 
+  - Have RStudio installed and configured with GitHub
+  - Can knit to PDF
+
+- Clone the **hw-01** repo and put your name in the YAML. Knit, Commit, and push to GitHub. If you can do this, your installation and configuration are good to go!
+
+- Let the TAs know if you don't see the **hw-01** repos or have questions. 
+  
