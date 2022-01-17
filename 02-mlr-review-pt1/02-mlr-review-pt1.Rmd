@@ -601,6 +601,7 @@ $$\begin{aligned}\widehat{speed} = &51.413 - 0.025 ~ starters + 0.070 ~ yearnew 
 Interpret the effect of year for the 5 most recent years (2013 - 2017).
 ]
 
+<!-- Ended here in lecture-->
 
 ---
 
