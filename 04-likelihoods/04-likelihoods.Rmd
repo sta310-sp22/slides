@@ -286,7 +286,7 @@ We will use this function to find the **maximum likelihood estimate (MLE)**. The
 .panel[.panel-name[Plot]
 ```{r echo = F}
 p <- seq(0,1, length.out = 100) #sequence of 100 values between 0 and 100
-lik <- p^44 *(1 -p)^46
+lik <- p^46 *(1 -p)^44
 
 x <- tibble(p = p, lik = lik)
 ggplot(data = x, aes(x = p, y = lik)) + 
@@ -300,7 +300,7 @@ ggplot(data = x, aes(x = p, y = lik)) +
 .panel[.panel-name[Code]
 ```{r eval = F}
 p <- seq(0,1, length.out = 100) #sequence of 100 values between 0 and 100
-lik <- p^44 *(1 -p)^46
+lik <- p^46 *(1 -p)^44
 
 x <- tibble(p = p, lik = lik)
 ggplot(data = x, aes(x = p, y = lik)) + 
