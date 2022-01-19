@@ -1,0 +1,91 @@
+---
+title: "Using Likelihoods"
+author: "Prof. Maria Tackett"
+date: "01.19.22"
+output:
+  xaringan::moon_reader:
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "90%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+##[Click for PDF of slides](04-likelihoods.pdf)
+
+---
+
+class: middle, inverse
+
+## Using likelihoods to compare models 
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Nonnested models 
+
+---
+
+class: middle, inverse
+
+## Properties of likelihoods
+
+---
+
+## Statistical properties (maybe take this out? )
+
+
+---
+
+## Looking ahead
+
+
+- We need to add covariates to this! 
+
+---
+
+# Distribution theory 
+
+
+

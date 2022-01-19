@@ -7,6 +7,8 @@
     <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
     <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/font-awesome/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/font-awesome/countdown-0.3.5/countdown.js"></script>
     <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
   </head>
   <body>
@@ -43,24 +45,28 @@ class: middle, center
 - See [syllabus](https://sta310-sp22.netlify.app/syllabus/#teaching-team--office-hours) for office hours schedule 
   - Office hours online this week
   
-- Team lab tomorrow - introducing mini-project 01
-
+- Team lab tomorrow - introducing Mini-Project 01
+  - Find a paper using a GLM in their analysis
+  - Evaluate the analysis in the paper 
+  - "Replicate" the analysis the same or similar data 
+  - Present results in a presentation and short write up
+  - More details in lab!
 ---
 
 ## In-person learning 😷
 
-Attendance to lectures and labs is expected as long as you're healthy and not in quarantine 
+Attendance in lectures and labs is expected as long as you're healthy and not in quarantine 
 
 **Lectures**
 
-- If you're unable to attend class, you can watch the recording of the lecture on Panopto  (link in Sakai) 
+- If you're unable to attend, you can watch the recording of the lecture on Panopto  (link in Sakai) 
 - Ask questions on GitHub Discussions or in office hours
   
 
 **Labs**
 
 - Labs are not recorded
-- On weeks with teamwork: If you are unable to attend lab but are able enough to participate remotely, set up a Zoom call with your teammates
+- On weeks with teamwork: If you are unable to attend lab but are able to participate remotely, work with your teammates to set up a Zoom call
 
 ---
 
@@ -69,7 +75,7 @@ Attendance to lectures and labs is expected as long as you're healthy and not in
 - Class Q&amp;A forum on [GitHub Discussions](https://github.com/sta310-sp22/discussion/discussions)
   - Place for questions about course content, assignments, etc. 
   - Only use email for personal questions (e.g., grades, illness, etc.)
-  - Let Prof. Tackett know if you do not have access to forum
+  - Let Prof. Tackett know if you do not have access to the forum
 
 **Demo**
 
@@ -79,10 +85,15 @@ Attendance to lectures and labs is expected as long as you're healthy and not in
 
 - Notes on [variable transformations]()
 
-- Exercise 5 (and other open-ended exercises)
+- Exercise 5
 
-&lt;font color = "red"&gt; Add what we're looking for in this exercise&lt;/font&gt;
+.midi[
+&gt; *This question will be graded based on*
 
+&gt; *The quality of the model selection process, including the exploratory data analysis. A high quality model selection process is accurate, comprehensive, and strategic (e.g., trying all possible interaction terms will not receive full credit).*
+
+&gt; *The quality of the summary. A high quality summary is accurate, comprehensive, answers the primary analysis question, and tells a cohesive story (e.g., a list of interpretations will not receive full credit).*
+]
 ---
 
 class: middle, inverse
@@ -99,9 +110,9 @@ class: middle, inverse
 
 - Define the Maximum Likelihood Estimate (MLE) and use it to answer an analysis question
 
-- Identify three ways to calculate or approximate the ML and apply these methods to find the MLE for a simple model
+- Identify three ways to calculate or approximate the MLE and apply these methods to find the MLE for a simple model
 
-- Use likelihoods to compare models
+- Use likelihoods to compare models (next week)
 
 ---
 
@@ -111,11 +122,14 @@ A **likelihood** is a function that tells us how likely we are to observe our da
 
 - Unlike Ordinary Least Squares (OLS), they do not require the responses be independent, identically distributed, and normal (iidN)
 
-- It is not the same as a probability function 
+- They are &lt;u&gt;not&lt;/u&gt; the same as probability functions
 
 --
 
   - **Probability function:** Fixed parameter value(s) + input possible outcomes `\(\Rightarrow\)` probability of seeing the different outcomes given the parameter value(s)
+  
+--
+  
   - **Likelihood:** Fixed data + input possible parameter values `\(\Rightarrow\)` probability of seeing the fixed data for each parameter value
 
 ---
@@ -124,7 +138,7 @@ A **likelihood** is a function that tells us how likely we are to observe our da
 
 The data includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
 
-We are interested in the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
+We will focus on the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
   - `H`: Foul was called on the home team 
   - `V`: Foul was called on the visiting team
   
@@ -154,8 +168,6 @@ refs %&gt;% slice(1:5) %&gt;% kable()
 |  214| 20100228|MARQET  |SETON    |V     |V     |H     |
 |  278| 20100128|SETON   |SFL      |H     |V     |V     |
 
-&lt;br&gt; 
-
 We will treat the games as independent in this analysis.
 
 ---
@@ -172,14 +184,14 @@ We will treat the games as independent in this analysis.
  
 --
 
-Which model is better?
+Ultimately we want to decide which model is better.
 
 ---
 
-### Exploratory data analysis
+## Exploratory data analysis
 
 .pull-left[
-.midi[
+.small[
 
 ```r
 refs %&gt;%
@@ -224,6 +236,8 @@ Let `\(p_H\)` be the probability the referees call a foul on the home team.
 
 `$$Lik(p_H) = p_H^{y_i}(1 - p_H)^{n_i - y_i}$$`
 
+Where `\(y_i\)` is the number of fouls called on the home team. 
+
 (In this example, we know `\(n_i = 3\)` for all observations.)
 
 --
@@ -253,6 +267,11 @@ For a single game where the first three fouls are `\(H, H, V\)`, then
 
 Fill in **A** and **B**.
 
+
+<div class="countdown" id="timer_61e86f45" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
 ---
 
 ## Model 1: Likelihood function
@@ -270,7 +289,7 @@ We will use this function to find the **maximum likelihood estimate (MLE)**. The
 
 .panelset.sideways[
 .panel[.panel-name[Plot]
-&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-4-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-5-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 
 .panel[.panel-name[Code]
@@ -303,7 +322,13 @@ B. 0.500
 C. 0.511
 
 D. 0.556
+
+[Click here](https://forms.gle/jeTNo7SwuE2vZur59) to submit your response.
 ]
+
+<div class="countdown" id="timer_61e86fe3" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 ---
 
@@ -321,7 +346,7 @@ There are three primary ways to find the MLE
 
 ## Approximate MLE from a graph 
 
-&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -365,7 +390,7 @@ optimize(ref_lik, interval = c(0,1), maximum = TRUE)
 
 --
 
-&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-9-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-11-1.png" width="60%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -388,7 +413,7 @@ optimize(ref_lik, interval = c(0,1), maximum = TRUE)
 
 --
 
-`$$\Rightarrow 46(1-p) = 44p$$`
+`$$\Rightarrow 46(1-p_H) = 44p_H$$`
 
 --
 
@@ -397,6 +422,13 @@ optimize(ref_lik, interval = c(0,1), maximum = TRUE)
 --
 
 `$$\hat{p}_H = \frac{46}{90} = 0.511$$`
+--
+
+.center[
+.large[
+😐
+]
+]
 
 ---
 
@@ -412,16 +444,22 @@ class: middle, inverse
 
 ## Model 2: Likelihood contributions
 
-- Fouls are &lt;u&gt;not&lt;/u&gt; independent within each game. We will specify this dependence using conditional probabilities. 
-  - Recall: `\(P(A|B) =\)` Probability of `\(A\)` given `\(B\)` has occurred
+- Now let's assume fouls are &lt;u&gt;not&lt;/u&gt; independent within each game. We will specify this dependence using conditional probabilities. 
+  - **Conditional probability**: `\(P(A|B) =\)` Probability of `\(A\)` given `\(B\)` has occurred
 
 --
 
 Define new parameters:
 
-- `\(p_{H|N}\)`: Probability refs call foul on home team given there are equal numbers of fouls on the home and visiting teams 
-- $p_{H|H Bias}: Probability refs call foul on home team given there are more prior fouls on the home team
-- $p_{H|V Bias}: Probability refs call foul on home team given there are more prior fouls on the visiting team 
+- `\(p_{H|N}\)`: Probability referees call foul on home team given there are equal numbers of fouls on the home and visiting teams 
+
+--
+
+- `\(p_{H|H Bias}\)`: Probability referees call foul on home team given there are more prior fouls on the home team
+
+--
+
+- $p_{H|V Bias}: Probability referees call foul on home team given there are more prior fouls on the visiting team 
 
 ---
 
@@ -463,11 +501,11 @@ class: middle
 .question[
 If fouls within a game are independent, how would you expect `\(\hat{p}_H\)`, `\(\hat{p}_{H\vert H Bias}\)` and `\(\hat{p}_{H\vert V Bias}\)` to compare? 
 
-a. `\(\hat{p}_H\)` is greater than `\(\hat{p}_{H\vert H Bias}\)` and `\(\hat{p}_{H\vert V Bias}\)`
+a. `\(\hat{p}_H\)` is greater than `\(\hat{p}_{H\vert H Bias}\)` and `\(\hat{p}_{H \vert V Bias}\)`
 
-b. `\(\hat{p}_{H\vert H Bias}\)` is greater than $\hat{p}_H $ and `\(\hat{p}_{H\vert V Bias}\)`
+b. `\(\hat{p}_{H\vert H Bias}\)` is greater than `\(\hat{p}_H\)` and `\(\hat{p}_{H \vert V Bias}\)`
 
-c. `\(\hat{p}_{H\vert V Bias}\)` is greater than $\hat{p}_H $ and `\(\hat{p}_{H\vert H Bias}\)`
+c. `\(\hat{p}_{H\vert V Bias}\)` is greater than `\(\hat{p}_H\)` and `\(\hat{p}_{H \vert V Bias}\)`
 
 d. They are all approximately equal.
 
@@ -485,7 +523,17 @@ a. `\(\hat{p}_H\)` is greater than  `\(\hat{p}_{H\vert H Bias}\)`
 b. `\(\hat{p}_{H\vert H Bias}\)` is greater than `\(\hat{p}_H\)`
 
 c. They are approximately equal.
+
+[Click here](https://forms.gle/Wy4YmJz3zgVezUdZA) to submit your response.
 ]
+
+---
+
+## Next time 
+
+- Using likelihoods to compare models 
+
+- Chapter 3: Distribution theory 
 
 ---
 
@@ -493,46 +541,6 @@ c. They are approximately equal.
 ## Acknowledgements
 
 These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
-
-
-
-
-&lt;!--
-
-class: middle, inverse
-
-## Using likelihoods to compare models 
-
----
-
-## Model comparisons 
-
-- Nested models 
-
-- Nonnested models 
-
----
-
-class: middle, inverse
-
-## Properties of likelihoods
-
----
-
-## Statistical properties (maybe take this out? )
-
-
----
-
-## Looking ahead
-
-
-- We need to add covariates to this! 
-
----
-
---&gt;
-
 
 
     </textarea>
