@@ -4,11 +4,11 @@
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 
 html{
-  font-size: 22pt; 
+  font-size: 20pt; 
 }
 
 p {
-  font-size: 22pt;
+  font-size: 20pt;
 }
 
 body { 
@@ -32,7 +32,7 @@ h1, h3 {
 }
 
 b, strong {
-  color: #8bbe1b;
+  color: #bdbf09;
 }
 
 a, a > code {
@@ -53,7 +53,6 @@ a, a > code {
   font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace; 
 font-size: 75%;
 }
-
 
 .remark-inline-code {
   font-weight: bold;
@@ -149,7 +148,7 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
 }
 
 .remark-slide-content{
-  font-size: 22pt;
+  font-size: 20pt;
 }
 
 .remark-slide-content:after {

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Using Likelihoods</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Maria Tackett" />
+    <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Using Likelihoods
+### Prof. Maria Tackett
+### 01.19.22
+
+---
+
+
+
+
+
+
+
+
+
+class: middle, center
+
+##[Click for PDF of slides](04-likelihoods.pdf)
+
+---
+
+## Announcements
+
+- [Homework 01](https://sta310-sp22.github.io/assignments/hw/hw-01.html) due Wednesday at 11:59pm 
+
+
+- Week 03 reading: [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+
+- See [syllabus](https://sta310-sp22.netlify.app/syllabus/#teaching-team--office-hours) for office hours schedule 
+  - Office hours online this week
+  
+- Team lab tomorrow - introducing mini-project 01
+
+---
+
+## In-person learning 😷
+
+Attendance to lectures and labs is expected as long as you're healthy and not in quarantine 
+
+**Lectures**
+
+- If you're unable to attend class, you can watch the recording of the lecture on Panopto  (link in Sakai) 
+- Ask questions on GitHub Discussions or in office hours
+  
+
+**Labs**
+
+- Labs are not recorded
+- On weeks with teamwork: If you are unable to attend lab but are able enough to participate remotely, set up a Zoom call with your teammates
+
+---
+
+## Class Q&amp;A Forum: GitHub Discussions
+
+- Class Q&amp;A forum on [GitHub Discussions](https://github.com/sta310-sp22/discussion/discussions)
+  - Place for questions about course content, assignments, etc. 
+  - Only use email for personal questions (e.g., grades, illness, etc.)
+  - Let Prof. Tackett know if you do not have access to forum
+
+**Demo**
+
+---
+
+## Homework 01
+
+- Notes on [variable transformations]()
+
+- Exercise 5 (and other open-ended exercises)
+
+&lt;font color = "red"&gt; Add what we're looking for in this exercise&lt;/font&gt;
+
+---
+
+class: middle, inverse
+
+## Using Likelihoods
+
+---
+
+## Learning goals 
+
+- Describe the concept of a likelihood
+
+- Construct the likelihood for a simple model
+
+- Define the Maximum Likelihood Estimate (MLE) and use it to answer an analysis question
+
+- Identify three ways to calculate or approximate the ML and apply these methods to find the MLE for a simple model
+
+- Use likelihoods to compare models
+
+---
+
+## What is the likelihood? 
+
+A **likelihood** is a function that tells us how likely we are to observe our data for a given parameter value (or values). 
+
+- Unlike Ordinary Least Squares (OLS), they do not require the responses be independent, identically distributed, and normal (iidN)
+
+- It is not the same as a probability function 
+
+--
+
+  - **Probability function:** Fixed parameter value(s) + input possible outcomes `\(\Rightarrow\)` probability of seeing the different outcomes given the parameter value(s)
+  - **Likelihood:** Fixed data + input possible parameter values `\(\Rightarrow\)` probability of seeing the fixed data for each parameter value
+
+---
+
+## Fouls in college basketball games
+
+The data includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
+
+We are interested in the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
+  - `H`: Foul was called on the home team 
+  - `V`: Foul was called on the visiting team
+  
+--
+
+We are focusing on the first three fouls for this analysis, but this could easily be extended to include all fouls in a game. 
+
+.footnote[.small[The dataset was derived from `basektball0910.csv` used in [BMLR Section 11.2](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#cs:refs)]]
+
+---
+
+## Fouls in college basketball games
+
+
+```r
+refs &lt;- read_csv("data/04-refs.csv")
+refs %&gt;% slice(1:5) %&gt;% kable()
+```
+
+
+
+| game|     date|visitor |hometeam |foul1 |foul2 |foul3 |
+|----:|--------:|:-------|:--------|:-----|:-----|:-----|
+|  166| 20100126|CLEM    |BC       |V     |V     |V     |
+|  224| 20100224|DEPAUL  |CIN      |H     |H     |V     |
+|  317| 20100109|MARQET  |NOVA     |H     |H     |H     |
+|  214| 20100228|MARQET  |SETON    |V     |V     |H     |
+|  278| 20100128|SETON   |SFL      |H     |V     |V     |
+
+&lt;br&gt; 
+
+We will treat the games as independent in this analysis.
+
+---
+
+## Different likelihood models 
+
+**Model 1 (Unconditional Model)**: What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
+
+--
+
+**Model 2 (Conditional Conditional Model)**: 
+  - Is there a tendency for the referees to call more fouls on the visiting team or home team? 
+  - Is there a tendency for referees to call a foul on the team that already has more fouls? 
+ 
+--
+
+Which model is better?
+
+---
+
+### Exploratory data analysis
+
+.pull-left[
+.midi[
+
+```r
+refs %&gt;%
+count(foul1, foul2, foul3) %&gt;% kable()
+```
+
+
+
+|foul1 |foul2 |foul3 |  n|
+|:-----|:-----|:-----|--:|
+|H     |H     |H     |  3|
+|H     |H     |V     |  2|
+|H     |V     |H     |  3|
+|H     |V     |V     |  7|
+|V     |H     |H     |  7|
+|V     |H     |V     |  1|
+|V     |V     |H     |  5|
+|V     |V     |V     |  2|
+]
+]
+
+.pull-right[
+There are 
+- 46 total fouls on the home team
+- 44 total fouls on the visiting team 
+]
+
+---
+
+class: middle, inverse
+
+## Model 1: Unconditional model 
+
+### What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
+
+---
+## Likelihood
+
+Let `\(p_H\)` be the probability the referees call a foul on the home team. 
+
+**The likelihood for a single observation** 
+
+`$$Lik(p_H) = p_H^{y_i}(1 - p_H)^{n_i - y_i}$$`
+
+(In this example, we know `\(n_i = 3\)` for all observations.)
+
+--
+
+**Example**
+
+For a single game where the first three fouls are `\(H, H, V\)`, then
+
+`$$Lik(p_H) = p_H^{2}(1 - p_H)^{3 - 2} = p_H^{2}(1 - p_H)$$`
+
+---
+
+## Model 1: Likelihood contribution 
+
+.midi[
+| Foul1 | Foul2 | Foul3 | n | Likelihood Contribution |
+|-------|-------|-------|---|:-----------------------:|
+| H     | H     | H     | 3 |       `\(p_H^3\)`               |
+| H     | H     | V     | 2 |        `\(p_H^2(1 - p_H)\)`                 |
+| H     | V     | H     | 3 |        `\(p_H^2(1 - p_H)\)`                 |
+| H     | V     | V     | 7 |       A                |
+| V     | H     | H     | 7 |        B                 |
+| V     | H     | V     | 1 |          `\(p_H(1 - p_H)^2\)`               |
+| V     | V     | H     | 5 |         `\(p_H(1 - p_H)^2\)`                |
+| V     | V     | V     | 2 |         `\((1 - p_H)^3\)`                |
+]
+
+Fill in **A** and **B**.
+
+---
+
+## Model 1: Likelihood function
+
+Because the observations (the games) are independent, the **likelihood** is
+
+`$$Lik(p_H) = \prod_{i=1}^{n}p_H^{y_i}(1 - p_H)^{3 - y_i}$$`
+--
+
+We will use this function to find the **maximum likelihood estimate (MLE)**. The MLE is the value between 0 and 1 where we are most likely to see the observed data.
+
+---
+
+## Visualizing the likelihood
+
+.panelset.sideways[
+.panel[.panel-name[Plot]
+&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-4-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+.panel[.panel-name[Code]
+
+```r
+p &lt;- seq(0,1, length.out = 100) #sequence of 100 values between 0 and 100
+lik &lt;- p^44 *(1 -p)^46
+
+x &lt;- tibble(p = p, lik = lik)
+ggplot(data = x, aes(x = p, y = lik)) + 
+  geom_point() + 
+  geom_line() +
+  labs(y = "Likelihood",
+       title = "Likelihood of p_H")
+```
+]
+]
+
+---
+
+class: middle
+
+.question[
+What is your best guess for the MLE, `\(\hat{p}_H\)`?
+
+A. 0.489
+
+B. 0.500
+
+C. 0.511
+
+D. 0.556
+]
+
+---
+
+## Finding the maximum likelihood estimate 
+
+There are three primary ways to find the MLE 
+
+✅ Approximate using a graph
+
+✅ Numerical approximation 
+
+✅ Using calculus
+
+---
+
+## Approximate MLE from a graph 
+
+&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Find the MLE using numerical approximation
+
+Specify a finite set of possible values the for `\(p_H\)` and calculate the likelihood for each value
+
+--
+
+
+```r
+# write an R function for the likelihood
+ref_lik &lt;- function(ph) {
+  ph^46 *(1 - ph)^44
+}
+```
+
+--
+
+
+```r
+# use the optimize function to find the MLE
+optimize(ref_lik, interval = c(0,1), maximum = TRUE)
+```
+
+```
+## $maximum
+## [1] 0.5111132
+## 
+## $objective
+## [1] 8.25947e-28
+```
+
+---
+
+## Find MLE using calculus
+
+- Find the MLE by taking the first derivative of the likelihood function. 
+
+- This can be tricky because of the Product Rule, so we can maximize the **log(Likelihood)** instead. The same value maximizes the likelihood and log(Likelihood)
+
+--
+
+&lt;img src="04-likelihoods_files/figure-html/unnamed-chunk-9-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Find MLE using calculus
+
+`$$Lik(p_H) = \prod_{i=1}^{n}p_H^{y_i}(1 - p_H)^{3 - y_i}$$`
+
+--
+
+`$$\begin{aligned}\log(Lik(p_H)) &amp;= \sum_{i=1}^{n}y_i\log(p_H) + (3 - y_i)\log(1 - p_H)\\[10pt] &amp;= 46\log(p_H) + 44\log(1 - p_H)\end{aligned}$$`
+---
+
+## Find MLE using calculus
+
+`$$\frac{d}{d p_H} \log(Lik(p_H)) = \frac{46}{p_H} - \frac{44}{1-p_H} = 0$$`
+
+--
+
+`$$\Rightarrow \frac{46}{p_H} = \frac{44}{1-p_H}$$`
+
+--
+
+`$$\Rightarrow 46(1-p) = 44p$$`
+
+--
+
+`$$\Rightarrow 46 = 90p_H$$`
+
+--
+
+`$$\hat{p}_H = \frac{46}{90} = 0.511$$`
+
+---
+
+class: middle, inverse
+
+## Model 2: Conditional model 
+
+### Is there a tendency for the referees to call more fouls on the visiting team or home team? 
+
+### Is there a tendency for referees to call a foul on the team that already has more fouls?
+
+---
+
+## Model 2: Likelihood contributions
+
+- Fouls are &lt;u&gt;not&lt;/u&gt; independent within each game. We will specify this dependence using conditional probabilities. 
+  - Recall: `\(P(A|B) =\)` Probability of `\(A\)` given `\(B\)` has occurred
+
+--
+
+Define new parameters:
+
+- `\(p_{H|N}\)`: Probability refs call foul on home team given there are equal numbers of fouls on the home and visiting teams 
+- $p_{H|H Bias}: Probability refs call foul on home team given there are more prior fouls on the home team
+- $p_{H|V Bias}: Probability refs call foul on home team given there are more prior fouls on the visiting team 
+
+---
+
+## Model 2: Likelihood contributions 
+
+.midi[
+| Foul1 | Foul2 | Foul3 | n | Likelihood Contribution |
+|-------|-------|-------|---|:-----------------------:|
+| H     | H     | H     | 3 | `\((p_{H\vert N})(p_{H\vert H Bias})(p_{H\vert H Bias}) = (p_{H\vert N})(p_{H\vert H Bias})^2\)` |
+| H     | H     | V     | 2 |        `\((p_{H\vert N})(p_{H\vert H Bias})(1 - p_{H\vert H Bias})\)`                 |
+| H     | V     | H     | 3 |        `\((p_{H\vert N})(1 - p_{H\vert H Bias})(p_{H\vert N}) = (p_{H\vert N})^2(1 - p_{H\vert H Bias})\)`                 |
+| H     | V     | V     | 7 |       A                |
+| V     | H     | H     | 7 |        B                 |
+| V     | H     | V     | 1 |          `\((1 - p_{H\vert N})(p_{H\vert V Bias})(1 - p_{H\vert N}) = (1 - p_{H\vert N})^2(p_{H\vert V Bias})\)`               |
+| V     | V     | H     | 5 |         `\((1 - p_{H\vert N})(1-p_{H\vert V Bias})(p_{H\vert V Bias})\)`                |
+| V     | V     | V     | 2 |         `\(\begin{aligned}&amp;(1 - p_{H\vert N})(1-p_{H\vert V Bias})(1-p_{H\vert V Bias})\\ &amp;=(1 - p_{H\vert N})(1-p_{H\vert V Bias})^2\end{aligned}\)`                |
+]
+
+Fill in **A** and **B**
+
+---
+
+## Likelihood function 
+
+`$$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &amp;= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &amp;(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$`      
+
+**(Note: The exponents sum to 90, the total number of fouls in the data)**
+
+&lt;br&gt; 
+
+--
+
+`$$\begin{aligned}\log (Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias})) &amp;= 25 \log(p_{H| N}) + 23 \log(1 - p_{H|N}) \\ &amp; + 8 \log(p_{H| H Bias}) + 12 \log(1 - p_{H| H Bias})\\ &amp;+ 13 \log(p_{H| V Bias}) + 9 \log(1-p_{H|V Bias})\end{aligned}$$`   
+
+---
+
+class: middle 
+
+.question[
+If fouls within a game are independent, how would you expect `\(\hat{p}_H\)`, `\(\hat{p}_{H\vert H Bias}\)` and `\(\hat{p}_{H\vert V Bias}\)` to compare? 
+
+a. `\(\hat{p}_H\)` is greater than `\(\hat{p}_{H\vert H Bias}\)` and `\(\hat{p}_{H\vert V Bias}\)`
+
+b. `\(\hat{p}_{H\vert H Bias}\)` is greater than $\hat{p}_H $ and `\(\hat{p}_{H\vert V Bias}\)`
+
+c. `\(\hat{p}_{H\vert V Bias}\)` is greater than $\hat{p}_H $ and `\(\hat{p}_{H\vert H Bias}\)`
+
+d. They are all approximately equal.
+
+]
+
+---
+
+class: middle 
+
+.question[
+If there is a tendency for referees to call a foul on the team that already has more fouls, how would you expect `\(\hat{p}_H\)` and  `\(\hat{p}_{H\vert H Bias}\)` to compare? 
+
+a. `\(\hat{p}_H\)` is greater than  `\(\hat{p}_{H\vert H Bias}\)` 
+
+b. `\(\hat{p}_{H\vert H Bias}\)` is greater than `\(\hat{p}_H\)`
+
+c. They are approximately equal.
+]
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
+
+
+
+&lt;!--
+
+class: middle, inverse
+
+## Using likelihoods to compare models 
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Nonnested models 
+
+---
+
+class: middle, inverse
+
+## Properties of likelihoods
+
+---
+
+## Statistical properties (maybe take this out? )
+
+
+---
+
+## Looking ahead
+
+
+- We need to add covariates to this! 
+
+---
+
+--&gt;
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%",
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

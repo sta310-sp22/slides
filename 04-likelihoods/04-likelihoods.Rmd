@@ -1,0 +1,554 @@
+---
+title: "Using Likelihoods"
+author: "Prof. Maria Tackett"
+date: "01.19.22"
+output:
+  xaringan::moon_reader:
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "90%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+##[Click for PDF of slides](04-likelihoods.pdf)
+
+---
+
+## Announcements
+
+- [Homework 01](https://sta310-sp22.github.io/assignments/hw/hw-01.html) due Wednesday at 11:59pm 
+
+
+- Week 03 reading: [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+
+- See [syllabus](https://sta310-sp22.netlify.app/syllabus/#teaching-team--office-hours) for office hours schedule 
+  - Office hours online this week
+  
+- Team lab tomorrow - introducing mini-project 01
+
+---
+
+## In-person learning `r emo::ji("mask")`
+
+Attendance to lectures and labs is expected as long as you're healthy and not in quarantine 
+
+**Lectures**
+
+- If you're unable to attend class, you can watch the recording of the lecture on Panopto  (link in Sakai) 
+- Ask questions on GitHub Discussions or in office hours
+  
+
+**Labs**
+
+- Labs are not recorded
+- On weeks with teamwork: If you are unable to attend lab but are able enough to participate remotely, set up a Zoom call with your teammates
+
+---
+
+## Class Q&A Forum: GitHub Discussions
+
+- Class Q&A forum on [GitHub Discussions](https://github.com/sta310-sp22/discussion/discussions)
+  - Place for questions about course content, assignments, etc. 
+  - Only use email for personal questions (e.g., grades, illness, etc.)
+  - Let Prof. Tackett know if you do not have access to forum
+
+**Demo**
+
+---
+
+## Homework 01
+
+- Notes on [variable transformations]()
+
+- Exercise 5 (and other open-ended exercises)
+
+<font color = "red"> Add what we're looking for in this exercise</font>
+
+---
+
+class: middle, inverse
+
+## Using Likelihoods
+
+---
+
+## Learning goals 
+
+- Describe the concept of a likelihood
+
+- Construct the likelihood for a simple model
+
+- Define the Maximum Likelihood Estimate (MLE) and use it to answer an analysis question
+
+- Identify three ways to calculate or approximate the ML and apply these methods to find the MLE for a simple model
+
+- Use likelihoods to compare models
+
+---
+
+## What is the likelihood? 
+
+A **likelihood** is a function that tells us how likely we are to observe our data for a given parameter value (or values). 
+
+- Unlike Ordinary Least Squares (OLS), they do not require the responses be independent, identically distributed, and normal (iidN)
+
+- It is not the same as a probability function 
+
+--
+
+  - **Probability function:** Fixed parameter value(s) + input possible outcomes $\Rightarrow$ probability of seeing the different outcomes given the parameter value(s)
+  - **Likelihood:** Fixed data + input possible parameter values $\Rightarrow$ probability of seeing the fixed data for each parameter value
+
+---
+
+## Fouls in college basketball games
+
+The data includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
+
+We are interested in the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
+  - `H`: Foul was called on the home team 
+  - `V`: Foul was called on the visiting team
+  
+--
+
+We are focusing on the first three fouls for this analysis, but this could easily be extended to include all fouls in a game. 
+
+.footnote[.small[The dataset was derived from `basektball0910.csv` used in [BMLR Section 11.2](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#cs:refs)]]
+
+---
+
+## Fouls in college basketball games
+
+```{r}
+refs <- read_csv("data/04-refs.csv")
+refs %>% slice(1:5) %>% kable()
+```
+
+<br> 
+
+We will treat the games as independent in this analysis.
+
+---
+
+## Different likelihood models 
+
+**Model 1 (Unconditional Model)**: What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
+
+--
+
+**Model 2 (Conditional Conditional Model)**: 
+  - Is there a tendency for the referees to call more fouls on the visiting team or home team? 
+  - Is there a tendency for referees to call a foul on the team that already has more fouls? 
+ 
+--
+
+Which model is better?
+
+---
+
+### Exploratory data analysis
+
+.pull-left[
+.midi[
+```{r}
+refs %>%
+count(foul1, foul2, foul3) %>% kable()
+```
+]
+]
+
+.pull-right[
+There are 
+- 46 total fouls on the home team
+- 44 total fouls on the visiting team 
+]
+
+---
+
+class: middle, inverse
+
+## Model 1: Unconditional model 
+
+### What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
+
+---
+## Likelihood
+
+Let $p_H$ be the probability the referees call a foul on the home team. 
+
+**The likelihood for a single observation** 
+
+$$Lik(p_H) = p_H^{y_i}(1 - p_H)^{n_i - y_i}$$
+
+(In this example, we know $n_i = 3$ for all observations.)
+
+--
+
+**Example**
+
+For a single game where the first three fouls are $H, H, V$, then
+
+$$Lik(p_H) = p_H^{2}(1 - p_H)^{3 - 2} = p_H^{2}(1 - p_H)$$
+
+---
+
+## Model 1: Likelihood contribution 
+
+.midi[
+| Foul1 | Foul2 | Foul3 | n | Likelihood Contribution |
+|-------|-------|-------|---|:-----------------------:|
+| H     | H     | H     | 3 |       $p_H^3$               |
+| H     | H     | V     | 2 |        $p_H^2(1 - p_H)$                 |
+| H     | V     | H     | 3 |        $p_H^2(1 - p_H)$                 |
+| H     | V     | V     | 7 |       A                |
+| V     | H     | H     | 7 |        B                 |
+| V     | H     | V     | 1 |          $p_H(1 - p_H)^2$               |
+| V     | V     | H     | 5 |         $p_H(1 - p_H)^2$                |
+| V     | V     | V     | 2 |         $(1 - p_H)^3$                |
+]
+
+Fill in **A** and **B**.
+
+---
+
+## Model 1: Likelihood function
+
+Because the observations (the games) are independent, the **likelihood** is
+
+$$Lik(p_H) = \prod_{i=1}^{n}p_H^{y_i}(1 - p_H)^{3 - y_i}$$
+--
+
+We will use this function to find the **maximum likelihood estimate (MLE)**. The MLE is the value between 0 and 1 where we are most likely to see the observed data.
+
+---
+
+## Visualizing the likelihood
+
+.panelset.sideways[
+.panel[.panel-name[Plot]
+```{r echo = F}
+p <- seq(0,1, length.out = 100) #sequence of 100 values between 0 and 100
+lik <- p^44 *(1 -p)^46
+
+x <- tibble(p = p, lik = lik)
+ggplot(data = x, aes(x = p, y = lik)) + 
+  geom_point() + 
+  geom_line() +
+  labs(y = "Likelihood",
+       title = "Likelihood of p_H")
+```
+]
+
+.panel[.panel-name[Code]
+```{r eval = F}
+p <- seq(0,1, length.out = 100) #sequence of 100 values between 0 and 100
+lik <- p^44 *(1 -p)^46
+
+x <- tibble(p = p, lik = lik)
+ggplot(data = x, aes(x = p, y = lik)) + 
+  geom_point() + 
+  geom_line() +
+  labs(y = "Likelihood",
+       title = "Likelihood of p_H")
+```
+]
+]
+
+---
+
+class: middle
+
+.question[
+What is your best guess for the MLE, $\hat{p}_H$?
+
+A. 0.489
+
+B. 0.500
+
+C. 0.511
+
+D. 0.556
+]
+
+---
+
+## Finding the maximum likelihood estimate 
+
+There are three primary ways to find the MLE 
+
+`r emo::ji("white_check_mark")` Approximate using a graph
+
+`r emo::ji("white_check_mark")` Numerical approximation 
+
+`r emo::ji("white_check_mark")` Using calculus
+
+---
+
+## Approximate MLE from a graph 
+
+```{r echo = F, out.width = "80%"}
+p <- seq(0,1, length.out = 100) #sequence of 100 values between 0 and 100
+lik <- p^46 *(1 -p)^44
+
+x1 <- tibble(p = p, lik = lik)
+
+lik_plot <- ggplot(data = x1, aes(x = p, y = lik)) + 
+  geom_point() + 
+  geom_line() + 
+  geom_vline(xintercept = 46/90, color = "red") + 
+    labs(y = "Likelihood", 
+       title = "Likelihood of p_H")
+
+lik_plot
+```
+
+---
+
+## Find the MLE using numerical approximation
+
+Specify a finite set of possible values the for $p_H$ and calculate the likelihood for each value
+
+--
+
+```{r}
+# write an R function for the likelihood
+ref_lik <- function(ph) {
+  ph^46 *(1 - ph)^44
+}
+```
+
+--
+
+```{r}
+# use the optimize function to find the MLE
+optimize(ref_lik, interval = c(0,1), maximum = TRUE)
+```
+
+---
+
+## Find MLE using calculus
+
+- Find the MLE by taking the first derivative of the likelihood function. 
+
+- This can be tricky because of the Product Rule, so we can maximize the **log(Likelihood)** instead. The same value maximizes the likelihood and log(Likelihood)
+
+--
+
+```{r echo = F, out.width = "60%"}
+loglik_plot <- ggplot(data = x1, aes(x = p, y = log(lik))) + 
+  geom_point() + 
+  geom_line() + 
+  geom_vline(xintercept = 46/90, color = "red") + 
+    labs(y = "log(Likelihood)", 
+       title = "log(Likelihood) of p_H")
+
+lik_plot + loglik_plot
+```
+
+---
+
+## Find MLE using calculus
+
+$$Lik(p_H) = \prod_{i=1}^{n}p_H^{y_i}(1 - p_H)^{3 - y_i}$$
+
+--
+
+$$\begin{aligned}\log(Lik(p_H)) &= \sum_{i=1}^{n}y_i\log(p_H) + (3 - y_i)\log(1 - p_H)\\[10pt] &= 46\log(p_H) + 44\log(1 - p_H)\end{aligned}$$
+---
+
+## Find MLE using calculus
+
+$$\frac{d}{d p_H} \log(Lik(p_H)) = \frac{46}{p_H} - \frac{44}{1-p_H} = 0$$
+
+--
+
+$$\Rightarrow \frac{46}{p_H} = \frac{44}{1-p_H}$$
+
+--
+
+$$\Rightarrow 46(1-p) = 44p$$
+
+--
+
+$$\Rightarrow 46 = 90p_H$$
+
+--
+
+$$\hat{p}_H = \frac{46}{90} = 0.511$$
+
+---
+
+class: middle, inverse
+
+## Model 2: Conditional model 
+
+### Is there a tendency for the referees to call more fouls on the visiting team or home team? 
+
+### Is there a tendency for referees to call a foul on the team that already has more fouls?
+
+---
+
+## Model 2: Likelihood contributions
+
+- Fouls are <u>not</u> independent within each game. We will specify this dependence using conditional probabilities. 
+  - Recall: $P(A|B) =$ Probability of $A$ given $B$ has occurred
+
+--
+
+Define new parameters:
+
+- $p_{H|N}$: Probability refs call foul on home team given there are equal numbers of fouls on the home and visiting teams 
+- $p_{H|H Bias}: Probability refs call foul on home team given there are more prior fouls on the home team
+- $p_{H|V Bias}: Probability refs call foul on home team given there are more prior fouls on the visiting team 
+
+---
+
+## Model 2: Likelihood contributions 
+
+.midi[
+| Foul1 | Foul2 | Foul3 | n | Likelihood Contribution |
+|-------|-------|-------|---|:-----------------------:|
+| H     | H     | H     | 3 | $(p_{H\vert N})(p_{H\vert H Bias})(p_{H\vert H Bias}) = (p_{H\vert N})(p_{H\vert H Bias})^2$ |
+| H     | H     | V     | 2 |        $(p_{H\vert N})(p_{H\vert H Bias})(1 - p_{H\vert H Bias})$                 |
+| H     | V     | H     | 3 |        $(p_{H\vert N})(1 - p_{H\vert H Bias})(p_{H\vert N}) = (p_{H\vert N})^2(1 - p_{H\vert H Bias})$                 |
+| H     | V     | V     | 7 |       A                |
+| V     | H     | H     | 7 |        B                 |
+| V     | H     | V     | 1 |          $(1 - p_{H\vert N})(p_{H\vert V Bias})(1 - p_{H\vert N}) = (1 - p_{H\vert N})^2(p_{H\vert V Bias})$               |
+| V     | V     | H     | 5 |         $(1 - p_{H\vert N})(1-p_{H\vert V Bias})(p_{H\vert V Bias})$                |
+| V     | V     | V     | 2 |         $\begin{aligned}&(1 - p_{H\vert N})(1-p_{H\vert V Bias})(1-p_{H\vert V Bias})\\ &=(1 - p_{H\vert N})(1-p_{H\vert V Bias})^2\end{aligned}$                |
+]
+
+Fill in **A** and **B**
+
+---
+
+## Likelihood function 
+
+$$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$      
+
+**(Note: The exponents sum to 90, the total number of fouls in the data)**
+
+<br> 
+
+--
+
+$$\begin{aligned}\log (Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias})) &= 25 \log(p_{H| N}) + 23 \log(1 - p_{H|N}) \\ & + 8 \log(p_{H| H Bias}) + 12 \log(1 - p_{H| H Bias})\\ &+ 13 \log(p_{H| V Bias}) + 9 \log(1-p_{H|V Bias})\end{aligned}$$   
+
+---
+
+class: middle 
+
+.question[
+If fouls within a game are independent, how would you expect $\hat{p}_H$, $\hat{p}_{H\vert H Bias}$ and $\hat{p}_{H\vert V Bias}$ to compare? 
+
+a. $\hat{p}_H$ is greater than $\hat{p}_{H\vert H Bias}$ and $\hat{p}_{H\vert V Bias}$
+
+b. $\hat{p}_{H\vert H Bias}$ is greater than $\hat{p}_H $ and $\hat{p}_{H\vert V Bias}$
+
+c. $\hat{p}_{H\vert V Bias}$ is greater than $\hat{p}_H $ and $\hat{p}_{H\vert H Bias}$
+
+d. They are all approximately equal.
+
+]
+
+---
+
+class: middle 
+
+.question[
+If there is a tendency for referees to call a foul on the team that already has more fouls, how would you expect $\hat{p}_H$ and  $\hat{p}_{H\vert H Bias}$ to compare? 
+
+a. $\hat{p}_H$ is greater than  $\hat{p}_{H\vert H Bias}$ 
+
+b. $\hat{p}_{H\vert H Bias}$ is greater than $\hat{p}_H$
+
+c. They are approximately equal.
+]
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
+
+
+
+<!--
+
+class: middle, inverse
+
+## Using likelihoods to compare models 
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Nonnested models 
+
+---
+
+class: middle, inverse
+
+## Properties of likelihoods
+
+---
+
+## Statistical properties (maybe take this out? )
+
+
+---
+
+## Looking ahead
+
+
+- We need to add covariates to this! 
+
+---
+
+-->
+
+
+
