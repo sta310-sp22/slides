@@ -101,7 +101,7 @@ Attendance in lectures and labs is expected as long as you're healthy and not in
 
 ## Homework 01
 
-- Notes on [variable transformations]()
+- Notes on [variable transformations](https://sta210-fa21.netlify.app/slides/14-transformations.html#1)
 
 - Exercise 5
 
@@ -154,7 +154,7 @@ A **likelihood** is a function that tells us how likely we are to observe our da
 
 ## Fouls in college basketball games
 
-The data includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
+The data set [`04-refs.csv`](data/04-refs.csv) includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
 
 We will focus on the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
   - `H`: Foul was called on the home team 
