@@ -143,7 +143,7 @@ The **maximum likelihood estimate (MLE)** is the value between 0 and 1 where we 
 .pull-left[
 **Model 1 (Unconditional Model)**
 
-- `\(\hat{p}_H = 49/90 = 0.511\)`
+- `\(\hat{p}_H = 46/90 = 0.511\)`
 
 
 **Model 2 (Conditional Model)**
@@ -211,8 +211,92 @@ Example:
 Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`, and `\(p_{H |V Bias}\)` can be set to equal `\(p_H\)` to get Model 1. 
 
 `$$\begin{aligned}&amp;H_0: p_{H| N} = p_{H| H Bias} = p_{H| V Bias} = p_H \\
-&amp;H_a: \text{At least one of }p_{H| N}, p_{H| H Bias}, and p_{H| V Bias} \text{ differs from the others}\end{aligned}$$`
+&amp;H_a: \text{At least one of }p_{H| N}, p_{H| H Bias}, p_{H| V Bias} \text{ differs from the others}\end{aligned}$$`
 
+---
+
+## Steps to compare models 
+
+1️⃣  Find the MLEs for each model 
+
+2️⃣  Plug the MLEs into the (log) likelihood function for each model to get the maximum value of the (log) likelihood for each model. 
+
+3️⃣  Find the difference in the log likelihoods
+
+4️⃣  Use inference to determine if the difference is statistically significant 
+
+---
+
+## Steps 1 - 2
+
+.pull-left[
+**Model 1:**
+
+- `\(\hat{p}_H = 46/90 = 0.511\)`
+
+`$$\max\{\log(Lik(p_H)\} = -62.36102$$`
+]
+
+.pull-right[
+**Model 2**
+
+- `\(\hat{p}_{H|N} = 25 / 48 = 0.521\)`
+- `\(\hat{p}_{H|H Bias} = 8 /20 = 0.4\)`
+- `\(\hat{p}_{H|V Bias} = 13/ 22 = 0.591\)`
+
+`$$\begin{aligned}\max\{&amp;\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\}\\
+&amp;= -62.61375\end{aligned}$$`
+]
+
+---
+
+## Step 3
+
+`$$\begin{aligned}\max\{&amp;\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\} - \max\{\log(Lik(p_H)\}\\ &amp;= -62.61375 - (-62.36102) = \textbf{-0.25273}\end{aligned}$$`
+
+&lt;br&gt;
+
+
+--
+
+.center[
+**Is the difference in the max (log) likelihoods statistically significant?** 
+]
+---
+
+## Likelihood ratio test
+
+**Test statistic**
+
+`$$\begin{aligned} LRT &amp;= 2[\max\{\log(Lik(\text{larger model}))\} - \max\{\log(Lik(\text{reduced model}))\}]\\[10pt]
+&amp;= 2\log\Bigg(\frac{\max\{(Lik(\text{larger model})\}}{\max\{(Lik(\text{reduced model})\}}\Bigg)\end{aligned}$$`
+
+&lt;br&gt; 
+
+--
+
+LRT follows a `\(\chi^2\)` distribution where the degrees of freedom equal the difference in the number of parameters between the two models
+
+---
+
+## Step 4
+
+
+
+
+---
+
+## Comparing non-nested models 
+
+---
+
+## Summary 
+
+- How we'll use likelihoods in this course
+
+- These examples don't include covariates! 
+
+---
 
 ---
 
