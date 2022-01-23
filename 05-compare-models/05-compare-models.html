@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Using likelihoods to compare models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Maria Tackett" />
+    <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Using likelihoods to compare models
+### Prof. Maria Tackett
+### 01.24.22
+
+---
+
+
+
+
+
+
+
+
+
+class: middle, center
+
+##[Click for PDF of slides](05-compare-models.pdf)
+
+---
+
+## Announcements
+
+- Project update 
+
+- Week 03 reading: [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+
+- Quiz 01 due Wed, Jan 26 at 3:30pm (before class)
+
+
+---
+
+## Learning goals 
+
+- Use likelihood to compare models 
+
+- Review distribution theory 
+
+---
+
+class: middle, inverse
+
+## Recap
+
+---
+
+## Fouls in college basketball games
+
+The data set [`04-refs.csv`](data/04-refs.csv) includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
+
+We will focus on the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
+  - `H`: Foul was called on the home team 
+  - `V`: Foul was called on the visiting team
+
+--
+
+We are focusing on the first three fouls for this analysis, but this could easily be extended to include all fouls in a game. 
+
+.footnote[.small[The dataset was derived from `basektball0910.csv` used in [BMLR Section 11.2](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#cs:refs)]]
+
+---
+
+## Fouls in college basketball games
+
+
+```r
+refs &lt;- read_csv("data/04-refs.csv")
+refs %&gt;% slice(1:5) %&gt;% kable()
+```
+
+
+
+| game|     date|visitor |hometeam |foul1 |foul2 |foul3 |
+|----:|--------:|:-------|:--------|:-----|:-----|:-----|
+|  166| 20100126|CLEM    |BC       |V     |V     |V     |
+|  224| 20100224|DEPAUL  |CIN      |H     |H     |V     |
+|  317| 20100109|MARQET  |NOVA     |H     |H     |H     |
+|  214| 20100228|MARQET  |SETON    |V     |V     |H     |
+|  278| 20100128|SETON   |SFL      |H     |V     |V     |
+
+We will treat the games as independent in this analysis.
+
+---
+
+## Likelihoods 
+
+A **likelihood** is a function that tells us how likely we are to observe our data for a given parameter value (or values). 
+
+--
+
+**Model 1 (Unconditional Model)**
+
+- `\(p_H\)`: probability of a foul being called on the home team
+
+--
+
+**Model 2 (Conditional Model)**
+
+- `\(p_{H|N}\)`: Probability referees call foul on home team given there are equal numbers of fouls on the home and visiting teams
+- `\(p_{H|H Bias}\)`: Probability referees call foul on home team given there are more prior fouls on the home team
+- `\(p_{H|V Bias}\)`: Probability referees call foul on home team given there are more prior fouls on the visiting team
+    
+
+---
+
+## Likelihoods
+
+A **likelihood** is a function that tells us how likely we are to observe our data for a given parameter value (or values). 
+
+**Model 1 (Unconditional Model)**
+
+`$$Lik(p_H) = p_H^{46}(1 - p_H)^{44}$$`
+
+--
+
+
+**Model 2 (Conditional Model)**
+
+`$$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &amp;= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &amp;(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$`     
+
+---
+
+## Maximum likelihood estimates
+
+The **maximum likelihood estimate (MLE)** is the value between 0 and 1 where we are most likely to see the observed data.
+
+--
+
+.pull-left[
+**Model 1 (Unconditional Model)**
+
+- `\(\hat{p}_H = 49/90 = 0.511\)`
+
+
+**Model 2 (Conditional Model)**
+
+- `\(\hat{p}_{H|N} = 25 / 48 = 0.521\)`
+- `\(\hat{p}_{H|H Bias} = 8 /20 = 0.4\)`
+- `\(\hat{p}_{H|V Bias} = 13/ 22 = 0.591\)`
+
+]
+
+.pull-right[
+
+- What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
+- Is there a tendency for the referees to call more fouls on the visiting team or home team? 
+- Is there a tendency for referees to call a foul on the team that already has more fouls? 
+
+]
+
+---
+
+class: middle, inverse
+
+## Model comparison 
+
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Unnested models
+
+---
+
+## Nested Models
+
+**Nested models**: Models such that the parameters of the reduced model are a subset of the parameters for a larger model 
+
+Example: 
+
+`$$\begin{aligned}&amp;\text{Model A: }y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \epsilon\\
+&amp;\text{Model B: }y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4 + \epsilon\end{aligned}$$`
+
+--
+
+Model A is nested in Model B. We could use likelihoods to test whether it is useful to add `\(x_3\)` and `\(x_4\)` to the model. 
+
+`$$\begin{aligned}&amp;H_0: \beta_3 = \beta_4 = 0 \\ 
+&amp;H_a: \text{ at least one }\beta_j \text{ is not equal to 0}\end{aligned}$$`
+
+---
+
+## Nested models
+
+**Another way to think about nested models**: Parameters in larger model can be equated to get the simpler model or if some parameters can be set to constants 
+
+Example: 
+
+`$$\begin{aligned}&amp;\text{Model 1: }p_H \\
+&amp;\text{Model 2: }p_{H| N}, p_{H| H Bias}, p_{H| V Bias}\end{aligned}$$`
+
+--
+
+Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`, and `\(p_{H |V Bias}\)` can be set to equal `\(p_H\)` to get Model 1. 
+
+`$$\begin{aligned}&amp;H_0: p_{H| N} = p_{H| H Bias} = p_{H| V Bias} = p_H \\
+&amp;H_a: \text{At least one of }p_{H| N}, p_{H| H Bias}, and p_{H| V Bias} \text{ differs from the others}\end{aligned}$$`
+
+
+---
+
+## Next time 
+
+- Using likelihoods to compare models 
+
+- Chapter 3: Distribution theory 
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
+---
+
+
+## Using likelihoods to compare models 
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Nonnested models 
+
+---
+
+class: middle, inverse
+
+## Properties of likelihoods
+
+---
+
+## Statistical properties (maybe take this out? )
+
+
+---
+
+## Looking ahead
+
+
+- We need to add covariates to this! 
+
+---
+
+# Distribution theory 
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%",
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

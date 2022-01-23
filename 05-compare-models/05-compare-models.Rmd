@@ -1,0 +1,279 @@
+---
+title: "Using likelihoods to compare models"
+author: "Prof. Maria Tackett"
+date: "01.24.22"
+output:
+  xaringan::moon_reader:
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "90%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+##[Click for PDF of slides](05-compare-models.pdf)
+
+---
+
+## Announcements
+
+- Project update 
+
+- Week 03 reading: [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+
+- Quiz 01 due Wed, Jan 26 at 3:30pm (before class)
+
+
+---
+
+## Learning goals 
+
+- Use likelihood to compare models 
+
+- Review distribution theory 
+
+---
+
+class: middle, inverse
+
+## Recap
+
+---
+
+## Fouls in college basketball games
+
+The data set [`04-refs.csv`](data/04-refs.csv) includes 30 randomly selected NCAA men's basketball games played in the 2009 - 2010 season.
+
+We will focus on the variables `foul1`, `foul2`, and `foul3`, which indicate which team had a foul called them for the 1st, 2nd, and 3rd fouls, respectively. 
+  - `H`: Foul was called on the home team 
+  - `V`: Foul was called on the visiting team
+
+--
+
+We are focusing on the first three fouls for this analysis, but this could easily be extended to include all fouls in a game. 
+
+.footnote[.small[The dataset was derived from `basektball0910.csv` used in [BMLR Section 11.2](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#cs:refs)]]
+
+---
+
+## Fouls in college basketball games
+
+```{r}
+refs <- read_csv("data/04-refs.csv")
+refs %>% slice(1:5) %>% kable()
+```
+
+We will treat the games as independent in this analysis.
+
+---
+
+## Likelihoods 
+
+A **likelihood** is a function that tells us how likely we are to observe our data for a given parameter value (or values). 
+
+--
+
+**Model 1 (Unconditional Model)**
+
+- $p_H$: probability of a foul being called on the home team
+
+--
+
+**Model 2 (Conditional Model)**
+
+- $p_{H|N}$: Probability referees call foul on home team given there are equal numbers of fouls on the home and visiting teams
+- $p_{H|H Bias}$: Probability referees call foul on home team given there are more prior fouls on the home team
+- $p_{H|V Bias}$: Probability referees call foul on home team given there are more prior fouls on the visiting team
+    
+
+---
+
+## Likelihoods
+
+A **likelihood** is a function that tells us how likely we are to observe our data for a given parameter value (or values). 
+
+**Model 1 (Unconditional Model)**
+
+$$Lik(p_H) = p_H^{46}(1 - p_H)^{44}$$
+
+--
+
+
+**Model 2 (Conditional Model)**
+
+$$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$     
+
+---
+
+## Maximum likelihood estimates
+
+The **maximum likelihood estimate (MLE)** is the value between 0 and 1 where we are most likely to see the observed data.
+
+--
+
+.pull-left[
+**Model 1 (Unconditional Model)**
+
+- $\hat{p}_H = 49/90 = 0.511$
+
+
+**Model 2 (Conditional Model)**
+
+- $\hat{p}_{H|N} = 25 / 48 = 0.521$
+- $\hat{p}_{H|H Bias} = 8 /20 = 0.4$
+- $\hat{p}_{H|V Bias} = 13/ 22 = 0.591$
+
+]
+
+.pull-right[
+
+- What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
+- Is there a tendency for the referees to call more fouls on the visiting team or home team? 
+- Is there a tendency for referees to call a foul on the team that already has more fouls? 
+
+]
+
+---
+
+class: middle, inverse
+
+## Model comparison 
+
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Unnested models
+
+---
+
+## Nested Models
+
+**Nested models**: Models such that the parameters of the reduced model are a subset of the parameters for a larger model 
+
+Example: 
+
+$$\begin{aligned}&\text{Model A: }y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \epsilon\\
+&\text{Model B: }y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4 + \epsilon\end{aligned}$$
+
+--
+
+Model A is nested in Model B. We could use likelihoods to test whether it is useful to add $x_3$ and $x_4$ to the model. 
+
+$$\begin{aligned}&H_0: \beta_3 = \beta_4 = 0 \\ 
+&H_a: \text{ at least one }\beta_j \text{ is not equal to 0}\end{aligned}$$
+
+---
+
+## Nested models
+
+**Another way to think about nested models**: Parameters in larger model can be equated to get the simpler model or if some parameters can be set to constants 
+
+Example: 
+
+$$\begin{aligned}&\text{Model 1: }p_H \\
+&\text{Model 2: }p_{H| N}, p_{H| H Bias}, p_{H| V Bias}\end{aligned}$$
+
+--
+
+Model 1 is nested in Model 2. The parameters $p_{H| N}$, $p_{H|H Bias}$, and $p_{H |V Bias}$ can be set to equal $p_H$ to get Model 1. 
+
+$$\begin{aligned}&H_0: p_{H| N} = p_{H| H Bias} = p_{H| V Bias} = p_H \\
+&H_a: \text{At least one of }p_{H| N}, p_{H| H Bias}, p_{H| V Bias} \text{ differs from the others}\end{aligned}$$
+
+---
+
+
+---
+
+## Next time 
+
+- Using likelihoods to compare models 
+
+- Chapter 3: Distribution theory 
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
+---
+
+
+## Using likelihoods to compare models 
+
+---
+
+## Model comparisons 
+
+- Nested models 
+
+- Nonnested models 
+
+---
+
+class: middle, inverse
+
+## Properties of likelihoods
+
+---
+
+## Statistical properties (maybe take this out? )
+
+
+---
+
+## Looking ahead
+
+
+- We need to add covariates to this! 
+
+---
+
+# Distribution theory 
+
+
+
