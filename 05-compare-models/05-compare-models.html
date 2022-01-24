@@ -27,6 +27,9 @@ class: center, middle, inverse, title-slide
 
 
 
+
+
+
 class: middle, center
 
 ##[Click for PDF of slides](05-compare-models.pdf)
@@ -132,6 +135,7 @@ A **likelihood** is a function that tells us how likely we are to observe our da
 
 `$$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &amp;= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &amp;(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$`     
 
+
 ---
 
 ## Maximum likelihood estimates
@@ -219,11 +223,11 @@ Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`,
 
 1️⃣  Find the MLEs for each model 
 
-2️⃣  Plug the MLEs into the (log) likelihood function for each model to get the maximum value of the (log) likelihood for each model. 
+2️⃣  Plug the MLEs into the log-likelihood function for each model to get the maximum value of the log-likelihood for each model. 
 
-3️⃣  Find the difference in the log likelihoods
+3️⃣  Find the difference in the log-likelihoods
 
-4️⃣  Use inference to determine if the difference is statistically significant 
+4️⃣  Use Likelihood Ratio Test to determine if the difference is statistically significant 
 
 ---
 
@@ -234,8 +238,20 @@ Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`,
 
 - `\(\hat{p}_H = 46/90 = 0.511\)`
 
-`$$\max\{\log(Lik(p_H)\} = -62.36102$$`
-]
+.small[
+
+```r
+loglik1 &lt;- function(ph){
+ log(ph^46 * (1 - ph)^44)
+}
+loglik1(46/90)
+```
+
+```
+## [1] -62.36102
+```
+]]
+
 
 .pull-right[
 **Model 2**
@@ -244,15 +260,37 @@ Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`,
 - `\(\hat{p}_{H|H Bias} = 8 /20 = 0.4\)`
 - `\(\hat{p}_{H|V Bias} = 13/ 22 = 0.591\)`
 
-`$$\begin{aligned}\max\{&amp;\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\}\\
-&amp;= -62.61375\end{aligned}$$`
+.small[
+
+```r
+loglik2 &lt;- function(phn, phb, phv) {
+  log(phn^25 * (1 - phn)^23 * phb^8 * 
+        (1 - phb)^12 * phv^13 * (1 - phv)^9)
+}
+loglik2(25/48, 8/20, 13/22)
+```
+
+```
+## [1] -61.57319
+```
+]
 ]
 
 ---
 
 ## Step 3
 
-`$$\begin{aligned}\max\{&amp;\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\} - \max\{\log(Lik(p_H)\}\\ &amp;= -62.61375 - (-62.36102) = \textbf{-0.25273}\end{aligned}$$`
+Find the difference in the log-likelihoods
+
+
+```r
+(diff &lt;- loglik2(25/48, 8/20, 13/22) - loglik1(46/90))
+```
+
+```
+## [1] 0.7878318
+```
+
 
 &lt;br&gt;
 
@@ -260,11 +298,11 @@ Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`,
 --
 
 .center[
-**Is the difference in the max (log) likelihoods statistically significant?** 
+**Is the difference in the maximum log-likelihoods statistically significant?** 
 ]
 ---
 
-## Likelihood ratio test
+## Likelihood Ratio Test
 
 **Test statistic**
 
@@ -282,29 +320,103 @@ LRT follows a `\(\chi^2\)` distribution where the degrees of freedom equal the d
 ## Step 4
 
 
+```r
+(LRT &lt;- 2 * (loglik2(25/48, 8/20, 13/22) - loglik1(46/90)))
+```
 
+```
+## [1] 1.575664
+```
+
+--
+
+The test statistic follows a `\(\chi^2\)` distribution with 2 degrees of freedom. Therefore, the p-value is `\(P(\chi^2 &gt; LRT)\)`. 
+
+
+```r
+pchisq(LRT, 2, lower.tail = FALSE)
+```
+
+```
+## [1] 0.4548299
+```
+
+--
+
+The p-value is very large, so we fail to reject `\(H_0\)`. We do not have convincing evidence that the conditional model is an improvement over the unconditional model. Therefore, we can stick with the unconditional model. 
 
 ---
 
 ## Comparing non-nested models 
 
+.pull-left[
+.midi[**AIC** = -2(max log-likelihood) + 2p]
+
+
+```r
+(Model1_AIC &lt;- 2 * loglik1(46/90) + 2 * 1)
+```
+
+```
+## [1] -122.722
+```
+
+```r
+(Model2_AIC &lt;-2 * loglik2(25/48, 8/20, 13/22) + 2 * 3)
+```
+
+```
+## [1] -117.1464
+```
+]
+
+--
+
+.pull-right[
+.midi[**BIC** = -2(max log-likelihood}) + plog(n)]
+
+
+```r
+(Model1_BIC &lt;- 2 * loglik1(46/90) + 1 * log(30))
+```
+
+```
+## [1] -121.3208
+```
+
+```r
+(Model2_BIC &lt;-2 * loglik2(25/48, 8/20, 13/22) + 3 * log(30))
+```
+
+```
+## [1] -112.9428
+```
+]
+
+&lt;br&gt;
+
+--
+
+
+**Choose Model 1 the unconditional model based on AIC and BIC**
+
 ---
 
-## Summary 
+## Looking ahead
 
-- How we'll use likelihoods in this course
+- Likelihoods help us answer the question of how likely we are to observe the data given different parameters
 
-- These examples don't include covariates! 
+--
 
----
+- In this example, we did not consider covariates, so in practice our parameters may look more similar to this 
 
----
+`$$p_H = \frac{e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}{1 + e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}$$`
 
-## Next time 
+--
 
-- Using likelihoods to compare models 
+- Finding the MLE becomes much more complex and numerical methods may be required.
+  - We will primarily rely on software to find the MLE, but the conceptual ideas will be the same
 
-- Chapter 3: Distribution theory 
 
 ---
 
@@ -312,43 +424,6 @@ LRT follows a `\(\chi^2\)` distribution where the degrees of freedom equal the d
 ## Acknowledgements
 
 These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
-
----
-
-
-## Using likelihoods to compare models 
-
----
-
-## Model comparisons 
-
-- Nested models 
-
-- Nonnested models 
-
----
-
-class: middle, inverse
-
-## Properties of likelihoods
-
----
-
-## Statistical properties (maybe take this out? )
-
-
----
-
-## Looking ahead
-
-
-- We need to add covariates to this! 
-
----
-
-# Distribution theory 
-
-
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

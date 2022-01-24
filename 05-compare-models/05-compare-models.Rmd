@@ -47,6 +47,17 @@ library(ggfortify)
 xaringanExtra::use_panelset()
 ```
 
+
+
+```{r echo = F}
+lik1 <- function(ph) {
+ ph^46 * (1 - ph)^44
+}
+
+lik2 <- function(phn, phb, phv) {
+  phn^25 * (1 - phn)^23 * phb^8 * (1 - phb)^12 * phv^13 * (1 - phv)^9
+}
+```
 class: middle, center
 
 ##[Click for PDF of slides](05-compare-models.pdf)
@@ -141,6 +152,7 @@ $$Lik(p_H) = p_H^{46}(1 - p_H)^{44}$$
 
 $$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$     
 
+
 ---
 
 ## Maximum likelihood estimates
@@ -228,11 +240,11 @@ $$\begin{aligned}&H_0: p_{H| N} = p_{H| H Bias} = p_{H| V Bias} = p_H \\
 
 `r emo::ji("one")`  Find the MLEs for each model 
 
-`r emo::ji("two")`  Plug the MLEs into the (log) likelihood function for each model to get the maximum value of the (log) likelihood for each model. 
+`r emo::ji("two")`  Plug the MLEs into the log-likelihood function for each model to get the maximum value of the log-likelihood for each model. 
 
-`r emo::ji("three")`  Find the difference in the log likelihoods
+`r emo::ji("three")`  Find the difference in the log-likelihoods
 
-`r emo::ji("four")`  Use inference to determine if the difference is statistically significant 
+`r emo::ji("four")`  Use Likelihood Ratio Test to determine if the difference is statistically significant 
 
 ---
 
@@ -243,8 +255,15 @@ $$\begin{aligned}&H_0: p_{H| N} = p_{H| H Bias} = p_{H| V Bias} = p_H \\
 
 - $\hat{p}_H = 46/90 = 0.511$
 
-$$\max\{\log(Lik(p_H)\} = -62.36102$$
-]
+.small[
+```{r}
+loglik1 <- function(ph){
+ log(ph^46 * (1 - ph)^44)
+}
+loglik1(46/90)
+```
+]]
+
 
 .pull-right[
 **Model 2**
@@ -253,15 +272,27 @@ $$\max\{\log(Lik(p_H)\} = -62.36102$$
 - $\hat{p}_{H|H Bias} = 8 /20 = 0.4$
 - $\hat{p}_{H|V Bias} = 13/ 22 = 0.591$
 
-$$\begin{aligned}\max\{&\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\}\\
-&= -62.61375\end{aligned}$$
+.small[
+```{r}
+loglik2 <- function(phn, phb, phv) {
+  log(phn^25 * (1 - phn)^23 * phb^8 * 
+        (1 - phb)^12 * phv^13 * (1 - phv)^9)
+}
+loglik2(25/48, 8/20, 13/22)
+```
+]
 ]
 
 ---
 
 ## Step 3
 
-$$\begin{aligned}\max\{&\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\} - \max\{\log(Lik(p_H)\}\\ &= -62.61375 - (-62.36102) = \textbf{-0.25273}\end{aligned}$$
+Find the difference in the log-likelihoods
+
+```{r}
+(diff <- loglik2(25/48, 8/20, 13/22) - loglik1(46/90))
+```
+
 
 <br>
 
@@ -269,11 +300,11 @@ $$\begin{aligned}\max\{&\log(Lik(p_{H|N},p_{H|H Bias},p_{H|V Bias}))\} - \max\{\
 --
 
 .center[
-**Is the difference in the max (log) likelihoods statistically significant?** 
+**Is the difference in the maximum log-likelihoods statistically significant?** 
 ]
 ---
 
-## Likelihood ratio test
+## Likelihood Ratio Test
 
 **Test statistic**
 
@@ -290,30 +321,70 @@ LRT follows a $\chi^2$ distribution where the degrees of freedom equal the diffe
 
 ## Step 4
 
+```{r}
+(LRT <- 2 * (loglik2(25/48, 8/20, 13/22) - loglik1(46/90)))
+```
 
+--
 
+The test statistic follows a $\chi^2$ distribution with 2 degrees of freedom. Therefore, the p-value is $P(\chi^2 > LRT)$. 
+
+```{r}
+pchisq(LRT, 2, lower.tail = FALSE)
+```
+
+--
+
+The p-value is very large, so we fail to reject $H_0$. We do not have convincing evidence that the conditional model is an improvement over the unconditional model. Therefore, we can stick with the unconditional model. 
 
 ---
 
 ## Comparing non-nested models 
 
+.pull-left[
+.midi[**AIC** = -2(max log-likelihood) + 2p]
+
+```{r}
+(Model1_AIC <- 2 * loglik1(46/90) + 2 * 1)
+(Model2_AIC <-2 * loglik2(25/48, 8/20, 13/22) + 2 * 3)
+```
+]
+
+--
+
+.pull-right[
+.midi[**BIC** = -2(max log-likelihood}) + plog(n)]
+
+```{r}
+(Model1_BIC <- 2 * loglik1(46/90) + 1 * log(30))
+(Model2_BIC <-2 * loglik2(25/48, 8/20, 13/22) + 3 * log(30))
+```
+]
+
+<br>
+
+--
+
+
+**Choose Model 1 the unconditional model based on AIC and BIC**
+
 ---
 
-## Summary 
+## Looking ahead
 
-- How we'll use likelihoods in this course
+- Likelihoods help us answer the question of how likely we are to observe the data given different parameters
 
-- These examples don't include covariates! 
+--
 
----
+- In this example, we did not consider covariates, so in practice our parameters may look more similar to this 
 
----
+$$p_H = \frac{e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}{1 + e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}$$
 
-## Next time 
+--
 
-- Using likelihoods to compare models 
+- Finding the MLE becomes much more complex and numerical methods may be required.
+  - We will primarily rely on software to find the MLE, but the conceptual ideas will be the same
 
-- Chapter 3: Distribution theory 
 
 ---
 
@@ -321,41 +392,4 @@ LRT follows a $\chi^2$ distribution where the degrees of freedom equal the diffe
 ## Acknowledgements
 
 These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
-
----
-
-
-## Using likelihoods to compare models 
-
----
-
-## Model comparisons 
-
-- Nested models 
-
-- Nonnested models 
-
----
-
-class: middle, inverse
-
-## Properties of likelihoods
-
----
-
-## Statistical properties (maybe take this out? )
-
-
----
-
-## Looking ahead
-
-
-- We need to add covariates to this! 
-
----
-
-# Distribution theory 
-
-
 
