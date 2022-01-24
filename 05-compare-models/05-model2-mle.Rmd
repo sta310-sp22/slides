@@ -13,6 +13,7 @@ refs <- read_csv("data/04-refs.csv")
 The likelihood is 
 
 $$\begin{aligned}Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias}) &= [(p_{H| N})^{25}(1 - p_{H|N})^{23}(p_{H| H Bias})^8 \\ &(1 - p_{H| H Bias})^{12}(p_{H| V Bias})^{13}(1-p_{H|V Bias})^9]\end{aligned}$$  
+
 The log-likelihood is 
 
 $$\begin{aligned}\log (Lik(p_{H| N}, p_{H|H Bias}, p_{H |V Bias})) &= 25 \log(p_{H| N}) + 23 \log(1 - p_{H|N}) \\ & + 8 \log(p_{H| H Bias}) + 12 \log(1 - p_{H| H Bias})\\ &+ 13 \log(p_{H| V Bias}) + 9 \log(1-p_{H|V Bias})\end{aligned}$$   
@@ -22,7 +23,7 @@ We would like to find the MLEs for $p_{H| N}, p_{H|H Bias}, \text{ and }p_{H |V 
 
 ## Finding MLEs using graphs 
 
-We need to find the MLEs for three parameters, therefore we would need to visualize a 4-dimensional object to find the MLEs from a graph. Given the difficulty of this taks and the lack of precision in the estimates from this method, we should rely on other approaches to find the MLEs.
+We need to find the MLEs for three parameters, therefore we would need to visualize a 4-dimensional object to find the MLEs from a graph. Given the difficulty of this task and the lack of precision in the estimates from this approach, we should rely on other approaches to find the MLEs in this instance.
 
 ## Finding MLEs using calculus
 
@@ -69,7 +70,7 @@ maxloglik<- function(nvals){
 maxloglik(100)
 ```
 
-Depending on the number of parameters, it may be hard to test enough values for a granular enough search to find the exact values of the MLEs. Therefore, one could use the function above to conduct a crude search to find starting values for R's `optim` function. The function `optim` differs from `optimize` in that it can optimize over multiple parameter values. 
+Depending on the number of parameters, it may be hard to conduct a granular enough search to find the exact values of the MLEs. Therefore, one could use the function above to conduct a crude search to find starting values for R's `optim` function. The function `optim` differs from `optimize` in that it can optimize over multiple parameter values (The `optimize` function can only optimize over a single parameter value).
 
 ```{r}
 # Function to calculate log-likelihood that will be used in the optim function
@@ -91,5 +92,6 @@ start_vals <- maxloglik(50) %>% select(-loglik)
 
 ```{r}
 # Use optim function in R to find the values to maximize the log-likelihood
+#set fnscale = -1 to maximize (the default is minimize)
 optim(par = start_vals, fn = loglik, control=list(fnscale=-1))
 ```
