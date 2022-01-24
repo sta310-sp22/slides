@@ -38,14 +38,27 @@ class: middle, center
 
 ## Announcements
 
-- Project update 
-
 - Week 03 reading: 
   - [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html) (for reference)
   - [BMLR: Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
 
-- Quiz 01 due Wed, Jan 26 at 3:30pm (before class)
+- Quiz 01 Tue, Jan 25 at 9am - Thu, Jan 26 at 3:30pm (start of lab)
 
+---
+
+## Quiz 01 
+
+- Open Jan 25 at 9am and must be completed by Thu, Jan 26 at 3:30pm
+  - The quiz is not timed and will be administered in Gradescope.
+
+- Covers 
+  - Syllabus
+  - BMLR Chapters 1 - 2
+  - Jan 05 - Jan 24 lectures
+
+- Fill in the blank, multiple choice, short answer questions 
+
+- Open book, open note, open internet (not crowd sourcing sites). You &lt;u&gt;cannot&lt;/u&gt; discuss the quiz with anyone else. Please email me if you have questions.
 
 ---
 
@@ -53,7 +66,7 @@ class: middle, center
 
 - Use likelihood to compare models 
 
-- Review distribution theory 
+- Activity: Exploring the response variable for mini-project 01
 
 ---
 
@@ -158,18 +171,27 @@ The **maximum likelihood estimate (MLE)** is the value between 0 and 1 where we 
 - `\(\hat{p}_{H|H Bias} = 8 /20 = 0.4\)`
 - `\(\hat{p}_{H|V Bias} = 13/ 22 = 0.591\)`
 
-.footnote[
-[Click here](05-model2-mle.pdf) for details on finding MLEs for this model.]
-
 ]
+
 
 .pull-right[
 
 - What is the probability the referees call a foul on the home team, assuming foul calls within a game are independent? 
 - Is there a tendency for the referees to call more fouls on the visiting team or home team? 
 - Is there a tendency for referees to call a foul on the team that already has more fouls? 
-
 ]
+
+
+---
+
+### MLEs for Model 2
+
+
+
+[Click here](05-model2-mle.pdf) for details on finding MLEs for Model2
+
+
+
 
 ---
 
@@ -184,7 +206,13 @@ class: middle, inverse
 
 - Nested models 
 
-- Unnested models
+- Non-nested models
+
+---
+
+class: middle, center
+
+## Comparing nested models
 
 ---
 
@@ -200,6 +228,8 @@ Example:
 --
 
 Model A is nested in Model B. We could use likelihoods to test whether it is useful to add `\(x_3\)` and `\(x_4\)` to the model. 
+
+--
 
 `$$\begin{aligned}&amp;H_0: \beta_3 = \beta_4 = 0 \\ 
 &amp;H_a: \text{ at least one }\beta_j \text{ is not equal to 0}\end{aligned}$$`
@@ -217,7 +247,9 @@ Example:
 
 --
 
-Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`, and `\(p_{H |V Bias}\)` can be set to equal `\(p_H\)` to get Model 1. 
+Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`, and `\(p_{H |V Bias}\)` can be set equal to `\(p_H\)` to get Model 1. 
+
+--
 
 `$$\begin{aligned}&amp;H_0: p_{H| N} = p_{H| H Bias} = p_{H| V Bias} = p_H \\
 &amp;H_a: \text{At least one of }p_{H| N}, p_{H| H Bias}, p_{H| V Bias} \text{ differs from the others}\end{aligned}$$`
@@ -226,17 +258,19 @@ Model 1 is nested in Model 2. The parameters `\(p_{H| N}\)`, `\(p_{H|H Bias}\)`,
 
 ## Steps to compare models 
 
-1️⃣  Find the MLEs for each model 
+1️⃣  Find the MLEs for each model. 
 
 2️⃣  Plug the MLEs into the log-likelihood function for each model to get the maximum value of the log-likelihood for each model. 
 
-3️⃣  Find the difference in the log-likelihoods
+3️⃣  Find the difference in the maximum log-likelihoods
 
-4️⃣  Use Likelihood Ratio Test to determine if the difference is statistically significant 
+4️⃣  Use the Likelihood Ratio Test to determine if the difference is statistically significant 
 
 ---
 
 ## Steps 1 - 2
+
+Find the MLEs for each model and plug them into the log-likelihood functions. 
 
 .pull-left[
 **Model 1:**
@@ -352,6 +386,12 @@ The p-value is very large, so we fail to reject `\(H_0\)`. We do not have convin
 
 ---
 
+class: middle, inverse
+
+## Comparing non-nested models
+
+---
+
 ## Comparing non-nested models 
 
 .pull-left[
@@ -378,7 +418,7 @@ The p-value is very large, so we fail to reject `\(H_0\)`. We do not have convin
 --
 
 .pull-right[
-.midi[**BIC** = -2(max log-likelihood}) + plog(n)]
+.midi[**BIC** = -2(max log-likelihood) + plog(n)]
 
 
 ```r
@@ -403,7 +443,7 @@ The p-value is very large, so we fail to reject `\(H_0\)`. We do not have convin
 --
 
 
-**Choose Model 1 the unconditional model based on AIC and BIC**
+**Choose Model 1, the unconditional model, based on AIC and BIC**
 
 ---
 
@@ -413,16 +453,48 @@ The p-value is very large, so we fail to reject `\(H_0\)`. We do not have convin
 
 --
 
-- In this example, we did not consider covariates, so in practice our parameters may look more similar to this 
+- In this example, we did not consider covariates, so in practice the parameters we want to estimate will look more similar to this
 
-`$$p_H = \frac{e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}{1 + e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}$$`
+`$$p_H = \frac{e^{\beta_0 + \beta_1x_1 + \dots + \beta_px_p}}{1 + e^{\beta_0 + \beta_1x_1 + \dots + \beta_px_p}}$$`
 
 --
 
 - Finding the MLE becomes much more complex and numerical methods may be required.
   - We will primarily rely on software to find the MLE, but the conceptual ideas will be the same
+  
+---
+
+class: middle, inverse
+
+## Response variable in mini-project 01
 
 ---
+
+## Activity Instructions
+
+.midi[The goal of this activity is for your team to start exploring the response variable for your mini-project 01 analysis. The properties explored in this activity are ones you will consider throughout the semester as you decide which GLM is most appropriate for a given data set. Use [Table 3.1 in BMLR](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html#additional-resources) for reference.]
+
+--
+
+.midi[Write the following for the primary response variable in your analysis:]
+
+- .small[What is the response variable? What is its definition?]
+- .small[Is the response variable discrete or continuous?]
+- .small[What possible values can it take? (not necessarily just the values in the data set)]
+- .small[What is the name of the distribution the variable follows?]
+- .small[What is/are the parameter(s) for this distribution? Estimate the parameters from the data.] 
+- .small[Visualize the distribution of the response variable. Is this what you expected? Why or why not?]
+
+---
+
+## Activity Instructions 
+
+.midi[[Click here](https://docs.google.com/presentation/d/1PlhwggKe4VclDQq8c6ZhYNKMWkFP2DOpV6fPoahpC44/edit?usp=sharing) to put the answers on your team's slide.]
+
+You can add any analysis to the bottom of the `proposal.Rmd` document in your team's project repo.
+
+---
+
 
 ## Looking ahead 
 
@@ -430,6 +502,7 @@ The p-value is very large, so we fail to reject `\(H_0\)`. We do not have convin
   - Use this chapter as a reference throughout the semester
   
 - For next time - [Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
+
 
 
 ---
