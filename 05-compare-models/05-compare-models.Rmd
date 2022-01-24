@@ -68,7 +68,9 @@ class: middle, center
 
 - Project update 
 
-- Week 03 reading: [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+- Week 03 reading: 
+  - [BMLR: Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html) (for reference)
+  - [BMLR: Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
 
 - Quiz 01 due Wed, Jan 26 at 3:30pm (before class)
 
@@ -387,6 +389,15 @@ $$p_H = \frac{e^{\beta_0 + \beta_1x1 + \dots + \beta_px_p}}{1 + e^{\beta_0 + \be
 
 - Finding the MLE becomes much more complex and numerical methods may be required.
   - We will primarily rely on software to find the MLE, but the conceptual ideas will be the same
+
+---
+
+## Looking ahead 
+
+- Review [Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+  - Use this chapter as a reference throughout the semester
+  
+- For next time - [Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
 
 
 ---
