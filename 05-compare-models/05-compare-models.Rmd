@@ -54,8 +54,8 @@ lik1 <- function(ph) {
  ph^46 * (1 - ph)^44
 }
 
-lik2 <- function(phn, phb, phv) {
-  phn^25 * (1 - phn)^23 * phb^8 * (1 - phb)^12 * phv^13 * (1 - phv)^9
+lik2 <- function(phn, phh, phv) {
+  phn^25 * (1 - phn)^23 * phh^8 * (1 - phh)^12 * phv^13 * (1 - phv)^9
 }
 ```
 class: middle, center
@@ -173,6 +173,9 @@ The **maximum likelihood estimate (MLE)** is the value between 0 and 1 where we 
 - $\hat{p}_{H|H Bias} = 8 /20 = 0.4$
 - $\hat{p}_{H|V Bias} = 13/ 22 = 0.591$
 
+.footnote[
+[Click here](05-model2-mle.pdf) for details on finding MLEs for this model.]
+
 ]
 
 .pull-right[
@@ -274,9 +277,9 @@ loglik1(46/90)
 
 .small[
 ```{r}
-loglik2 <- function(phn, phb, phv) {
-  log(phn^25 * (1 - phn)^23 * phb^8 * 
-        (1 - phb)^12 * phv^13 * (1 - phv)^9)
+loglik2 <- function(phn, phh, phv) {
+  log(phn^25 * (1 - phn)^23 * phh^8 * 
+        (1 - phh)^12 * phv^13 * (1 - phv)^9)
 }
 loglik2(25/48, 8/20, 13/22)
 ```
