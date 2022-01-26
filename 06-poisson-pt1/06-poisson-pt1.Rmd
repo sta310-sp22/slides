@@ -1,0 +1,523 @@
+---
+title: "Poisson Regression"
+author: "Prof. Maria Tackett"
+date: "01.26.22"
+output:
+  xaringan::moon_reader:
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "90%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+##[Click for PDF of slides](06-poisson-pt1.pdf)
+
+---
+
+## Announcements
+
+- Week 03 & 04 reading: 
+  - [BMLR: Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
+
+- Quiz 01 due Thu, Jan 27 at 3:30pm (start of lab)
+
+- Mini-project 01: Analysis plan <font color = "red">due ??</font>
+
+---
+
+## Learning goals 
+
+- Describe properties of the Poisson random variable
+
+- Write the Poisson regression model 
+
+- Describe how the Poisson regression differs from least-squares regression
+
+- Interpret the coefficients for the Poisson regression model 
+
+- Write the likelihood for Poisson regression and describe how it is used to estimate the coefficients for the model 
+
+---
+
+## Scenarios to use Poisson regression 
+
+- Does the number of employers conducting on-campus interviews during a year differ for public and private colleges?
+
+- Does the daily number of asthma-related visits to an Emergency Room differ depending on air pollution indices?
+
+- Does the number of paint defects per square foot of wall differ based on the years of experience of the painter? 
+
+---
+
+## Scenarios to use Poisson regression 
+
+- Does the .vocab[number of employers conducting on-campus interviews during a year] differ for public and private colleges?
+
+- Does the .vocab[daily number of asthma-related visits to an Emergency Room] differ depending on air pollution indices?
+
+- Does the .vocab[number of paint defects per square foot of wall] differ based on the years of experience of the painter? 
+
+<br> 
+
+--
+
+
+Each response variable is a .vocab[count per a unit of time or space].
+
+---
+
+## Poisson distribution
+
+Let $Y$ be the number of events in a given unit of time or space. Then $Y$ can be modeled using a .vocab[Poisson distribution]
+
+$$P(Y=y) = \frac{e^{-\lambda}\lambda^y}{y!} \hspace{10mm} y=0,1,2,\ldots, \infty$$
+
+
+
+.vocab[Features]
+
+- $E(Y) = Var(Y) = \lambda$ 
+- The distribution is typically skewed right, particularly if $\lambda$ is small
+- The distribution becomes more symmetric as $\lambda$ increases
+  - If $\lambda$ is sufficiently large, it can be approximated using a normal distribution ([Click here](https://online.stat.psu.edu/stat414/lesson/28/28.2) for an example.)
+  
+---
+
+## Poisson distribution for different $\lambda$'s
+
+```{r echo = F}
+set.seed(2000)
+sim1 <- rpois(100000,2)
+sim2 <- rpois(100000,5)
+sim3 <- rpois(100000,50)
+#sim4 <- rpois(100000,1)
+pois_sim <- tibble (
+  sim1 = sim1, 
+  sim2 = sim2, 
+  sim3 = sim3, 
+  sim4 = sim4
+)
+p1 <- ggplot(data = pois_sim, aes(x = sim1)) +
+  geom_histogram() +
+  labs(x = "", title = "lambda = 2")
+p2 <- ggplot(data = pois_sim, aes(x = sim2)) +
+  geom_histogram() +
+  labs(x = "", title = "lambda = 5")
+p3 <- ggplot(data = pois_sim, aes(x = sim3)) +
+  geom_histogram() +
+  labs(x = "", title = "lambda = 50")
+#p4 <- ggplot(data = pois_sim, aes(x = sim4)) +
+#  geom_histogram() +
+#  labs(x = "", title = "lambda = 100")
+p1 + p2 + p3 
+```
+
+
+```{r echo = F}
+sum1 <- c(mean(sim1), var(sim1))
+sum2 <- c(mean(sim2), var(sim2))
+sum3 <- c(mean(sim3), var(sim3))
+#sum4 <- c(mean(sim4), var(sim4))
+data <- rbind(sum1,sum2,sum3,sum4)
+rownames(data) <- c("lambda=2", "lambda=5","lambda=50")
+colnames(data) <- c("Mean", "Variance")
+kable(data,format="html")
+```
+  
+---
+
+## Example 
+
+The annual number of earthquakes registering at least 2.5 on the Richter Scale and having an epicenter within 40 miles of downtown Memphis follows a Poisson distribution with mean 6.5. 
+
+What is the probability there will be at 3 or fewer such earthquakes next year?
+
+$$P(Y \leq 3) = P(Y = 0) + P(Y = 1) + P(Y = 2) + P(Y = 3)$$
+
+--
+
+$$ = \frac{e^{-6.5}\lambda^0}{0!} + \frac{e^{-6.5}\lambda^1}{1!} + \frac{e^{-6.5}\lambda^2}{2!} + \frac{e^{-6.5}\lambda^3}{3!}$$
+$$ = 
+
+
+
+
+
+---
+
+
+
+---
+
+## Poisson Regression
+
+- We want $\lambda$ to be a function of predictor variables $x_1, \ldots, x_p$
+
+--
+
+.question[
+Why is a multiple linear regression model not appropriate?
+]
+
+--
+
+- $\lambda$ must be greater than or equal to 0 for any combination of predictor variables
+- Constant variance assumption will be violated!
+
+---
+
+## Multiple linear regression vs. Poisson 
+
+```{r echo = F, out.width = "65%", eval = F}
+include_graphics("img/23/poisson_ols.png")
+```
+
+
+.footnote[Image from: [*Broadening Your Statistical Horizons*](https://bookdown.org/roback/bookdown-bysh/ch-poissonreg.html)]
+
+---
+
+## Poisson Regression
+
+If the observed values $Y_i$ are Poisson, then we can model using a <font class="vocab">Poisson regression model</font> of the form
+
+.alert[
+$$\log(\lambda_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \dots + \beta_p x_{pi}$$
+]
+---
+ 
+## Interpreting Model Coefficients
+
+- <font class="vocab">Slope, $\beta_j$: </font>
+    - **Quantitative Predictor**:  When $x_j$ increases by one unit, the mean of $y$ is expected to multiply by a factor of $\exp\{\beta_j\}$, (*holding all else constant*).
+    
+    - **Categorical Predictor**: The mean of $y$ for category $k$ is expected to be $\exp\{\beta_j\}$ times the mean of $y$  for the baseline category, (*holding all else constant*).
+
+--
+
+- <font class="vocab">Intercept, $\beta_0$: </font> When all of the predictors equal 0, the mean of $y$ is expected to be $\exp\{\beta_0\}$.
+
+---
+
+## Example: Household size in the Philippines
+
+The data come from the 2015 Family Income and Expenditure Survey conducted by the Philippine Statistics Authority. 
+
+.vocab[Goal:] We want to use the data to understand the relationship between the age of the head of the household and the number of people in their household. 
+
+.vocab[Variables]
+
+- `age`: the age of the head of household
+- `total`: the number of people in the household other than the head
+
+```{r echo = F}
+hh <- read_csv("data/fHH1.csv") %>%
+  filter(age < 95) %>%
+  mutate(ageCent = age - mean(age))
+```
+
+
+---
+
+## Exploratory data analysis 
+
+```{r}
+ggplot(data = hh, aes(x = total)) + 
+  geom_histogram() + 
+  labs(title = "Number of people in the household", 
+       y = "count",
+       x = "") + 
+  theme_bw()
+```
+
+---
+
+## Exploratory data analysis 
+
+Let's examine a plot of the log-transformed mean number of people in the household by age
+
+```{r}
+hh %>%
+  group_by(age) %>%
+  summarise(log_mean_total = log(mean(total))) %>%
+  ggplot(aes(x = age, y = log_mean_total)) +
+  geom_point() +
+  labs(y = "Log(mean household number)", 
+       x = "Age", 
+       title = "Log-transformed mean household number vs. age") +
+  theme_bw()
+```
+
+
+---
+
+## Exploratory data analysis 
+
+Let's examine a plot of the log-transformed mean number of people in the household by age
+
+```{r}
+hh %>%
+  group_by(age) %>%
+  summarise(log_mean_total = log(mean(total))) %>%
+  ggplot(aes(x = age, y = log_mean_total)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+    labs(y = "Log(mean household number)", 
+       x = "Age", 
+       title = "Log-transformed mean household number vs. age") +
+  theme_bw()
+```
+
+---
+
+## Number in household vs. age
+.midi[
+```{r echo = T}
+model1 <- glm(total ~ ageCent, data = hh, family = "poisson")
+tidy(model1, conf.int = T) %>%
+  kable(digits = 3)
+```
+]
+
+$$\color{#87037B}{\log(\overline{\text{total}}) = 1.303 - 0.0047 \times \text{ageCent}}$$
+
+---
+
+## Interpretations
+
+```{r echo = F}
+tidy(model1, conf.int = T) %>%
+  kable(digits = 3)
+```
+
+--
+
+For each additional year older the head of the household is, we expect the mean number in the house to multiply by a factor of `r round(exp(-0.0047),3)` (exp(-0.0047)). 
+
+--
+
+For households with a head of the household who is `r round(mean(hh$age),3)` years old, we expect the mean number of people in the household to be `r round(exp(1.303),3)` (exp(1.303)).
+
+
+---
+
+## Drop-In-Deviance Test
+
+We can use a .vocab[drop-in-deviance test] to compare nested models (similar to logistic regression). 
+
+Let's try adding `ageCent^2` to the model. 
+
+$$H_0: \beta_{ageCent^2} = 0 \text{ vs. }H_a: \beta_{ageCent^2} \neq 0$$
+
+.midi[
+```{r echo=T}
+model1 <- glm(total ~ ageCent, data = hh, family = "poisson")
+model2 <- glm(total ~ ageCent + I(ageCent^2),
+              data = hh, family = "poisson")
+```
+
+```{r echo = T, eval = F}
+anova(model1, model2, test = "Chisq")
+```
+]
+---
+
+## Drop-In-Deviance Test
+
+```{r}
+anova(model1, model2, test = "Chisq") %>%
+  kable(digits = 3)
+```
+
+--
+
+The p-value is small, so we reject $H_0$. We will include `ageCent^2` to the model. 
+
+
+---
+
+## Final model 
+
+```{r}
+tidy(model2, conf.int = T) %>%
+  kable(digits = 3)
+```
+
+---
+
+## Model Assumptions 
+
+1. .vocab[Poisson Response]: The response follows a Poisson distribution for each level of the predictor.
+
+2. .vocab[Independence]: The observations are independent of one another.
+
+3. .vocab[Mean = variance]: The mean value of the response equals the variance of the response for each level of the predictor.
+
+4. .vocab[Linearity]: $\log(\lambda)$ is a linear function of the predictors.
+
+---
+
+## Poisson response 
+
+Let's check the first assumption by looking at the distribution of the response for groups of the predictor.
+
+
+```{r echo = T}
+hh <- hh %>%
+  mutate(age_group = cut(age, breaks = seq(15, 100, 5)))
+```
+
+---
+
+## Poisson response 
+
+.small[
+```{r echo = F}
+ggplot(data = hh, aes(x = total)) +
+  geom_histogram() +
+  facet_wrap(~ age_group)
+```
+]
+
+This condition is satisfied based on the overall distribution of the response (from the EDA) and the distribution of the response by age group.
+
+---
+
+## Independence
+
+We don't have much information about how the households were selected for the survey. 
+
+If the households were not selected randomly but rather groups of household were selected from different areas with different customs about living arrangements, then the independence assumption would be violated. 
+
+---
+
+## Mean = variance
+
+Let's look at the mean and variance for each age group. 
+
+```{r}
+hh %>%
+  group_by(age_group) %>%
+  summarize(mean_total = mean(total), var_total = var(total), n = n()) %>%
+  slice(1:10)
+```
+
+---
+
+## Mean = variance
+
+
+```{r}
+hh %>%
+  group_by(age_group) %>%
+  summarize(mean_total = mean(total), var_total = var(total), n = n()) %>%
+  slice(11:16)
+```
+
+--
+
+It appears the assumption is violated in some age groups; however, the violations are small enough that we can proceed.
+
+
+---
+
+## Linearity 
+
+The raw residual for the $i^{th}$ observation, $y_i - \hat{\lambda}_i$, is difficult to interpret since the variance is equal to the mean in the Poisson distribution.
+
+--
+
+
+Instead, we can analyze a standardized residual called the .vocab[Pearson residual].
+$$r_i = \frac{y_i - \hat{\lambda}_i}{\sqrt{\hat{\lambda}_i}}$$
+
+--
+
+We will examine a plot of the Pearson residuals versus the predicted values to check the linearity assumption.
+
+---
+
+## `augment` function
+
+```{r echo = T}
+hh_aug <- augment(model2, type.predict = "response", 
+                  type.residuals = "pearson")
+```
+
+
+---
+
+## Linearity condition
+```{r}
+ggplot(hh_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha= 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Predicted mean number of people in household", 
+       y = "Pearson residual", 
+       title = "Residuals vs. Predicted") +
+  theme_bw()
+```
+
+--
+
+There is no distinguishable pattern in the residuals, so the linearity assumption is satisfied.
+
+
+---
+
+
+## Looking ahead 
+
+- Review [Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+  - Use this chapter as a reference throughout the semester
+  
+- For next time - [Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
+
+
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+

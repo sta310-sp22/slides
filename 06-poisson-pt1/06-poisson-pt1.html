@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Poisson Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Maria Tackett" />
+    <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Poisson Regression
+### Prof. Maria Tackett
+### 01.26.22
+
+---
+
+
+
+
+
+
+
+
+
+class: middle, center
+
+##[Click for PDF of slides](06-poisson-pt1.pdf)
+
+---
+
+## Announcements
+
+- Week 03 &amp; 04 reading: 
+  - [BMLR: Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
+
+- Quiz 01 due Thu, Jan 27 at 3:30pm (start of lab)
+
+- Mini-project 01: Analysis plan &lt;font color = "red"&gt;due ??&lt;/font&gt;
+
+---
+
+## Learning goals 
+
+- Describe properties of the Poisson random variable
+
+- Write the Poisson regression model 
+
+- Describe how the Poisson regression differs from least-squares regression
+
+- Interpret the coefficients for the Poisson regression model 
+
+- Write the likelihood for Poisson regression and describe how it is used to estimate the coefficients for the model 
+
+---
+
+## Scenarios to use Poisson regression 
+
+- Does the number of employers conducting on-campus interviews during a year differ for public and private colleges?
+
+- Does the daily number of asthma-related visits to an Emergency Room differ depending on air pollution indices?
+
+- Does the number of paint defects per square foot of wall differ based on the years of experience of the painter? 
+
+---
+
+## Scenarios to use Poisson regression 
+
+- Does the .vocab[number of employers conducting on-campus interviews during a year] differ for public and private colleges?
+
+- Does the .vocab[daily number of asthma-related visits to an Emergency Room] differ depending on air pollution indices?
+
+- Does the .vocab[number of paint defects per square foot of wall] differ based on the years of experience of the painter? 
+
+&lt;br&gt; 
+
+--
+
+
+Each response variable is a .vocab[count per a unit of time or space].
+
+---
+
+## Poisson distribution
+
+Let `\(Y\)` be the number of events in a given unit of time or space. Then `\(Y\)` can be modeled using a .vocab[Poisson distribution]
+
+`$$P(Y=y) = \frac{e^{-\lambda}\lambda^y}{y!} \hspace{10mm} y=0,1,2,\ldots, \infty$$`
+
+
+
+.vocab[Features]
+
+- `\(E(Y) = Var(Y) = \lambda\)` 
+- The distribution is typically skewed right, particularly if `\(\lambda\)` is small
+- The distribution becomes more symmetric as `\(\lambda\)` increases
+  - If `\(\lambda\)` is sufficiently large, it can be approximated using a normal distribution ([Click here](https://online.stat.psu.edu/stat414/lesson/28/28.2) for an example.)
+  
+---
+
+## Poisson distribution for different `\(\lambda\)`'s
+
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-2-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Simulated Poisson distributions
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Mean &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Variance &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; lambda=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.99042 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.988188 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; lambda=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.99367 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.986580 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; lambda=20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49.99288 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49.896268 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; lambda=100 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.99684 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.399734 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+  
+---
+
+## Using the Poisson distribution 
+
+The annual number of earthquakes registering at least 2.5 on the Richter Scale and having an epicenter within 40 miles of downtown Memphis follows a Poisson distribution with mean 6.5. 
+
+What is the probability there will be at 3 or fewer such earthquakes next year?
+
+
+
+
+---
+
+
+
+---
+
+## Poisson Regression
+
+- We want `\(\lambda\)` to be a function of predictor variables `\(x_1, \ldots, x_p\)`
+
+--
+
+.question[
+Why is a multiple linear regression model not appropriate?
+]
+
+--
+
+- `\(\lambda\)` must be greater than or equal to 0 for any combination of predictor variables
+- Constant variance assumption will be violated!
+
+---
+
+## Multiple linear regression vs. Poisson 
+
+
+
+
+.footnote[Image from: [*Broadening Your Statistical Horizons*](https://bookdown.org/roback/bookdown-bysh/ch-poissonreg.html)]
+
+---
+
+## Poisson Regression
+
+If the observed values `\(Y_i\)` are Poisson, then we can model using a &lt;font class="vocab"&gt;Poisson regression model&lt;/font&gt; of the form
+
+.alert[
+`$$\log(\lambda_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \dots + \beta_p x_{pi}$$`
+]
+---
+ 
+## Interpreting Model Coefficients
+
+- &lt;font class="vocab"&gt;Slope, `\(\beta_j\)`: &lt;/font&gt;
+    - **Quantitative Predictor**:  When `\(x_j\)` increases by one unit, the mean of `\(y\)` is expected to multiply by a factor of `\(\exp\{\beta_j\}\)`, (*holding all else constant*).
+    
+    - **Categorical Predictor**: The mean of `\(y\)` for category `\(k\)` is expected to be `\(\exp\{\beta_j\}\)` times the mean of `\(y\)`  for the baseline category, (*holding all else constant*).
+
+--
+
+- &lt;font class="vocab"&gt;Intercept, `\(\beta_0\)`: &lt;/font&gt; When all of the predictors equal 0, the mean of `\(y\)` is expected to be `\(\exp\{\beta_0\}\)`.
+
+---
+
+## Example: Household size in the Philippines
+
+The data come from the 2015 Family Income and Expenditure Survey conducted by the Philippine Statistics Authority. 
+
+.vocab[Goal:] We want to use the data to understand the relationship between the age of the head of the household and the number of people in their household. 
+
+.vocab[Variables]
+
+- `age`: the age of the head of household
+- `total`: the number of people in the household other than the head
+
+
+
+
+---
+
+## Exploratory data analysis 
+
+
+```r
+ggplot(data = hh, aes(x = total)) + 
+  geom_histogram() + 
+  labs(title = "Number of people in the household", 
+       y = "count",
+       x = "") + 
+  theme_bw()
+```
+
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-6-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Exploratory data analysis 
+
+Let's examine a plot of the log-transformed mean number of people in the household by age
+
+
+```r
+hh %&gt;%
+  group_by(age) %&gt;%
+  summarise(log_mean_total = log(mean(total))) %&gt;%
+  ggplot(aes(x = age, y = log_mean_total)) +
+  geom_point() +
+  labs(y = "Log(mean household number)", 
+       x = "Age", 
+       title = "Log-transformed mean household number vs. age") +
+  theme_bw()
+```
+
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-7-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Exploratory data analysis 
+
+Let's examine a plot of the log-transformed mean number of people in the household by age
+
+
+```r
+hh %&gt;%
+  group_by(age) %&gt;%
+  summarise(log_mean_total = log(mean(total))) %&gt;%
+  ggplot(aes(x = age, y = log_mean_total)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+    labs(y = "Log(mean household number)", 
+       x = "Age", 
+       title = "Log-transformed mean household number vs. age") +
+  theme_bw()
+```
+
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-8-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Number in household vs. age
+.midi[
+
+```r
+model1 &lt;- glm(total ~ ageCent, data = hh, family = "poisson")
+tidy(model1, conf.int = T) %&gt;%
+  kable(digits = 3)
+```
+
+
+
+|term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept) |    1.303|     0.013|    96.647|       0|    1.276|     1.329|
+|ageCent     |   -0.005|     0.001|    -4.832|       0|   -0.006|    -0.003|
+]
+
+`$$\color{#87037B}{\log(\overline{\text{total}}) = 1.303 - 0.0047 \times \text{ageCent}}$$`
+
+---
+
+## Interpretations
+
+
+|term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept) |    1.303|     0.013|    96.647|       0|    1.276|     1.329|
+|ageCent     |   -0.005|     0.001|    -4.832|       0|   -0.006|    -0.003|
+
+--
+
+For each additional year older the head of the household is, we expect the mean number in the house to multiply by a factor of 0.995 (exp(-0.0047)). 
+
+--
+
+For households with a head of the household who is 52.657 years old, we expect the mean number of people in the household to be 3.68 (exp(1.303)).
+
+
+---
+
+## Drop-In-Deviance Test
+
+We can use a .vocab[drop-in-deviance test] to compare nested models (similar to logistic regression). 
+
+Let's try adding `ageCent^2` to the model. 
+
+`$$H_0: \beta_{ageCent^2} = 0 \text{ vs. }H_a: \beta_{ageCent^2} \neq 0$$`
+
+.midi[
+
+```r
+model1 &lt;- glm(total ~ ageCent, data = hh, family = "poisson")
+model2 &lt;- glm(total ~ ageCent + I(ageCent^2),
+              data = hh, family = "poisson")
+```
+
+
+```r
+anova(model1, model2, test = "Chisq")
+```
+]
+---
+
+## Drop-In-Deviance Test
+
+
+```r
+anova(model1, model2, test = "Chisq") %&gt;%
+  kable(digits = 3)
+```
+
+
+
+| Resid. Df| Resid. Dev| Df| Deviance| Pr(&gt;Chi)|
+|---------:|----------:|--:|--------:|--------:|
+|      1496|   2330.729| NA|       NA|       NA|
+|      1495|   2198.533|  1|  132.197|        0|
+
+--
+
+The p-value is small, so we reject `\(H_0\)`. We will include `ageCent^2` to the model. 
+
+
+---
+
+## Final model 
+
+
+```r
+tidy(model2, conf.int = T) %&gt;%
+  kable(digits = 3)
+```
+
+
+
+|term         | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:------------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept)  |    1.436|     0.017|    82.339|       0|    1.402|     1.470|
+|ageCent      |   -0.004|     0.001|    -3.584|       0|   -0.006|    -0.002|
+|I(ageCent^2) |   -0.001|     0.000|   -10.938|       0|   -0.001|    -0.001|
+
+---
+
+## Model Assumptions 
+
+1. .vocab[Poisson Response]: The response follows a Poisson distribution for each level of the predictor.
+
+2. .vocab[Independence]: The observations are independent of one another.
+
+3. .vocab[Mean = variance]: The mean value of the response equals the variance of the response for each level of the predictor.
+
+4. .vocab[Linearity]: `\(\log(\lambda)\)` is a linear function of the predictors.
+
+---
+
+## Poisson response 
+
+Let's check the first assumption by looking at the distribution of the response for groups of the predictor.
+
+
+
+```r
+hh &lt;- hh %&gt;%
+  mutate(age_group = cut(age, breaks = seq(15, 100, 5)))
+```
+
+---
+
+## Poisson response 
+
+.small[
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-16-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+This condition is satisfied based on the overall distribution of the response (from the EDA) and the distribution of the response by age group.
+
+---
+
+## Independence
+
+We don't have much information about how the households were selected for the survey. 
+
+If the households were not selected randomly but rather groups of household were selected from different areas with different customs about living arrangements, then the independence assumption would be violated. 
+
+---
+
+## Mean = variance
+
+Let's look at the mean and variance for each age group. 
+
+
+```r
+hh %&gt;%
+  group_by(age_group) %&gt;%
+  summarize(mean_total = mean(total), var_total = var(total), n = n()) %&gt;%
+  slice(1:10)
+```
+
+```
+## # A tibble: 10 × 4
+##    age_group mean_total var_total     n
+##    &lt;fct&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;int&gt;
+##  1 (15,20]         1.67     0.667     6
+##  2 (20,25]         2.17     1.56     18
+##  3 (25,30]         2.92     1.41     49
+##  4 (30,35]         3.44     2.19    108
+##  5 (35,40]         3.84     3.57    158
+##  6 (40,45]         4.23     4.44    175
+##  7 (45,50]         4.49     6.40    194
+##  8 (50,55]         4.01     5.25    188
+##  9 (55,60]         3.81     6.53    145
+## 10 (60,65]         3.71     6.20    153
+```
+
+---
+
+## Mean = variance
+
+
+
+```r
+hh %&gt;%
+  group_by(age_group) %&gt;%
+  summarize(mean_total = mean(total), var_total = var(total), n = n()) %&gt;%
+  slice(11:16)
+```
+
+```
+## # A tibble: 6 × 4
+##   age_group mean_total var_total     n
+##   &lt;fct&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;int&gt;
+## 1 (65,70]         3.34      8.00   115
+## 2 (70,75]         2.74      6.75    91
+## 3 (75,80]         2.53      4.97    57
+## 4 (80,85]         2.23      3.15    30
+## 5 (85,90]         2.56      7.03     9
+## 6 (90,95]         1         2        2
+```
+
+--
+
+It appears the assumption is violated in some age groups; however, the violations are small enough that we can proceed.
+
+
+---
+
+## Linearity 
+
+The raw residual for the `\(i^{th}\)` observation, `\(y_i - \hat{\lambda}_i\)`, is difficult to interpret since the variance is equal to the mean in the Poisson distribution.
+
+--
+
+
+Instead, we can analyze a standardized residual called the .vocab[Pearson residual].
+`$$r_i = \frac{y_i - \hat{\lambda}_i}{\sqrt{\hat{\lambda}_i}}$$`
+
+--
+
+We will examine a plot of the Pearson residuals versus the predicted values to check the linearity assumption.
+
+---
+
+## `augment` function
+
+
+```r
+hh_aug &lt;- augment(model2, type.predict = "response", 
+                  type.residuals = "pearson")
+```
+
+
+---
+
+## Linearity condition
+
+```r
+ggplot(hh_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha= 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Predicted mean number of people in household", 
+       y = "Pearson residual", 
+       title = "Residuals vs. Predicted") +
+  theme_bw()
+```
+
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-20-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+--
+
+There is no distinguishable pattern in the residuals, so the linearity assumption is satisfied.
+
+
+---
+
+
+## Looking ahead 
+
+- Review [Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
+  - Use this chapter as a reference throughout the semester
+  
+- For next time - [Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
+
+
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%",
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
