@@ -7,6 +7,8 @@
     <script src="libs/font-awesome/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/font-awesome/panelset-0.2.6/panelset.css" rel="stylesheet" />
     <script src="libs/font-awesome/panelset-0.2.6/panelset.js"></script>
+    <link href="libs/font-awesome/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/font-awesome/countdown-0.3.5/countdown.js"></script>
     <link rel="stylesheet" href="sta310-slides.css" type="text/css" />
   </head>
   <body>
@@ -40,7 +42,7 @@ class: middle, center
 
 - Quiz 01 due Thu, Jan 27 at 3:30pm (start of lab)
 
-- Mini-project 01: Analysis plan &lt;font color = "red"&gt;due ??&lt;/font&gt;
+- [Mini-project 01: Analysis plan](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html#Analysis_plan) due Thu, Jan 27 at 11:59pm for feedback (optional)
 
 ---
 
@@ -54,7 +56,7 @@ class: middle, center
 
 - Interpret the coefficients for the Poisson regression model 
 
-- Write the likelihood for Poisson regression and describe how it is used to estimate the coefficients for the model 
+- Compare two Poisson regression models
 
 ---
 
@@ -91,7 +93,7 @@ Let `\(Y\)` be the number of events in a given unit of time or space. Then `\(Y\
 
 `$$P(Y=y) = \frac{e^{-\lambda}\lambda^y}{y!} \hspace{10mm} y=0,1,2,\ldots, \infty$$`
 
-
+--
 
 .vocab[Features]
 
@@ -102,13 +104,8 @@ Let `\(Y\)` be the number of events in a given unit of time or space. Then `\(Y\
   
 ---
 
-## Poisson distribution for different `\(\lambda\)`'s
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-2-1.png" width="60%" style="display: block; margin: auto;" /&gt;
 
-&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-2-1.png" width="90%" style="display: block; margin: auto;" /&gt;
-
----
-
-## Simulated Poisson distributions
 
 &lt;table&gt;
  &lt;thead&gt;
@@ -120,233 +117,389 @@ Let `\(Y\)` be the number of events in a given unit of time or space. Then `\(Y\
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; lambda=2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.99042 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.988188 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; lambda = 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.99351 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9902178 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; lambda=5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; lambda = 5 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 4.99367 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.986580 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.9865798 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; lambda=20 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; lambda = 50 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 49.99288 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 49.896268 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; lambda=100 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 99.99684 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 100.399734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49.8962683 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
   
 ---
 
-## Using the Poisson distribution 
+## Example 
 
-The annual number of earthquakes registering at least 2.5 on the Richter Scale and having an epicenter within 40 miles of downtown Memphis follows a Poisson distribution with mean 6.5. 
-
-What is the probability there will be at 3 or fewer such earthquakes next year?
-
-
-
-
----
-
-
-
----
-
-## Poisson Regression
-
-- We want `\(\lambda\)` to be a function of predictor variables `\(x_1, \ldots, x_p\)`
+The annual number of earthquakes registering at least 2.5 on the Richter Scale and having an epicenter within 40 miles of downtown Memphis follows a Poisson distribution with mean 6.5. **What is the probability there will be at 3 or fewer such earthquakes next year?**
 
 --
+
+`$$P(Y \leq 3) = P(Y = 0) + P(Y = 1) + P(Y = 2) + P(Y = 3)$$`
+
+--
+
+$$ = \frac{e^{-6.5}6.5^0}{0!} + \frac{e^{-6.5}6.5^1}{1!} + \frac{e^{-6.5}6.5^2}{2!} + \frac{e^{-6.5}6.5^3}{3!}$$
+--
+
+$$ = 0.112$$
+
+--
+
+
+```r
+ppois(3, 6.5)
+```
+
+```
+## [1] 0.1118496
+```
+
+&lt;br&gt;
+
+.footnote[Example adapted from [Introduction to Probability Theory Example 28-2](https://online.stat.psu.edu/stat414/lesson/28/28.2)]
+
+---
+
+class: middle, inverse
+
+## Poisson regression
+
+---
+
+## The data: Household size in the Philippines
+
+The data [fHH1.csv](data/fHH1.csv) come from the 2015 Family Income and Expenditure Survey conducted by the Philippine Statistics Authority. 
+
+**Goal**: Understand the association between household size and various characteristics of the household
+
+**Response**: 
+- `total`: Number of people in the household other than the head
+
+.left[
+**Predictors**: 
+- `location`: Where the house is located
+- `age`: Age of the head of household
+- `roof`: Type of roof on the residence (proxy for wealth)
+]
+
+.right[
+**Other variables**: 
+- `numLT5`: Number in the household under 5 years old 
+]
+
+---
+
+## The data 
+
+
+```r
+hh_data &lt;- read_csv("data/fHH1.csv")
+hh_data %&gt;% slice(1:5) %&gt;% kable()
+```
+
+
+
+|location     | age| total| numLT5|roof                          |
+|:------------|---:|-----:|------:|:-----------------------------|
+|CentralLuzon |  65|     0|      0|Predominantly Strong Material |
+|MetroManila  |  75|     3|      0|Predominantly Strong Material |
+|DavaoRegion  |  54|     4|      0|Predominantly Strong Material |
+|Visayas      |  49|     3|      0|Predominantly Strong Material |
+|MetroManila  |  74|     3|      0|Predominantly Strong Material |
+
+---
+
+## Response variable
+
+.pull-left[
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-left[
+
+|  mean|   var|
+|-----:|-----:|
+| 3.685| 5.534|
+]
+---
+
+## Why the least-squares model doesn't work
+
+The goal is to model `\(\lambda\)`, the expected number of people in the household (other than the head), as a function of the predictors (covariates)
+
+--
+
+We might be tempted to try a linear model `$$\lambda_i = \beta_0 + \beta_1x_{i1} + \beta_2x_{i2} + \dots + \beta_px_{ip}$$`
+
+--
+
+This model won't work because...
+
+- It could produce negative values of `\(\lambda\)` for certain values of the predictors 
+- The equal variance assumption required to conduct inference for linear regression is violated. 
+
+---
+
+## Poisson regression model 
+
+If `\(Y_i \sim Poisson\)` with `\(\lambda = \lambda_i\)` for the given values `\(x_{i1}, \ldots, x_{ip}\)`, then 
+
+.eq[
+`$$\log(\lambda_i) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \dots + \beta_p x_{ip}$$`
+]
+
+--
+
+- Each observation can have a different value of `\(\lambda\)` based on its value of the predictors `\(x_1, \ldots, x_p\)`
+
+- `\(\lambda\)` determines the mean and variance, so we don't need to estimate a separate error term 
+
+---
+
+## Poisson vs. multiple linear regression 
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="06-poisson-pt1_files/figure-html/OLSpois-1.png" alt="Regression models: Linear regression (left) and Poisson regression (right)." width="60%" /&gt;
+&lt;p class="caption"&gt;Regression models: Linear regression (left) and Poisson regression (right).&lt;/p&gt;
+&lt;/div&gt;
+
+.footnote[From [BMLR Figure 4.1](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#a-graphical-look-at-poisson-regression)]
+
+---
+
+## Assumptions for Poisson regression 
+
+.pull-left[
+**Poisson response**: The response variable is a count per unit of time or space, described by a Poisson distribution, at each level of the predictor(s)
+
+**Independence**: The observations must be independent of one another
+
+**Mean = Variance**: The mean must equal the variance
+
+**Linearity**: The log of the mean rate, `\(\log(\lambda)\)`, must be a linear function of the predictor(s)
+]
+
+.pull-right[
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+class: middle, inverse
+
+## Model 1: Number in household vs. age
+
+
+---
+
+## Model 1: Household vs. Age
+
+
+```r
+model1 &lt;- glm(total ~ age, data = hh_data, family = poisson)
+
+tidy(model1) %&gt;% 
+  kable(digits = 4)
+```
+
+
+
+|term        | estimate| std.error| statistic| p.value|
+|:-----------|--------:|---------:|---------:|-------:|
+|(Intercept) |   1.5499|    0.0503|   30.8290|       0|
+|age         |  -0.0047|    0.0009|   -5.0258|       0|
+
+`$$\log(\hat{\lambda}) = 1.5499  - 0.0047 ~ age$$`
+
+---
 
 .question[
-Why is a multiple linear regression model not appropriate?
+The coefficient for `age` is -0.0047. Interpret this coefficient in context. Select all that apply. [Click here](https://forms.gle/L6oTrTQzgh27FzVK9) to submit your response.
+
+.small[a. The mean household size is predicted to decrease by 0.0047 for each year older the head of the household is.]
+
+.small[b. The mean household size is predicted to multiply by a factor of 0.9953 for each year older the head of the household is.]
+
+.small[c. The mean household size is predicted to decrease by 0.9953 for each year older the head of the household is.]
+
+.small[d. The mean household size is predicted to multiply by a factor of 0.47% for each year older the head of the household is.] 
+
+.small[e. The mean household size is predicted to decrease by 0.47% for each year older the head of the household is.]
+
 ]
+]
+
+---
+
+.question[
+The coefficient for `age` is -0.0047. Interpret this coefficient in context. Select all that apply. [Click here](https://forms.gle/L6oTrTQzgh27FzVK9) to submit your response.
+
+.small[a. The mean household size is predicted to decrease by 0.0047 for each year older the head of the household is.]
+
+.small[b. The mean household size is predicted to multiply by a factor of 0.9953 for each year older the head of the household is.]
+
+.small[c. The mean household size is predicted to decrease by 0.9953 for each year older the head of the household is.]
+
+.small[d. The mean household size is predicted to multiply by a factor of 0.47% for each year older the head of the household is.] 
+
+.small[e. The mean household size is predicted to decrease by 0.47% for each year older the head of the household is.]
+
+]
+]
+
+<div class="countdown" id="timer_61f19712" style="right:0;bottom:0;margin:5%;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+## Understanding the interpretation 
+
+Let's derive the change in predicted mean when we go from `\(x\)` to `\(x+1\)` 
+
+(see boardwork)
+
+
+---
+
+## Is the coefficient of `age` statistically significant? 
+
+
+|term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept) |   1.5499|    0.0503|   30.8290|       0|   1.4512|    1.6482|
+|age         |  -0.0047|    0.0009|   -5.0258|       0|  -0.0065|   -0.0029|
+
+`$$H_0: \beta_1 = 0 \hspace{2mm} \text{ vs. } \hspace{2mm} H_a: \beta_1 \neq 0$$`
 
 --
 
-- `\(\lambda\)` must be greater than or equal to 0 for any combination of predictor variables
-- Constant variance assumption will be violated!
+**Test statistic**
 
----
-
-## Multiple linear regression vs. Poisson 
-
-
-
-
-.footnote[Image from: [*Broadening Your Statistical Horizons*](https://bookdown.org/roback/bookdown-bysh/ch-poissonreg.html)]
-
----
-
-## Poisson Regression
-
-If the observed values `\(Y_i\)` are Poisson, then we can model using a &lt;font class="vocab"&gt;Poisson regression model&lt;/font&gt; of the form
-
-.alert[
-`$$\log(\lambda_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \dots + \beta_p x_{pi}$$`
-]
----
- 
-## Interpreting Model Coefficients
-
-- &lt;font class="vocab"&gt;Slope, `\(\beta_j\)`: &lt;/font&gt;
-    - **Quantitative Predictor**:  When `\(x_j\)` increases by one unit, the mean of `\(y\)` is expected to multiply by a factor of `\(\exp\{\beta_j\}\)`, (*holding all else constant*).
-    
-    - **Categorical Predictor**: The mean of `\(y\)` for category `\(k\)` is expected to be `\(\exp\{\beta_j\}\)` times the mean of `\(y\)`  for the baseline category, (*holding all else constant*).
+`$$Z = \frac{\hat{\beta}_1 - 0}{SE(\hat{\beta}_1)} = \frac{-0.0047 - 0}{0.0009} = -5.026 \text{ (using exact values)}$$`
 
 --
 
-- &lt;font class="vocab"&gt;Intercept, `\(\beta_0\)`: &lt;/font&gt; When all of the predictors equal 0, the mean of `\(y\)` is expected to be `\(\exp\{\beta_0\}\)`.
+**P-value**
+
+`$$P(|Z| &gt; |-5.026|) = 5.01 \times 10^{-7} \approx 0$$` 
 
 ---
 
-## Example: Household size in the Philippines
-
-The data come from the 2015 Family Income and Expenditure Survey conducted by the Philippine Statistics Authority. 
-
-.vocab[Goal:] We want to use the data to understand the relationship between the age of the head of the household and the number of people in their household. 
-
-.vocab[Variables]
-
-- `age`: the age of the head of household
-- `total`: the number of people in the household other than the head
+## What are plausible values for the coefficient of `age`? 
 
 
+|term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept) |   1.5499|    0.0503|   30.8290|       0|   1.4512|    1.6482|
+|age         |  -0.0047|    0.0009|   -5.0258|       0|  -0.0065|   -0.0029|
 
+**95% confidence interval for the coefficient of `age`**
+
+`$$\hat{\beta}_1 \pm Z^{*}\times SE(\hat{\beta}_1)$$`
+`$$-0.0047 \pm 1.96 \times 0.0009 = \mathbf{(-.0065, -0.0029)}$$`
+
+.question[
+Interpret the interval in terms of the change in mean household size. 
+]
 
 ---
 
-## Exploratory data analysis 
+**Which plot can best help us determine whether Model 1 is a good fit?**
+
+&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle, inverse
+
+## Model 2: Add a quadratic effect for `age`
+
+---
+
+## Model 2: Add a quadratic effect for `age`
 
 
 ```r
-ggplot(data = hh, aes(x = total)) + 
-  geom_histogram() + 
-  labs(title = "Number of people in the household", 
-       y = "count",
-       x = "") + 
-  theme_bw()
-```
+hh_data &lt;- hh_data %&gt;% 
+  mutate(age2 = age*age)
 
-&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-6-1.png" width="90%" style="display: block; margin: auto;" /&gt;
-
----
-
-## Exploratory data analysis 
-
-Let's examine a plot of the log-transformed mean number of people in the household by age
-
-
-```r
-hh %&gt;%
-  group_by(age) %&gt;%
-  summarise(log_mean_total = log(mean(total))) %&gt;%
-  ggplot(aes(x = age, y = log_mean_total)) +
-  geom_point() +
-  labs(y = "Log(mean household number)", 
-       x = "Age", 
-       title = "Log-transformed mean household number vs. age") +
-  theme_bw()
-```
-
-&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-7-1.png" width="90%" style="display: block; margin: auto;" /&gt;
-
-
----
-
-## Exploratory data analysis 
-
-Let's examine a plot of the log-transformed mean number of people in the household by age
-
-
-```r
-hh %&gt;%
-  group_by(age) %&gt;%
-  summarise(log_mean_total = log(mean(total))) %&gt;%
-  ggplot(aes(x = age, y = log_mean_total)) +
-  geom_point() +
-  geom_smooth(se = FALSE) +
-    labs(y = "Log(mean household number)", 
-       x = "Age", 
-       title = "Log-transformed mean household number vs. age") +
-  theme_bw()
-```
-
-&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-8-1.png" width="90%" style="display: block; margin: auto;" /&gt;
-
----
-
-## Number in household vs. age
-.midi[
-
-```r
-model1 &lt;- glm(total ~ ageCent, data = hh, family = "poisson")
-tidy(model1, conf.int = T) %&gt;%
-  kable(digits = 3)
+model2 &lt;- glm(total ~ age + age2, data = hh_data, family = poisson)
+tidy(model2, conf.int = T) %&gt;% 
+  kable(digits = 4)
 ```
 
 
 
 |term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
 |:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
-|(Intercept) |    1.303|     0.013|    96.647|       0|    1.276|     1.329|
-|ageCent     |   -0.005|     0.001|    -4.832|       0|   -0.006|    -0.003|
-]
-
-`$$\color{#87037B}{\log(\overline{\text{total}}) = 1.303 - 0.0047 \times \text{ageCent}}$$`
+|(Intercept) |  -0.3325|    0.1788|   -1.8594|   0.063|  -0.6863|    0.0148|
+|age         |   0.0709|    0.0069|   10.2877|   0.000|   0.0575|    0.0845|
+|age2        |  -0.0007|    0.0001|  -11.0578|   0.000|  -0.0008|   -0.0006|
 
 ---
 
-## Interpretations
+## Model 2: Add a quadratic effect for `age`
 
 
 |term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
 |:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
-|(Intercept) |    1.303|     0.013|    96.647|       0|    1.276|     1.329|
-|ageCent     |   -0.005|     0.001|    -4.832|       0|   -0.006|    -0.003|
+|(Intercept) |  -0.3325|    0.1788|   -1.8594|   0.063|  -0.6863|    0.0148|
+|age         |   0.0709|    0.0069|   10.2877|   0.000|   0.0575|    0.0845|
+|age2        |  -0.0007|    0.0001|  -11.0578|   0.000|  -0.0008|   -0.0006|
 
---
+We can determine whether to keep `\(age^2\)` in the model in two ways: 
 
-For each additional year older the head of the household is, we expect the mean number in the house to multiply by a factor of 0.995 (exp(-0.0047)). 
+1️⃣ Use the p-value (or confidence interval) for the coefficient (since we are adding a single term to the model)
 
---
-
-For households with a head of the household who is 52.657 years old, we expect the mean number of people in the household to be 3.68 (exp(1.303)).
-
+2️⃣ Conduct a drop-in-deviance test
 
 ---
 
-## Drop-In-Deviance Test
+## Deviance 
 
-We can use a .vocab[drop-in-deviance test] to compare nested models (similar to logistic regression). 
+A **deviance** is a way to measure how the observed data deviates from the model predictions.
 
-Let's try adding `ageCent^2` to the model. 
+- It's a measure unexplained variability in the response variable (similar to SSE in linear regression ) 
 
-`$$H_0: \beta_{ageCent^2} = 0 \text{ vs. }H_a: \beta_{ageCent^2} \neq 0$$`
+- Lower deviance means the model is a better fit to the data 
 
-.midi[
+--
 
-```r
-model1 &lt;- glm(total ~ ageCent, data = hh, family = "poisson")
-model2 &lt;- glm(total ~ ageCent + I(ageCent^2),
-              data = hh, family = "poisson")
-```
+We can calculate the "deviance residual" for each observation in the data (more on the formula later). Let `\((\text{deviance residual}_i\)` be the deviance residual for the `\(i^{th}\)` observation, then 
 
+`$$\text{deviance} = \sum(\text{deviance residual})_i^2$$`
 
-```r
-anova(model1, model2, test = "Chisq")
-```
-]
+*Note: Deviance is also known as the "residual deviance"*
+
 ---
 
-## Drop-In-Deviance Test
+## Drop-in-Deviance Test
+
+We can use a **drop-in-deviance test** to compare two models. To conduct the test 
+
+1️⃣ Compute the deviance for each model 
+
+2️⃣ Calculate the drop in deviance 
+
+`$$\text{drop-in-deviance =  Deviance(reduced model) - Deviance(larger model)}$$`
+
+3️⃣ Given the reduced model is the true model `\((H_0 \text{ true})\)`, then `$$\text{drop-in-deviance} \sim \chi_d^2$$`
+
+where `\(d\)` is the difference in degrees of freedom between the two models (i.e., the difference in number of terms)
+
+---
+
+## Drop-in-deviance to compare Model1 and Model2
 
 
 ```r
@@ -358,181 +511,31 @@ anova(model1, model2, test = "Chisq") %&gt;%
 
 | Resid. Df| Resid. Dev| Df| Deviance| Pr(&gt;Chi)|
 |---------:|----------:|--:|--------:|--------:|
-|      1496|   2330.729| NA|       NA|       NA|
-|      1495|   2198.533|  1|  132.197|        0|
+|      1498|   2337.089| NA|       NA|       NA|
+|      1497|   2200.944|  1|  136.145|        0|
 
---
-
-The p-value is small, so we reject `\(H_0\)`. We will include `ageCent^2` to the model. 
-
-
----
-
-## Final model 
-
-
-```r
-tidy(model2, conf.int = T) %&gt;%
-  kable(digits = 3)
-```
-
-
-
-|term         | estimate| std.error| statistic| p.value| conf.low| conf.high|
-|:------------|--------:|---------:|---------:|-------:|--------:|---------:|
-|(Intercept)  |    1.436|     0.017|    82.339|       0|    1.402|     1.470|
-|ageCent      |   -0.004|     0.001|    -3.584|       0|   -0.006|    -0.002|
-|I(ageCent^2) |   -0.001|     0.000|   -10.938|       0|   -0.001|    -0.001|
-
----
-
-## Model Assumptions 
-
-1. .vocab[Poisson Response]: The response follows a Poisson distribution for each level of the predictor.
-
-2. .vocab[Independence]: The observations are independent of one another.
-
-3. .vocab[Mean = variance]: The mean value of the response equals the variance of the response for each level of the predictor.
-
-4. .vocab[Linearity]: `\(\log(\lambda)\)` is a linear function of the predictors.
-
----
-
-## Poisson response 
-
-Let's check the first assumption by looking at the distribution of the response for groups of the predictor.
-
-
-
-```r
-hh &lt;- hh %&gt;%
-  mutate(age_group = cut(age, breaks = seq(15, 100, 5)))
-```
-
----
-
-## Poisson response 
-
-.small[
-&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-16-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+.question[
+- Write the null and alternative hypotheses.
+- What does the value 2337.089	tell you? 
+- What does the value 1 tell you? 
+- What is your conclusion? 
 ]
 
-This condition is satisfied based on the overall distribution of the response (from the EDA) and the distribution of the response by age group.
-
 ---
 
-## Independence
+## Add `location` to the model? 
 
-We don't have much information about how the households were selected for the survey. 
+Suppose we want to add `location` to the model, so we compare the following models: 
 
-If the households were not selected randomly but rather groups of household were selected from different areas with different customs about living arrangements, then the independence assumption would be violated. 
+**Model A**: `\(\lambda_i = \beta_0 + \beta_1 ~ age_i + \beta_2 ~ age_i^2\)`
 
----
+**Model B**: `\(\lambda_i =  \beta_0 + \beta_1 ~ age_i + \beta_2 ~ age_i^2 + \beta_3 ~ Loc1_i + \beta_4 ~ Loc2_i + \beta_5 ~ Loc3_i + \beta_6 ~ Loc4_i\)`
 
-## Mean = variance
+.question[
+.small[Which of the following are reliable ways to determine if `location` should be added to the model? Select all that apply. [Click here](https://forms.gle/G3oDWo8ifhTPqCf67) to submit your response.]
 
-Let's look at the mean and variance for each age group. 
-
-
-```r
-hh %&gt;%
-  group_by(age_group) %&gt;%
-  summarize(mean_total = mean(total), var_total = var(total), n = n()) %&gt;%
-  slice(1:10)
-```
-
-```
-## # A tibble: 10 × 4
-##    age_group mean_total var_total     n
-##    &lt;fct&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;int&gt;
-##  1 (15,20]         1.67     0.667     6
-##  2 (20,25]         2.17     1.56     18
-##  3 (25,30]         2.92     1.41     49
-##  4 (30,35]         3.44     2.19    108
-##  5 (35,40]         3.84     3.57    158
-##  6 (40,45]         4.23     4.44    175
-##  7 (45,50]         4.49     6.40    194
-##  8 (50,55]         4.01     5.25    188
-##  9 (55,60]         3.81     6.53    145
-## 10 (60,65]         3.71     6.20    153
-```
-
----
-
-## Mean = variance
-
-
-
-```r
-hh %&gt;%
-  group_by(age_group) %&gt;%
-  summarize(mean_total = mean(total), var_total = var(total), n = n()) %&gt;%
-  slice(11:16)
-```
-
-```
-## # A tibble: 6 × 4
-##   age_group mean_total var_total     n
-##   &lt;fct&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;int&gt;
-## 1 (65,70]         3.34      8.00   115
-## 2 (70,75]         2.74      6.75    91
-## 3 (75,80]         2.53      4.97    57
-## 4 (80,85]         2.23      3.15    30
-## 5 (85,90]         2.56      7.03     9
-## 6 (90,95]         1         2        2
-```
-
---
-
-It appears the assumption is violated in some age groups; however, the violations are small enough that we can proceed.
-
-
----
-
-## Linearity 
-
-The raw residual for the `\(i^{th}\)` observation, `\(y_i - \hat{\lambda}_i\)`, is difficult to interpret since the variance is equal to the mean in the Poisson distribution.
-
---
-
-
-Instead, we can analyze a standardized residual called the .vocab[Pearson residual].
-`$$r_i = \frac{y_i - \hat{\lambda}_i}{\sqrt{\hat{\lambda}_i}}$$`
-
---
-
-We will examine a plot of the Pearson residuals versus the predicted values to check the linearity assumption.
-
----
-
-## `augment` function
-
-
-```r
-hh_aug &lt;- augment(model2, type.predict = "response", 
-                  type.residuals = "pearson")
-```
-
-
----
-
-## Linearity condition
-
-```r
-ggplot(hh_aug, aes(x = .fitted, y = .resid)) +
-  geom_point(alpha= 0.3) +
-  geom_hline(yintercept = 0, color = "red") +
-  labs(x = "Predicted mean number of people in household", 
-       y = "Pearson residual", 
-       title = "Residuals vs. Predicted") +
-  theme_bw()
-```
-
-&lt;img src="06-poisson-pt1_files/figure-html/unnamed-chunk-20-1.png" width="90%" style="display: block; margin: auto;" /&gt;
-
---
-
-There is no distinguishable pattern in the residuals, so the linearity assumption is satisfied.
+Drop-in-deviance test,  Use the p-value for each coefficient, Likelihood ratio test, Nested F Test, BIC
+]
 
 
 ---
@@ -540,11 +543,8 @@ There is no distinguishable pattern in the residuals, so the linearity assumptio
 
 ## Looking ahead 
 
-- Review [Chapter 3 - Distribution Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-distthry.html)
-  - Use this chapter as a reference throughout the semester
-  
 - For next time - [Chapter 4 - Poisson Regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html)
-
+  - Sections 4.4 - 4.9
 
 
 ---
@@ -553,6 +553,7 @@ There is no distinguishable pattern in the residuals, so the linearity assumptio
 ## Acknowledgements
 
 These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

@@ -32,12 +32,13 @@ h1, h3 {
 }
 
 b, strong {
-  color: #4187aa;
+  /*color: #4187aa;*/
+   color: #87037B;
 }
 
 a, a > code {
   font-family: 'Open Sans', sans-serif;
-  color: #AF5A94;
+  color: #87037B;
   text-decoration: underline;
   font-weight: bold;
   font-size: 90%;

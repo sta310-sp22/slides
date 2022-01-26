@@ -1,0 +1,52 @@
+---
+title: "Poisson Regression"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+hh_data <- read_csv("data/fHH1.csv")
+```
+
+
+```{r}
+logL <- function(params){
+  beta0 <- params[1]
+  beta1 <- params[2]
+  sum(-exp(beta0 + beta1*hh_data$age) + hh_data$total*(beta0 + beta1*hh_data$age))
+}
+```
+
+```{r}
+# try a grid of values 
+beta0 <- seq(-5, 5, length = 50)
+beta1 <- seq(-5, 5, length = 50)
+candidates <- expand.grid(beta0,beta1)
+
+y <- rep(0,nrow(candidates))
+
+for(i in 1:nrow(candidates)){
+  y[i] <- logL(candidates[i,])
+}
+
+bind_cols(candidates, y) %>%
+  arrange(desc(y)) %>%
+  slice(1)
+```
+
+
+
+
+
+```{r}
+# Use optim function in R to find the values to maximize the log-likelihood
+#set fnscale = -1 to maximize (the default is minimize)
+optim(par = c(-5,-5), fn = logL, control=list(fnscale=-1))
+```
+
+
+
