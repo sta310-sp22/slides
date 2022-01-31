@@ -1,6 +1,6 @@
 ---
 title: "Poisson Regression"
-subtitle: "Goodness of fit & overdispersion"
+subtitle: "Goodness-of-fit & overdispersion"
 author: "Prof. Maria Tackett"
 date: "01.31.22"
 output:
@@ -58,11 +58,17 @@ class: middle, center
 
 ## Announcements
 
-- Reading: 
+- Reading: [BMLR - Chapter 4 Poisson regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
 
-- Add project due dates
+- [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
+  - Draft **due Wed, Feb 02 at 12pm (noon)** in GitHub repo
+  - Peer review in class Wednesday 
+  - Final write up and presentations **Wed, Feb 09**
 
-- Add HW due dates
+- Thursday's class: Offsets and Zero-inflated Poisson model (ZIP)
+
+- HW 02 **due Mon, Feb 07 at 11:59pm**
+  - Released later today (will announce on GitHub Discussions)
 
 ---
 
@@ -81,8 +87,6 @@ class: middle, center
 class: middle, inverse
 
 ## Recap 
-
-
 
 ---
 
@@ -199,28 +203,68 @@ class: middle, inverse
 
 ---
 
-## Residuals 
+## Pearson residuals
 
-- Pearson residuals 
+We can calculate two types of residuals for Poisson regression: Pearson residuals and deviance residuals  
 
-- Deviance residuals 
+.eq[
+$$\text{Pearson residual}_i = \frac{\text{observed} - \text{predicted}}{\text{std. error}} = \frac{y_i - \hat{\lambda}_i}{\sqrt{\hat{\lambda}_i}}$$
+]
 
-<font color = "red"> Add color </font> 
+- Similar interpretation as residuals from linear regression 
+
+- Expect most to fall between -2 and 2
+
+- Used to calculate overdispersion parameter
 
 ---
 
-## Plot of deviance residuals vs. fitted
+## Deviance residuals 
 
+The **deviance residual** indicates how much the observed data deviates from the fitted model
 
-<font color = "red"> Add plots </font> 
+.eq[
+$$\text{deviance residual}_i = \text{sign}(y_i - \hat{\lambda}_i)\sqrt{2\Bigg[y_i\log\bigg(\frac{y_i}{\hat{\lambda}_i}\bigg) - (y_i - \hat{\lambda}_i)\Bigg]}$$
+
+where 
+
+$$\text{sign}(y_i - \hat{\lambda}_i)  =  \begin{cases}
+1 & \text{ if }(y_i - \hat{\lambda}_i) > 0 \\
+-1 & \text{ if }(y_i - \hat{\lambda}_i) < 0 \\
+0 & \text{ if }(y_i - \hat{\lambda}_i) = 0
+\end{cases}$$
+]
+
+Recall $(\text{residual deviance}) = \sum_{i=1}^{n}(\text{deviance residual})_i^2$
 
 ---
 
-## Calculate the (residual) deviance
+## Model 3: Residual plots 
 
-- Do this in R? 
 
-<font color = "red">Look at this for Model 3 in R</font>
+```{r}
+model3_aug_pearson <- augment(model3, type.residuals = "pearson") 
+model3_aug_deviance <- augment(model3, type.residuals = "deviance")
+```
+
+
+```{r echo = F}
+p1 <- ggplot(data = model3_aug_pearson, aes(x = .fitted, y = .resid)) + 
+  geom_point()  + 
+  geom_smooth() + 
+  labs(x = "Fitted values", 
+       y = "Pearson residuals", 
+       title = "Pearson residuals vs. fitted")
+
+p2 <-  ggplot(data = model3_aug_deviance, aes(x = .fitted, y = .resid)) + 
+  geom_point()  + 
+  geom_smooth() + 
+  labs(x = "Fitted values", 
+       y = "Deviance residuals", 
+       title = "Deviance residuals vs. fitted")
+
+p1 + p2
+```
 
 ---
 
@@ -232,9 +276,9 @@ class: middle, inverse
 
 $$\text{deviance} \sim \chi^2_{df}$$ 
 
-   where $df$ is the model's residual degrees of freedom 
+  where $df$ is the model's residual degrees of freedom 
 
-- **Question to answer**: What is the probability of observing a deviance larger than the one we've observed, given this mdoel sufficiently fits the data?
+- **Question to answer**: What is the probability of observing a deviance larger than the one we've observed, given this model sufficiently fits the data?
 
 $$P(\chi^2_{df} > \text{ deviance})$$
 
@@ -245,6 +289,11 @@ $$P(\chi^2_{df} > \text{ deviance})$$
 ```{r}
 model3$deviance
 model3$df.residual
+```
+
+--
+
+```{r}
 pchisq(model3$deviance, model3$df.residual, lower.tail = FALSE)
 ```
 
@@ -272,7 +321,7 @@ There are a few potential reasons for the lack-of-fit
 **Overdispersion**: There is more variability in the response than what is implied by the Poisson model 
 
 .pull-left[
-.vocab[Overall]
+.center[.vocab[Overall]]
 
 ```{r echo = F}
 hh_data %>%
@@ -284,7 +333,7 @@ hh_data %>%
 --
 
 .pull-right[
-.vocab[by Location]
+.center[.vocab[by Location]]
 
 ```{r echo = F}
 hh_data %>%
@@ -330,15 +379,9 @@ $$\hat{\phi} =\frac{\text{deviance}}{\text{residual df}} = \frac{\sum_{i=1}^{n}(
 where $p$ is the number of terms in the model (including the intercept)
 ]
 
-- If there is no overdispersion $\hat{\phi} \approx 1$
+- If there is no overdispersion $\hat{\phi} = 1$
 
 - If there is overdispersion $\hat{\phi} >  1$
-
---
-
-.question[
-Calculate the overdispersion parameter $\hat{\phi}$ in R.
-]
 
 ---
 
@@ -402,24 +445,58 @@ tidy(model3_q) %>%
 ```
 ]
 
-.pull-left[
-- Test statistic is 
+.pull-right[
+.center[**Test statistic**]
 $$t = \frac{\hat{\beta} - 0}{SE_{Q}(\hat{\beta})} \sim t_{n-p}$$
+]
+
+
 ---
 
-class: middle, center
+class: middle, inverse
 
 ## Negative binomial regression model 
 
 ---
 
-## Negative binomial random variable
+## Negative binomial regression model 
 
-- add info 
+Another approach to handle overdispersion is to use a **negative binomial regression model** 
 
+- This has more flexibility than the quasi-Poisson model, because there is a new parameter in addition to $\lambda$
 
+<br> 
+
+--
+
+Let $Y$ be a **negative binomial random variable**, $Y\sim NegBinom(r, p)$, then 
+
+$$P(Y = y_i) = {y_i + r - 1 \choose r - 1}(1-p)^{y_i}p^r \hspace{5mm} y_i = 0, 1, 2, \ldots, \infty$$
 
 ---
+
+## Negative binomial regression model 
+
+- **Main idea**: Generate a $\lambda$ for each observation (household) and generate a count using the Poisson random variable with parameter $\lambda$ 
+  - Makes the counts more dispersed than with a single parameter 
+  
+- Think of it as a Poisson model such that $\lambda$ is also random 
+--
+
+.eq[
+$$\begin{aligned} &\text{If }Y|\lambda \sim Poisson(\lambda)\\
+&\text{ and } \lambda \sim Gamma\bigg(r, \frac{1-p}{p}\bigg)\\
+&\text{ then } Y \sim NegBinom(r, p)\end{aligned}$$
+]
+
+---
+
+## Negative binomial simulation exercise
+
+---
+
+## Negative binomial regression in R
+
 
 ```{r}
 library(MASS)
@@ -428,18 +505,12 @@ tidy(model3_nb) %>%
   kable(digits = 4)
 ```
 
----
-
-## Explaining the Negative binomial regression model 
-
-- Do the simulation exercise from the HW
-
 
 ---
 
 
 ## Acknowledgements
 
-These slides are based on content in [BMLR Chapter 2 - Beyond Least Squares: Using Likelihoods](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+These slides are based on content in [BMLR - Chapter 4 Poisson regression ](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
 
 
