@@ -63,12 +63,22 @@ class: middle, center
 - [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
   - Draft **due Wed, Feb 02 at 12pm (noon)** in GitHub repo
   - Peer review in class Wednesday 
-  - Final write up and presentations **Wed, Feb 09**
+  - Final write up and presentations **Wed, Feb 09 at 3:30pm**
 
 - Thursday's class: Offsets and Zero-inflated Poisson model (ZIP)
 
 - HW 02 **due Mon, Feb 07 at 11:59pm**
   - Released later today (will announce on GitHub Discussions)
+  
+---
+
+## HW 01 
+
+- Exercise 2: The independence assumption is on the residuals (observations) <u>not</u> the predictors. 
+  - Multicollinearity is the correlation between predictors 
+
+- Read feedback carefully in Gradescope. Ask questions about feedback during office hours. 
+
 
 ---
 
@@ -145,7 +155,7 @@ tidy(model1) %>%
 
 $$\log(\hat{\lambda}) = 1.5499  - 0.0047 ~ age$$
 
-The mean household size is predicted to decrease by 0.47% for each year older the head of the household is.
+The mean household size is predicted to decrease by 0.47% (multiply by a factor of $e^{-0.0047}$) for each year older the head of the household is.
 
 ---
 
@@ -160,6 +170,7 @@ tidy(model2, conf.int = T) %>%
   kable(digits = 4)
 ```
 
+Determined Model 2 is a better fit than Model 1 based on the drop-in-deviance test.
 ---
 
 ## Add `location` to the model? 
@@ -180,7 +191,7 @@ anova(model2, model3, test = "Chisq") %>%
   kable(digits = 3)
 ```
 
-The p-value is small (0.01 < 0.05), so we conclude that Mode 3 is a better fit for the data. 
+The p-value is small (0.01 < 0.05), so we conclude that Model 3 is a better fit for the data. 
 
 ---
 
@@ -207,11 +218,15 @@ class: middle, inverse
 
 We can calculate two types of residuals for Poisson regression: Pearson residuals and deviance residuals  
 
+--
+
 .eq[
 $$\text{Pearson residual}_i = \frac{\text{observed} - \text{predicted}}{\text{std. error}} = \frac{y_i - \hat{\lambda}_i}{\sqrt{\hat{\lambda}_i}}$$
 ]
 
-- Similar interpretation as residuals from linear regression 
+--
+
+- Similar interpretation as standardized residuals from linear regression 
 
 - Expect most to fall between -2 and 2
 
@@ -234,8 +249,6 @@ $$\text{sign}(y_i - \hat{\lambda}_i)  =  \begin{cases}
 0 & \text{ if }(y_i - \hat{\lambda}_i) = 0
 \end{cases}$$
 ]
-
-Recall $(\text{residual deviance}) = \sum_{i=1}^{n}(\text{deviance residual})_i^2$
 
 ---
 
@@ -270,28 +283,33 @@ p1 + p2
 
 ## Goodness-of-fit
 
-- **Goal**: Use the (residual) deviance to assess how much the predicted values differ from the observed values 
+- **Goal**: Use the (residual) deviance to assess how much the predicted values differ from the observed values. Recall $(\text{deviance}) = \sum_{i=1}^{n}(\text{deviance residual})_i^2$
+
+
+--
 
 - If the model sufficiently fits the data, then 
 
 $$\text{deviance} \sim \chi^2_{df}$$ 
 
-  where $df$ is the model's residual degrees of freedom 
+  where $df$ is the model's residual degrees of freedom
+
+--
 
 - **Question to answer**: What is the probability of observing a deviance larger than the one we've observed, given this model sufficiently fits the data?
 
 $$P(\chi^2_{df} > \text{ deviance})$$
 
+.question[Calculate the goodness-of-fit of Model 3 in R.]
+
 ---
 
-## Model 3: Goodness-of-fit
+## Model 3: Goodness-of-fit calculations
 
 ```{r}
 model3$deviance
 model3$df.residual
 ```
-
---
 
 ```{r}
 pchisq(model3$deviance, model3$df.residual, lower.tail = FALSE)
@@ -303,13 +321,13 @@ The probability of observing a deviance greater than `r round(model3$deviance,1)
 
 ## Lack-of-fit
 
-There are a few potential reasons for the lack-of-fit
+There are a few potential reasons for lack-of-fit:
 
 - Missing important interactions or higher-order terms
 
 - Missing important variables (perhaps this means a more comprehensive data set is required)
 
-- There could be extreme observations causing the deviance to be larger than expected (not observed in our data)
+- There could be extreme observations causing the deviance to be larger than expected (assess based on the residual plots)
 
 - There could be a problem with the Poisson model 
   - May need more flexibility in the model to handle **overdispersion**
@@ -349,17 +367,17 @@ hh_data %>%
 
 If there is overdispersion, then there is more variation in the response than what's implied by a Poisson model. This means 
 
-`r emo::ji("x")` The standard errors of the model coefficients are artificially small 
+`r emo::ji("x")`  The standard errors of the model coefficients are artificially small 
 
-`r emo::ji("x")` The p-values are artificially small 
+`r emo::ji("x")`  The p-values are artificially small 
 
-`r emo::ji("x")` This could lead to models that are more complex than what is needed 
+`r emo::ji("x")`  This could lead to models that are more complex than what is needed 
 
 --
 
 We can take overdispersion into account by
   - inflating standard errors by multiplying them by a dispersion factor
-  - using a negative-binomial regression model.
+  - using a negative-binomial regression model
 
 ---
 
@@ -391,7 +409,7 @@ where $p$ is the number of terms in the model (including the intercept)
 
 $$SE_{Q}(\hat{\beta}) = \sqrt{\hat{\phi}}  * SE(\hat{\beta})$$
 - "Q" stands for **quasi-Poisson**, since this is an ad-hoc solution 
-  - The process for model building and model comparison is called **quasilikelihood**
+  - The process for model building and model comparison is called **quasilikelihood** (similar to likelihood without exact underlying distributions)
 
 
 ---
@@ -492,6 +510,16 @@ $$\begin{aligned} &\text{If }Y|\lambda \sim Poisson(\lambda)\\
 ---
 
 ## Negative binomial simulation exercise
+
+.question[
+Complete the Negative binomial regression exercise in R.
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 8, seconds = 0,
+          margin = "5%")
+```
 
 ---
 
