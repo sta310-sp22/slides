@@ -1,0 +1,424 @@
+---
+title: "Poisson Regression"
+subtitle: "Offset & Zero-inflated Poisson models"
+author: "Prof. Maria Tackett"
+date: "01.31.22"
+output:
+  xaringan::moon_reader:
+    #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+    self_contained: true
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "70%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+library(gridExtra)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+##[Click for PDF of slides](08-poisson-pt3.pdf)
+
+---
+
+## Announcements
+
+- Reading: [BMLR - Chapter 4 Poisson regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+  -  For Monday: BMLR - Chapter 5: Generalized Linear Models: A Unifying Theory 
+
+
+- [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
+  - Final write up and presentations **Wed, Feb 09 at 3:30pm**
+
+- HW 02 **due Mon, Feb 07 at 11:59pm**
+
+
+---
+
+## Learning goals 
+
+- Explore properties of negative binomial versus Poisson response 
+
+- Fit and interpret models with offset to adjust for differences in sampling effort
+
+- Fit and interpret Zero-inflated Poisson models
+
+---
+
+class: middle, inverse
+
+## Negative binomial regression model 
+
+---
+
+## Negative binomial regression model 
+
+Another approach to handle overdispersion is to use a **negative binomial regression model** 
+
+- This has more flexibility than the quasi-Poisson model, because there is a new parameter in addition to $\lambda$
+
+<br> 
+
+--
+
+Let $Y$ be a **negative binomial random variable**, $Y\sim NegBinom(r, p)$, then 
+
+$$P(Y = y_i) = {y_i + r - 1 \choose r - 1}(1-p)^{y_i}p^r \hspace{5mm} y_i = 0, 1, 2, \ldots, \infty$$
+
+---
+
+## Negative binomial regression model 
+
+- **Main idea**: Generate a $\lambda$ for each observation (household) and generate a count using the Poisson random variable with parameter $\lambda$ 
+  - Makes the counts more dispersed than with a single parameter 
+  
+- Think of it as a Poisson model such that $\lambda$ is also random 
+--
+
+.eq[
+$$\begin{aligned} &\text{If }Y|\lambda \sim Poisson(\lambda)\\
+&\text{ and } \lambda \sim Gamma\bigg(r, \frac{1-p}{p}\bigg)\\
+&\text{ then } Y \sim NegBinom(r, p)\end{aligned}$$
+]
+
+---
+
+## Negative binomial simulation exercise
+
+.question[
+Complete the Negative binomial regression exercise in R.
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 8, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+class: middle, inverse
+
+## Offset
+
+---
+
+## Data: Airbnbs in NYC
+
+The data set [NYCairbnb-sample.csv](data/NYCairbnb-sample.csv) contains information about a random sample of 1000 Airbnbs in New York City. It is a subset of the data on 40628 Airbnbs scraped by Awad et al. (2017).
+
+**Variables**
+
+- `number_of_reviews`: Number of reviews for the unit on Airbnb (proxy for number of rentals)
+- `price`: price per night in US dollars
+- `room_type`: Entire home/apartment, private room, or shared room
+- `days`: Number of days the unit has been listed (date when info scraped - date when unit first listed on Airbnb)
+
+
+.footnote[Data set pulled from BMLR Section 4.11.3.]
+
+---
+
+## Data: Airbnbs in NYC
+
+```{r}
+airbnb <- read_csv("data/NYCairbnb-sample.csv") %>%
+  select(id, number_of_reviews, days, room_type, price)
+```
+
+```{r echo = F}
+set.seed(020322)
+airbnb %>% sample_n(5) %>%
+  kable()
+```
+
+**Goal**: Use the price and room type an Airbnb to describe variation in the number of reviews (a proxy for number of rentals).
+
+---
+
+## EDA
+
+.pull-left[
+```{r echo = F, out.width = "100%"}
+p1 <- ggplot(data = airbnb, aes(x = number_of_reviews)) + 
+  geom_histogram()
+
+p2 <- airbnb %>%
+  group_by(price) %>%
+  summarise(log_mean = log(mean(price))) %>%
+  ggplot(aes(x = price, y = log_mean)) + 
+  geom_point()
+
+p1  / p2 + plot_layout(heights = c(10,10))
+
+```
+]
+
+.pull-right[
+
+**Overall** 
+
+```{r echo = F}
+airbnb %>%
+  summarise(mean = mean(number_of_reviews), 
+            var = var(number_of_reviews)) %>%
+  kable(digits = 3)
+```
+
+**by Room type**
+
+```{r, echo = F}
+airbnb %>%
+  group_by(room_type) %>%
+  summarise(mean = mean(number_of_reviews), 
+            var = var(number_of_reviews)) %>%
+  kable(digits = 3)
+```
+]
+
+---
+
+We would like to fit the Poisson regression model
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2$$
+
+--
+
+.question[
+- Based on the EDA, what are some potential issues we may want to address in the model building? 
+
+- Suppose any model fit issues are addressed. What are some potential limitations to the conclusions and interpretations from the model? 
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 3, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+## Offset 
+
+- Sometimes counts are not directly comparable because the observations differ based on some characteristic directly related to the counts, i.e. the *sampling effort*.
+
+- An **offset** can be used to adjust for differences in sampling effort. 
+
+--
+
+- Let $x_{offset}$ be the variable that accounts for differences in sampling effort. Then, we will add $\log(x_{offset})$ will be added to the model.
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 ~ x_{i1} + \beta_2 ~ x_{i2} + ... + \beta_p ~ x_{ip} + \log(x_{offset_i})$$
+
+- The offset is a term in the model with coefficient always equal to 1.
+
+---
+
+## Adding an offset to the Airbnb model 
+
+We will add the offset $\log(days)$ to the model. This accounts for the fact that we wouldl expect Airbnbs that have been listed longer to have more reviews. 
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2 + \log(days)$$
+--
+
+**Notes**: 
+
+- The response variable for the model is still  $\log(\lambda_i)$, the log mean number of reviews
+
+- The offset adjusts for the number of days
+
+---
+
+## Detail on the offset
+
+We want to adjust for the number of days, so we are interested in $\frac{reviews}{days}$.
+
+--
+
+Given $\lambda$ is the mean number of reviews
+
+$$\log\Big(\frac{\lambda}{days}\Big) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2$$
+
+--
+
+$$\Rightarrow \log({\lambda}) - \log(days) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2$$
+
+--
+
+$$\Rightarrow \log({\lambda}) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2 + \log(days)$$
+
+---
+
+## Airbnb model in R
+
+```{r}
+airbnb_model <- glm(number_of_reviews ~ price + room_type, 
+                    data = airbnb, family = poisson, 
+                    offset = log(days)) #<<
+```
+
+```{r echo = F}
+tidy(airbnb_model) %>%
+  kable(digits = 4)
+```
+
+--
+
+The coefficient for $\log(days)$ is fixed at 1, so it is not in the model output. 
+
+
+---
+
+## Interpretations
+
+```{r echo = F}
+tidy(airbnb_model) %>%
+  kable(digits = 4)
+```
+
+.question[
+- Interpret the coefficient of `price`. 
+- Interpret the coefficient of  `room_typePrivate room`
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 3, seconds = 0,
+          margin = "5%")
+```
+
+
+---
+
+### Goodness-of-fit
+
+$$\begin{aligned}&H_0: \text{ The model is a good fit for the data}\\
+&H_a: \text{ There is significant lack of fit}\end{aligned}$$
+
+```{r}
+pchisq(airbnb_model$deviance, airbnb_model$df.residual, lower.tail = F)
+```
+
+--
+
+There is evidence of significant lack of fit in the model. Therefore, more models would need to be explored that address the issues mentioned earlier. 
+
+--
+
+*In practice we would assess goodness-of-fit and finalize the model <b>before</b> any interpretations and conclusions.*
+
+---
+
+class: middle, inverse
+
+## Zero-inflated Poisson model
+
+---
+
+## Data: Weekend drinking 
+
+[ADD VARIABLES]
+
+---
+
+## Distribution of the response 
+
+---
+
+## Distribution of the response vs. what you would expect. 
+
+
+- What does it mean to be a  "0" in this data? 
+
+---
+
+## Zero-inflated Poisson model 
+
+The **Zero-inflated Poisson (ZIP)** model has two parts 
+
+1. Log mean number of drinks among students who do drink  
+
+[ADD MODEL FORM]
+
+2. Probability that a student does not drink 
+
+[ADD MODEL FORM!]
+
+---
+
+## Understanding the ZIP model
+
+- This is a latent variable mixture model 
+
+
+---
+
+## ZIP model in R
+
+[ADD R CODE]
+
+---
+
+## Interpretation 
+
+[MAKE A MULTIPLE CHOICE QUESTION WITH SOME OPTIONS THAT HAVE AMONG DRINKERS AND THOSE WITHOUT]
+
+---
+
+## Test for model fit 
+
+[Test for model fit]
+
+
+---
+
+## Beyond ZIP 
+
+We have just discussed one model but ZIP is one of many relevant models. 
+
+For example, **hurdle** model 
+
+
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR - Chapter 4 Poisson regression ](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+
+
