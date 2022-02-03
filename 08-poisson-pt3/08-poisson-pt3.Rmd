@@ -65,8 +65,7 @@ class: middle, center
 - [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
   - Final write up and presentations **Wed, Feb 09 at 3:30pm**
 
-- HW 02 **due Mon, Feb 07 at 11:59pm**
-
+- [HW 02](https://sta310-sp22.github.io/assignments/hw/hw-02.html) **due Mon, Feb 07 at 11:59pm**
 
 ---
 
@@ -121,7 +120,7 @@ $$\begin{aligned} &\text{If }Y|\lambda \sim Poisson(\lambda)\\
 ## Negative binomial simulation exercise
 
 .question[
-Complete the Negative binomial regression exercise in R.
+Complete the Negative binomial regression exercise in `lecture-07.Rmd` (found in your lecture-07 GitHub repo).
 ]
 
 ```{r echo = F}
@@ -174,17 +173,22 @@ airbnb %>% sample_n(5) %>%
 ## EDA
 
 .pull-left[
-```{r echo = F, out.width = "100%"}
+```{r echo = F, out.width = "150%"}
 p1 <- ggplot(data = airbnb, aes(x = number_of_reviews)) + 
-  geom_histogram()
+  geom_histogram() + 
+   labs(x = "Number of reviews",
+    title = "Distribution of number of reviews")
 
 p2 <- airbnb %>%
   group_by(price) %>%
   summarise(log_mean = log(mean(price))) %>%
   ggplot(aes(x = price, y = log_mean)) + 
-  geom_point()
+  geom_point() + 
+  labs(x = "Price in  US dollars",
+    y = "Log mean number of reviews", 
+    title = "Log mean number of reviews vs. price")
 
-p1  / p2 + plot_layout(heights = c(10,10))
+p1  / p2 + plot_layout(heights = c(20,20))
 
 ```
 ]
@@ -213,9 +217,11 @@ airbnb %>%
 
 ---
 
+## Considerations for modeling
+
 We would like to fit the Poisson regression model
 
-$$\log(\lambda_i) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2$$
+$$\log(\lambda) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2$$
 
 --
 
@@ -241,7 +247,7 @@ countdown(minutes = 3, seconds = 0,
 
 --
 
-- Let $x_{offset}$ be the variable that accounts for differences in sampling effort. Then, we will add $\log(x_{offset})$ will be added to the model.
+- Let $x_{offset}$ be the variable that accounts for differences in sampling effort, then $\log(x_{offset})$ will be added to the model.
 
 $$\log(\lambda_i) = \beta_0 + \beta_1 ~ x_{i1} + \beta_2 ~ x_{i2} + ... + \beta_p ~ x_{ip} + \log(x_{offset_i})$$
 
@@ -253,7 +259,7 @@ $$\log(\lambda_i) = \beta_0 + \beta_1 ~ x_{i1} + \beta_2 ~ x_{i2} + ... + \beta_
 
 We will add the offset $\log(days)$ to the model. This accounts for the fact that we wouldl expect Airbnbs that have been listed longer to have more reviews. 
 
-$$\log(\lambda_i) = \beta_0 + \beta_1 ~ price + \beta_2 ~ room\_type1 + \beta_3 ~ room\_type2 + \log(days)$$
+$$\log(\lambda_i) = \beta_0 + \beta_1 ~ price_i + \beta_2 ~ room\_type1_i + \beta_3 ~ room\_type2_i + \log(days_i)$$
 --
 
 **Notes**: 
@@ -325,7 +331,7 @@ countdown(minutes = 3, seconds = 0,
 
 ---
 
-### Goodness-of-fit
+## Goodness-of-fit
 
 $$\begin{aligned}&H_0: \text{ The model is a good fit for the data}\\
 &H_a: \text{ There is significant lack of fit}\end{aligned}$$
@@ -352,67 +358,205 @@ class: middle, inverse
 
 ## Data: Weekend drinking 
 
-[ADD VARIABLES]
+The data [`weekend-drinks.csv`](data/weekend-drinks.csv) contains information from a survey of 77 students in a introductory statistics course on a dry campus. 
+
+**Variables** 
+
+- `drinks`: Number of drinks they had in the past weekend 
+- `off_campus`: 1 - lives off campus, 0 otherwise
+- `first_year`: 1 - student is a first-year, 0 otherwise
+- `sex`: f - student identifies as female, m - student identifies as male 
+
+**Goal**: The goal is explore factors related to drinking behavior on a dry campus.
+
+.footnote[Case study in BMLR - Section 4.10]
 
 ---
 
-## Distribution of the response 
+## EDA: Response variable
+
+```{r, echo = F}
+drinks <- read_csv("data/weekend-drinks.csv")
+```
+
+
+```{r echo = F, out.width = "70%"}
+ggplot(data = drinks, aes(x = drinks)) + 
+  geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.8, fill = "gray", color = "gray") + 
+  labs(title = "Observed number of drinks", 
+       subtitle = "Mean = 2.013")
+```
+
+```{r echo = F, eval = F}
+drinks %>%
+  summarise(mean = mean(drinks), var = var(drinks)) %>%
+  kable(digits = 3)
+```
 
 ---
 
-## Distribution of the response vs. what you would expect. 
+## Observed vs. expected response
 
+```{r echo = F,  out.width = "70%"}
+drinks %>%
+  mutate(sim = rpois(77, 2.013)) %>%
+ggplot() +   
+  geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.7, fill = "gray", color = "gray") + 
+  geom_histogram(aes(x = sim), binwidth = 1, fill = "steelblue", alpha = 0.73, color = "steelblue") + 
+  labs(title = "Observed (gray) vs. Expected (blue) number of drinks")
+```
 
-- What does it mean to be a  "0" in this data? 
+.center[**What does it mean to be a "zero" in this data?**]
+
+---
+
+## Two types of zeros
+
+There are two types of zeros
+
+- Those who happen to have a zero in the data set (people who drink but happened to not drink last weekend)
+- Those who will always report a value of zero (non-drinkers)
+   - These are called **true zeros** 
+
+--
+
+We introduce a new parameter $\alpha$ for the proportion of two zeros, then fit a model that has two components
+
+`r emo::ji("one")` The association between mean number of drinks and various characteristics among those who drink 
+
+`r emo::ji("two")` The estimated proportion of non-drinkers
 
 ---
 
 ## Zero-inflated Poisson model 
 
-The **Zero-inflated Poisson (ZIP)** model has two parts 
+**Zero-inflated Poisson (ZIP)** model has two parts 
 
-1. Log mean number of drinks among students who do drink  
+`r emo::ji("one")` Association, among drinkers, between the mean number of drinks and predictors sex and off campus residence
 
-[ADD MODEL FORM]
+$$\log(\lambda) = \beta_0 + \beta_1 ~ off\_campus + \beta_2 ~ sex$$
+where $\lambda$ is the mean number of drinks among those who drink 
 
-2. Probability that a student does not drink 
+--
 
-[ADD MODEL FORM!]
+`r emo::ji("two")` Probability that a student does not drink 
+
+$$\text{logit}(\alpha) = \log\Big(\frac{\alpha}{1- \alpha}\Big) = \beta_0 + \beta_1 ~ first\_year$$
+
+where $\alpha$ is the proportion of non-drinkers
+
+--
+
+**Note:** The same variables can be used in each component 
 
 ---
 
-## Understanding the ZIP model
+## Details of the ZIP model 
 
-- This is a latent variable mixture model 
+- The ZIP model is a special case of a **latent variable model** 
+  - A type of **mixture model** where observations for one or more groups occur together but the group membership unknown 
+
+- Zero-inflated models are a common type of mixture model; they apply beyond Poisson regression 
+
+---
+
+## Details of the ZIP model 
+
+.pull-left[
+```{r echo = FALSE}
+drinks %>%
+  mutate(sim = rpois(77, 2.013)) %>%
+ggplot() +   
+  geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.7, fill = "gray", color = "gray") + 
+  geom_histogram(aes(x = sim), binwidth = 1, fill = "steelblue", alpha = 0.73, color = "steelblue") + 
+  labs(title = "Observed (gray) vs. Expected (blue) number of drinks")
+```
+]
+
+.pull-right[
+.center[**How they work**]
+
+- Remove the expected Poisson distribution (blue) from the observed (gray). Some zeros will remain; these are the true zeros (non-drinkers). A reasonable estimate for $\alpha$ is the proportion of such zeros 
+
+- Use the likelihood function and iterative process using <u>all</u> data to fit the models. 
+
+]
 
 
 ---
 
 ## ZIP model in R
 
-[ADD R CODE]
+Fit ZIP models using the `zeroinfl` function from the **pscl** R package.
+
+```{r}
+library(pscl)
+
+drinks_zip <- zeroinfl(drinks ~ off_campus + sex | first_year,
+                data = drinks)
+drinks_zip
+```
 
 ---
 
-## Interpretation 
+## Tidy output 
 
-[MAKE A MULTIPLE CHOICE QUESTION WITH SOME OPTIONS THAT HAVE AMONG DRINKERS AND THOSE WITHOUT]
+Use the `tidy` function from the  **poissonreg** package for tidy model output. 
+
+```{r}
+library(poissonreg)
+```
+
+
+**Mean number of drinks among drinkers**
+
+```{r}
+tidy(drinks_zip, type = "count") %>% kable(digits = 3)
+```
+
+**Proportion of non-drinkers**
+
+```{r}
+tidy(drinks_zip, type = "zero") %>% kable(digits = 3)
+```
+
+
 
 ---
 
-## Test for model fit 
+## Interpreting the model coefficients
 
-[Test for model fit]
+```{r echo = F}
+tidy(drinks_zip, type = "count") %>% kable(digits = 3)
+```
 
+
+.question[
+- Interpret the intercept. 
+- Interpret the coefficients of `off_campus` and `sexm`. 
+]
 
 ---
 
-## Beyond ZIP 
+## Estimated proportion zeros 
 
-We have just discussed one model but ZIP is one of many relevant models. 
+```{r echo = F}
+tidy(drinks_zip, type = "zero") %>% kable(digits = 3)
+```
 
-For example, **hurdle** model 
+.question[
+- What is the estimated proportion of non-drinkers among first years? 
+- What is the estimated proportion of non-drinkers among sophomores, juniors, seniors? 
+]
 
+---
+
+## These are just a few of the many models...
+
+- Use the [Vuong Test](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#the-vuong-test-optional) to compare the fit of the ZIP model to a regular Poisson model   
+  - Why can't we use a drop-in-deviance test? 
+
+- We've just discussed the ZIP model here, but there are other model applications beyond the standard Poisson regression model (e.g., hurdle models, Zero-inflated Negative Binomial models, etc. )
 
 ---
 
