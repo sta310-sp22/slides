@@ -59,7 +59,7 @@ class: middle, center
 ## Announcements
 
 - Reading: [BMLR - Chapter 4 Poisson regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
-  -  For Monday: BMLR - Chapter 5: Generalized Linear Models: A Unifying Theory 
+  -  For Monday: BMLR - [Chapter 5: Generalized Linear Models: A Unifying Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-glms.html)
 
 
 - [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
@@ -166,7 +166,7 @@ airbnb %>% sample_n(5) %>%
   kable()
 ```
 
-**Goal**: Use the price and room type an Airbnb to describe variation in the number of reviews (a proxy for number of rentals).
+**Goal**: Use the price and room type of Airbnbs to describe variation in the number of reviews (a proxy for number of rentals).
 
 ---
 
@@ -257,16 +257,13 @@ $$\log(\lambda_i) = \beta_0 + \beta_1 ~ x_{i1} + \beta_2 ~ x_{i2} + ... + \beta_
 
 ## Adding an offset to the Airbnb model 
 
-We will add the offset $\log(days)$ to the model. This accounts for the fact that we wouldl expect Airbnbs that have been listed longer to have more reviews. 
+We will add the offset $\log(days)$ to the model. This accounts for the fact that we would expect Airbnbs that have been listed longer to have more reviews. 
 
 $$\log(\lambda_i) = \beta_0 + \beta_1 ~ price_i + \beta_2 ~ room\_type1_i + \beta_3 ~ room\_type2_i + \log(days_i)$$
---
+<br>
 
-**Notes**: 
 
-- The response variable for the model is still  $\log(\lambda_i)$, the log mean number of reviews
-
-- The offset adjusts for the number of days
+**Note:** The response variable for the model is still  $\log(\lambda_i)$, the log mean number of reviews
 
 ---
 
@@ -316,6 +313,8 @@ The coefficient for $\log(days)$ is fixed at 1, so it is not in the model output
 tidy(airbnb_model) %>%
   kable(digits = 4)
 ```
+
+<br> 
 
 .question[
 - Interpret the coefficient of `price`. 
@@ -403,8 +402,10 @@ drinks %>%
 ggplot() +   
   geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.7, fill = "gray", color = "gray") + 
   geom_histogram(aes(x = sim), binwidth = 1, fill = "steelblue", alpha = 0.73, color = "steelblue") + 
-  labs(title = "Observed (gray) vs. Expected (blue) number of drinks")
+  labs(title = "Observed (gray) vs. Expected (blue) in Poisson(2.013)")
 ```
+
+--
 
 .center[**What does it mean to be a "zero" in this data?**]
 
@@ -420,7 +421,10 @@ There are two types of zeros
 
 --
 
-We introduce a new parameter $\alpha$ for the proportion of two zeros, then fit a model that has two components
+We introduce a new parameter $\alpha$ for the proportion of true zeros,  then fit a model that has two components:
+
+--
+
 
 `r emo::ji("one")` The association between mean number of drinks and various characteristics among those who drink 
 
@@ -432,7 +436,7 @@ We introduce a new parameter $\alpha$ for the proportion of two zeros, then fit 
 
 **Zero-inflated Poisson (ZIP)** model has two parts 
 
-`r emo::ji("one")` Association, among drinkers, between the mean number of drinks and predictors sex and off campus residence
+`r emo::ji("one")` Association, among those who drink, between the mean number of drinks and predictors sex and off campus residence
 
 $$\log(\lambda) = \beta_0 + \beta_1 ~ off\_campus + \beta_2 ~ sex$$
 where $\lambda$ is the mean number of drinks among those who drink 
@@ -457,31 +461,6 @@ where $\alpha$ is the proportion of non-drinkers
   - A type of **mixture model** where observations for one or more groups occur together but the group membership unknown 
 
 - Zero-inflated models are a common type of mixture model; they apply beyond Poisson regression 
-
----
-
-## Details of the ZIP model 
-
-.pull-left[
-```{r echo = FALSE}
-drinks %>%
-  mutate(sim = rpois(77, 2.013)) %>%
-ggplot() +   
-  geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.7, fill = "gray", color = "gray") + 
-  geom_histogram(aes(x = sim), binwidth = 1, fill = "steelblue", alpha = 0.73, color = "steelblue") + 
-  labs(title = "Observed (gray) vs. Expected (blue) number of drinks")
-```
-]
-
-.pull-right[
-.center[**How they work**]
-
-- Remove the expected Poisson distribution (blue) from the observed (gray). Some zeros will remain; these are the true zeros (non-drinkers). A reasonable estimate for $\alpha$ is the proportion of such zeros 
-
-- Use the likelihood function and iterative process using <u>all</u> data to fit the models. 
-
-]
-
 
 ---
 
@@ -513,6 +492,10 @@ library(poissonreg)
 ```{r}
 tidy(drinks_zip, type = "count") %>% kable(digits = 3)
 ```
+
+---
+
+## Tidy output 
 
 **Proportion of non-drinkers**
 
