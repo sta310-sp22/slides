@@ -180,15 +180,30 @@ p1 <- ggplot(data = airbnb, aes(x = number_of_reviews)) +
     title = "Distribution of number of reviews")
 
 p2 <- airbnb %>%
+  filter(price <= 2000) %>%
   group_by(price) %>%
-  summarise(log_mean = log(mean(price))) %>%
+  summarise(log_mean = log(mean(number_of_reviews))) %>%
   ggplot(aes(x = price, y = log_mean)) + 
-  geom_point() + 
+  geom_point(alpha= 0.7) + 
+  geom_smooth() + 
   labs(x = "Price in  US dollars",
     y = "Log mean number of reviews", 
-    title = "Log mean number of reviews vs. price")
+    title = "Log mean number of reviews vs. price", 
+    subtitle = "Airbnbs $2000 or less")
 
-p1  / p2 + plot_layout(heights = c(20,20))
+p3 <- airbnb %>%
+  filter(price <= 500) %>%
+  group_by(price) %>%
+  summarise(log_mean = log(mean(number_of_reviews))) %>%
+  ggplot(aes(x = price, y = log_mean)) + 
+  geom_point(alpha= 0.7) + 
+  geom_smooth() + 
+  labs(x = "Price in  US dollars",
+    y = "Log mean number of reviews", 
+    title = "Log mean number of reviews vs. price", 
+    subtitle = "Airbnbs $500 or less")
+
+p1  / (p2 + p3) + plot_layout(heights = c(20,20))
 
 ```
 ]
@@ -432,120 +447,7 @@ We introduce a new parameter $\alpha$ for the proportion of true zeros,  then fi
 
 ---
 
-## Zero-inflated Poisson model 
-
-**Zero-inflated Poisson (ZIP)** model has two parts 
-
-`r emo::ji("one")` Association, among those who drink, between the mean number of drinks and predictors sex and off campus residence
-
-$$\log(\lambda) = \beta_0 + \beta_1 ~ off\_campus + \beta_2 ~ sex$$
-where $\lambda$ is the mean number of drinks among those who drink 
-
---
-
-`r emo::ji("two")` Probability that a student does not drink 
-
-$$\text{logit}(\alpha) = \log\Big(\frac{\alpha}{1- \alpha}\Big) = \beta_0 + \beta_1 ~ first\_year$$
-
-where $\alpha$ is the proportion of non-drinkers
-
---
-
-**Note:** The same variables can be used in each component 
-
----
-
-## Details of the ZIP model 
-
-- The ZIP model is a special case of a **latent variable model** 
-  - A type of **mixture model** where observations for one or more groups occur together but the group membership unknown 
-
-- Zero-inflated models are a common type of mixture model; they apply beyond Poisson regression 
-
----
-
-## ZIP model in R
-
-Fit ZIP models using the `zeroinfl` function from the **pscl** R package.
-
-```{r}
-library(pscl)
-
-drinks_zip <- zeroinfl(drinks ~ off_campus + sex | first_year,
-                data = drinks)
-drinks_zip
-```
-
----
-
-## Tidy output 
-
-Use the `tidy` function from the  **poissonreg** package for tidy model output. 
-
-```{r}
-library(poissonreg)
-```
-
-
-**Mean number of drinks among drinkers**
-
-```{r}
-tidy(drinks_zip, type = "count") %>% kable(digits = 3)
-```
-
----
-
-## Tidy output 
-
-**Proportion of non-drinkers**
-
-```{r}
-tidy(drinks_zip, type = "zero") %>% kable(digits = 3)
-```
-
-
-
----
-
-## Interpreting the model coefficients
-
-```{r echo = F}
-tidy(drinks_zip, type = "count") %>% kable(digits = 3)
-```
-
-
-.question[
-- Interpret the intercept. 
-- Interpret the coefficients of `off_campus` and `sexm`. 
-]
-
----
-
-## Estimated proportion zeros 
-
-```{r echo = F}
-tidy(drinks_zip, type = "zero") %>% kable(digits = 3)
-```
-
-.question[
-- What is the estimated proportion of non-drinkers among first years? 
-- What is the estimated proportion of non-drinkers among sophomores, juniors, seniors? 
-]
-
----
-
-## These are just a few of the many models...
-
-- Use the [Vuong Test](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#the-vuong-test-optional) to compare the fit of the ZIP model to a regular Poisson model   
-  - Why can't we use a drop-in-deviance test? 
-
-- We've just discussed the ZIP model here, but there are other model applications beyond the standard Poisson regression model (e.g., hurdle models, Zero-inflated Negative Binomial models, etc. )
-
----
-
-
 ## Acknowledgements
 
 These slides are based on content in [BMLR - Chapter 4 Poisson regression ](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
-
 
