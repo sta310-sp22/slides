@@ -172,8 +172,7 @@ airbnb %>% sample_n(5) %>%
 
 ## EDA
 
-.pull-left[
-```{r echo = F, out.width = "150%"}
+```{r echo = F}
 p1 <- ggplot(data = airbnb, aes(x = number_of_reviews)) + 
   geom_histogram() + 
    labs(x = "Number of reviews",
@@ -187,8 +186,8 @@ p2 <- airbnb %>%
   geom_point(alpha= 0.7) + 
   geom_smooth() + 
   labs(x = "Price in  US dollars",
-    y = "Log mean number of reviews", 
-    title = "Log mean number of reviews vs. price", 
+    y = "Log(mean # reviews)", 
+    title = "Log mean #  of reviews vs. price", 
     subtitle = "Airbnbs $2000 or less")
 
 p3 <- airbnb %>%
@@ -199,16 +198,19 @@ p3 <- airbnb %>%
   geom_point(alpha= 0.7) + 
   geom_smooth() + 
   labs(x = "Price in  US dollars",
-    y = "Log mean number of reviews", 
-    title = "Log mean number of reviews vs. price", 
+    y = "Log(mean # reviews)", 
+    title = "Log mean # of reviews vs. price", 
     subtitle = "Airbnbs $500 or less")
 
-p1  / (p2 + p3) + plot_layout(heights = c(20,20))
+p1  / (p2 + p3) 
 
 ```
-]
 
-.pull-right[
+---
+
+## EDA 
+
+.pull-left[
 
 **Overall** 
 
@@ -218,7 +220,9 @@ airbnb %>%
             var = var(number_of_reviews)) %>%
   kable(digits = 3)
 ```
+]
 
+.pull-right[
 **by Room type**
 
 ```{r, echo = F}
