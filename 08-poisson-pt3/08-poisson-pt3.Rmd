@@ -58,15 +58,27 @@ class: middle, center
 
 ## Announcements
 
-- Reading: [BMLR - Chapter 4 Poisson regression](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
-  -  For Monday: BMLR - [Chapter 5: Generalized Linear Models: A Unifying Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-glms.html)
+- For Monday: BMLR - [Chapter 5: Generalized Linear Models: A Unifying Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-glms.html)
 
 
 - [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
   - Final write up and presentations **Wed, Feb 09 at 3:30pm**
 
-- [HW 02](https://sta310-sp22.github.io/assignments/hw/hw-02.html) **due Mon, Feb 07 at 11:59pm**
+- [HW 02](https://sta310-sp22.github.io/assignments/hw/hw-02.html) **due TODAY at 11:59pm**
 
+---
+
+class: middle, inverse
+
+## HW 02 questions? 
+
+---
+
+class: middle, inverse
+
+## Presentation order
+
+(all presentations and write ups due on Wed, Feb 09 at 3:30pm)
 ---
 
 ## Learning goals 

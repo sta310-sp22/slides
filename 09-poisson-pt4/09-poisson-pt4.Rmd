@@ -1,0 +1,427 @@
+---
+title: "Poisson Regression"
+subtitle: "Zero-inflated Poisson models"
+author: "Prof. Maria Tackett"
+date: "02.07.22"
+output:
+  xaringan::moon_reader:
+    #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+    self_contained: true
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "70%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+library(gridExtra)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+## [Click for PDF of slides](09-poisson-pt4.pdf)
+
+---
+
+
+## Announcements
+
+- For Mon, Feb 14: BMLR - [Chapter 5: Generalized Linear Models: A Unifying Theory](https://bookdown.org/roback/bookdown-BeyondMLR/ch-glms.html)
+
+
+- [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
+  - Final write up and presentations **Wed, Feb 09 at 3:30pm**
+
+- [HW 02](https://sta310-sp22.github.io/assignments/hw/hw-02.html) **due TODAY at 11:59pm**
+
+---
+
+class: middle
+
+## HW 02 questions? 
+
+---
+
+class: middle
+
+## Presentation order
+
+(all presentations and write ups due on Wed, Feb 09 at 3:30pm)
+
+
+---
+
+## Learning goals 
+
+- Fit and interpret the Zero-inflated Poisson model 
+
+- Write likelihood for Poisson and Zero-inflated Poisson model
+
+---
+
+## Data: Weekend drinking 
+
+The data [`weekend-drinks.csv`](data/weekend-drinks.csv) contains information from a survey of 77 students in a introductory statistics course on a dry campus. 
+
+**Variables** 
+
+- `drinks`: Number of drinks they had in the past weekend 
+- `off_campus`: 1 - lives off campus, 0 otherwise
+- `first_year`: 1 - student is a first-year, 0 otherwise
+- `sex`: f - student identifies as female, m - student identifies as male 
+
+**Goal**: The goal is explore factors related to drinking behavior on a dry campus.
+
+.footnote[Case study in BMLR - Section 4.10]
+
+---
+
+## EDA: Response variable
+
+```{r, echo = F}
+drinks <- read_csv("data/weekend-drinks.csv")
+```
+
+
+```{r echo = F, out.width = "70%"}
+ggplot(data = drinks, aes(x = drinks)) + 
+  geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.8, fill = "gray", color = "gray") + 
+  labs(title = "Observed number of drinks", 
+       subtitle = "Mean = 2.013")
+```
+
+```{r echo = F, eval = F}
+drinks %>%
+  summarise(mean = mean(drinks), var = var(drinks)) %>%
+  kable(digits = 3)
+```
+
+---
+
+## Observed vs. expected response
+
+```{r echo = F,  out.width = "70%"}
+drinks %>%
+  mutate(sim = rpois(77, 2.013)) %>%
+ggplot() +   
+  geom_histogram(aes(x = drinks), binwidth = 1, alpha = 0.7, fill = "gray", color = "gray") + 
+  geom_histogram(aes(x = sim), binwidth = 1, fill = "steelblue", alpha = 0.73, color = "steelblue") + 
+  labs(title = "Observed (gray) vs. Expected (blue) in Poisson(2.013)")
+```
+
+--
+
+.center[**What does it mean to be a "zero" in this data?**]
+
+---
+
+## Two types of zeros
+
+There are two types of zeros
+
+- Those who happen to have a zero in the data set (people who drink but happened to not drink last weekend)
+- Those who will always report a value of zero (non-drinkers)
+   - These are called **true zeros** 
+
+--
+
+We introduce a new parameter $\alpha$ for the proportion of true zeros,  then fit a model that has two components:
+
+--
+
+
+`r emo::ji("one")`  The association between mean number of drinks and various characteristics among those who drink 
+
+`r emo::ji("two")`  The estimated proportion of non-drinkers
+
+---
+
+
+## Zero-inflated Poisson model
+
+**Zero-inflated Poisson (ZIP)** model has two parts
+
+`r emo::ji("one")` Association, among those who drink, between the mean number of drinks and predictors sex and off campus residence
+
+$$\log(\lambda) = \beta_0 + \beta_1 ~ off\_campus + \beta_2 ~ sex$$
+where $\lambda$ is the mean number of drinks among those who drink
+
+--
+
+`r emo::ji("two")` Probability that a student does not drink
+
+$$\text{logit}(\alpha) = \log\Big(\frac{\alpha}{1- \alpha}\Big) = \beta_0 + \beta_1 ~ first\_year$$
+
+where $\alpha$ is the proportion of non-drinkers
+
+--
+
+**Note:** The same variables can be used in each component
+
+---
+
+## Details of the ZIP model
+
+- The ZIP model is a special case of a **latent variable model**
+  - A type of **mixture model** where observations for one or more groups occur together but the group membership unknown
+
+- Zero-inflated models are a common type of mixture model; they apply beyond Poisson regression
+
+---
+
+## ZIP model in R
+
+Fit ZIP models using the `zeroinfl` function from the **pscl** R package.
+
+```{r}
+library(pscl)
+
+drinks_zip <- zeroinfl(drinks ~ off_campus + sex | first_year,
+                data = drinks)
+drinks_zip
+```
+
+---
+
+## Tidy output
+
+Use the `tidy` function from the  **poissonreg** package for tidy model output.
+
+```{r}
+library(poissonreg)
+```
+
+
+**Mean number of drinks among those who drink**
+
+```{r}
+tidy(drinks_zip, type = "count") %>% kable(digits = 3)
+```
+
+---
+
+## Tidy output
+
+**Proportion of non-drinkers**
+
+```{r}
+tidy(drinks_zip, type = "zero") %>% kable(digits = 3)
+```
+
+
+
+---
+
+## Interpreting the model coefficients
+
+```{r echo = F}
+tidy(drinks_zip, type = "count") %>% kable(digits = 3)
+```
+
+<br> 
+
+.question[
+- Interpret the intercept.
+- Interpret the coefficients of `off_campus` and `sexm`.
+
+[Click here](https://forms.gle/vkV71Jp1DuocfgPBA) to submit our response. 
+]
+
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 3, seconds = 0,
+          margin = "5%")
+```
+
+
+---
+
+## Estimated proportion zeros
+
+```{r echo = F}
+tidy(drinks_zip, type = "zero") %>% kable(digits = 3)
+```
+
+.question[
+Based on the model...
+
+- What is the probability a first-year student is a non-drinker?
+- What is the probability a upperclass student (sophomore, junior, senior) is a non-drinker?
+
+[Click here](https://forms.gle/Uh2WjEduh9Cv6KiU9) to submit your response.
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 2, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+## These are just a few of the many models...
+
+- Use the [Vuong Test](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#the-vuong-test-optional) to compare the fit of the ZIP model to a regular Poisson model
+  - Why can't we use a drop-in-deviance test?
+
+- We've just discussed the ZIP model here, but there are other model applications beyond the standard Poisson regression model (e.g., hurdle models, Zero-inflated Negative Binomial models, etc. )
+
+---
+
+class: middle, inverse
+
+## Likelihoods for Poisson models 
+
+---
+
+## Estimating coefficients in Poisson model 
+
+- Least squares estimation would not work because the normality and equal variance assumptions don't hold for Poisson regression 
+
+- **Maximum likelihood estimation** is used to estimate the coefficients of Poisson regression. 
+
+- The likelihood is the product of the probabilities for the $n$ *<u>independent</u>* observations in the data 
+
+
+---
+
+## Likelihood for regular Poisson model
+
+Let's go back to example about [household size](https://sta310-sp22.github.io/slides/06-poisson-pt1/06-poisson-pt1.html#1) in the Philippines. We will focus on the model using the main effect of age to understand variability in mean household size. 
+
+--
+
+Suppose the first five observations have household sizes of 4, 2, 8, 6, and 1. Then the likelihood is 
+
+$$L = \frac{e^{-\lambda_1}\lambda_1^4}{4!} * \frac{e^{-\lambda_2}\lambda_2^2}{2!} * \frac{e^{-\lambda_3}\lambda_3^8}{8!} * 
+\frac{e^{-\lambda_4}\lambda_4^6}{6!} * \frac{e^{-\lambda_5}\lambda_5^1}{1!}$$
+
+---
+
+## Likelihood for regular Poisson model
+
+
+We will use the log likelihood to make finding the MLE easier 
+
+$$\begin{aligned}\log(L) &= -\lambda_1 + 4\log(\lambda_1) - \lambda_2 + 2\log(\lambda_2) - \lambda_3 + 8\log(\lambda_3)\\ & -\lambda_4 + 6 \log(\lambda_4) - \lambda_5 + \log(\lambda_5) + C \end{aligned}$$
+
+where 
+  - $\lambda$ is the mean number in household depending on $x_i$
+  - $C = -[\log(4!) + \log(2!) + \log(8!) + \log(6!)+ \log(1!)]$
+
+---
+
+## Likelihood for regular Poisson model
+
+Given the age of the head of the household, we fit the model 
+
+$$\log(\lambda_i) = \beta_0 + \beta_1~age_i$$
+
+Then we replace each $\lambda_i$ in $\log(L)$ with $e^{\beta_0 + \beta_1~age_i}$. 
+
+--
+
+Suppose the first five observations have ages $X = (32, 21, 55, 44, 28)$. Then
+
+--
+
+$$\begin{aligned} \log(L) &= [-e^{\beta_0 + \beta_132}+ 4(\beta_0 + \beta_1 32)] + [ - e^{\beta_0 + \beta_121} + 2(\beta_0 + \beta_121)] \\ &+  [- e^{\beta_0 + \beta_155} + 8(\beta_0 + \beta_155)] +  [-e^{\beta_0 + \beta_144} + 6(\beta_0 + \beta_144)] \\ &+ [-e^{\beta_0 + \beta_128}(\beta_0 + \beta_128)] + C \end{aligned}$$
+
+--
+
+Use search algorithm to find the values of $\beta_0$ and $\beta_1$ that maximize the above equation. 
+
+---
+
+## Probabilities under ZIP model
+
+There are three different types of observations in the data:
+
+- Observed zero and will always be 0 (true zeros)
+- Observed 0 but will not always be 0
+- Observed non-zero count and will not always be 0
+
+---
+
+## Probabilities under ZIP model
+
+**True zeros**
+$$P(0 | \text{true zero})= \alpha$$
+
+--
+
+**Observed 0 but will not always be 0**
+
+$$P(0 | \text{not always zero}) = (1 - \alpha)\frac{e^{-\lambda}\lambda^0}{0!}$$
+
+--
+
+**Did not observe 0 and will not always be 0**
+
+$$P(z_i | \text{not always zero}) = (1 - \alpha)\frac{e^{-\lambda}\lambda^{z_i}}{z_i!}$$
+
+---
+
+## Probabilities under ZIP model
+
+Putting this all together. Let $y_i$ be an observed response then 
+
+$$P(Y_i = y_i | x_i) = \begin{cases}
+\alpha + (1 - \alpha)e^{-\lambda_i} && \text{ if } y_i = 0 \\
+(1 - \alpha)\frac{e^{-\lambda_i}\lambda_i^{y_i}}{y_i!} && \text{ if } y_i > 0
+\end{cases}$$
+
+--
+
+Recall from our example, 
+
+$$\lambda_i = e^{\beta_0 + \beta_1~off\_campus_i + \beta_2 ~ sex_i}$$
+
+$$\alpha= \frac{e^{\beta_{0\alpha} + \beta_{1\alpha} ~ first\_year}}{1 + e^{\beta_{0\alpha} + \beta_{1\alpha} ~ first\_year}}$$
+
+- Plug in $\lambda_i$ and $\alpha$ into the above equation obtain the likelihood function
+---
+
+
+## Acknowledgements
+
+These slides are based on content in [BMLR](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html)
+ - Section 4.4.5: Using likelihoods to fit models 
+ - Section 4.4.10 Case Study: Weekend Drinking
+
+
+
