@@ -412,9 +412,9 @@ Recall from our example,
 
 $$\lambda_i = e^{\beta_0 + \beta_1~off\_campus_i + \beta_2 ~ sex_i}$$
 
-$$\alpha= \frac{e^{\beta_{0\alpha} + \beta_{1\alpha} ~ first\_year}}{1 + e^{\beta_{0\alpha} + \beta_{1\alpha} ~ first\_year}}$$
+$$\alpha_i = \frac{e^{\beta_{0\alpha} + \beta_{1\alpha} ~ first\_year_i}}{1 + e^{\beta_{0\alpha} + \beta_{1\alpha} ~ first\_year_i}}$$
 
-- Plug in $\lambda_i$ and $\alpha$ into the above equation obtain the likelihood function
+- Plug in $\lambda_i$ and $\alpha_i$ into the above equation obtain the likelihood function
 ---
 
 
