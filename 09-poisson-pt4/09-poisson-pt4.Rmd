@@ -64,6 +64,7 @@ class: middle, center
 
 - [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
   - Final write up and presentations **Wed, Feb 09 at 3:30pm**
+  - GitHub repo organization due **Wed, Feb 09 at 11:59pm**
 
 - [HW 02](https://sta310-sp22.github.io/assignments/hw/hw-02.html) **due TODAY at 11:59pm**
 
