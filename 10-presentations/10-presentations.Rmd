@@ -1,0 +1,153 @@
+---
+title: "Mini-Project 01 Presentations"
+date: "02.09.22"
+output:
+  xaringan::moon_reader:
+    #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+    self_contained: true
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "70%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+library(gridExtra)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+
+## Announcements
+
+
+- [Mini-Project 01](https://sta310-sp22.github.io/assignments/projects/mini-project-01.html): 
+  - Final write up & GitHub repo organization due **Fri, Feb 11 at 5pm**
+  - Project team peer review will be available later this week
+
+---
+
+## Presentation order 
+
+1. Tidy Team 
+2. Pipe It Up 
+3. install.packages("best_team")
+4. AASK
+5. Data Destroyers
+6. AJA
+7. Team KitKat
+8. The Residuals 
+
+---
+
+## Presentation review assignments
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-t4zm{border-color:inherit;font-size:16px;text-align:center;vertical-align:middle}
+.tg .tg-qv16{font-size:16px;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-gmla{border-color:inherit;font-size:16px;text-align:center;vertical-align:top}
+.tg .tg-fymr{border-color:inherit;font-weight:bold;text-align:left;vertical-align:top}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-t4zm" rowspan="2"><span style="font-weight:bold">Team</span></th>
+    <th class="tg-gmla" colspan="2"><span style="font-weight:bold">Presentations you're reviewing</span></th>
+  </tr>
+  <tr>
+    <th class="tg-qv16">Presentation 1</th>
+    <th class="tg-qv16">Presentation 2</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-fymr">Tidy Team</td>
+    <td class="tg-0pky">AJA</td>
+    <td class="tg-0pky">install.packages("best_team") </td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">Pipe It Up</td>
+    <td class="tg-0pky">The Residuals </td>
+    <td class="tg-0pky">Data Destroyers </td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">install.packages("best_team")</td>
+    <td class="tg-0pky">Pipe It Up</td>
+    <td class="tg-0pky">AASK </td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">AASK</td>
+    <td class="tg-0pky">Data Destroyers </td>
+    <td class="tg-0pky">Pipe It Up </td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">Data Destroyers</td>
+    <td class="tg-0pky">Team KitKat</td>
+    <td class="tg-0pky">The Residuals </td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">AJA</td>
+    <td class="tg-0pky">install.packages("best_team")</td>
+    <td class="tg-0pky">Team KitKat</td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">Team KitKat</td>
+    <td class="tg-0pky">AASK </td>
+    <td class="tg-0pky">Tidy Team</td>
+  </tr>
+  <tr>
+    <td class="tg-fymr">The Residuals</td>
+    <td class="tg-0pky">Tidy Team</td>
+    <td class="tg-0pky">AJA </td>
+  </tr>
+</tbody>
+</table>
+
+[Click here](https://forms.office.com/r/bWRsAU185M) to submit your presentation scores.
+
+---
+
+## QR Code to access presentation form
+
+```{r echo = F, fig.align = "center", out.width = "40%"}
+knitr::include_graphics("img/project01-qrcode.png")
+```
+
+
