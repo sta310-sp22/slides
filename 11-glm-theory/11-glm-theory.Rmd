@@ -57,7 +57,7 @@ class: middle, center
 
 ## Announcements
 
-- Fill out [mini-project 01 teamwork evaluation](https://forms.office.com/r/MuLAg4y7dY) by **Wed, Feb 16 at 11:59pm**
+- Fill out [mini-project 01 team evaluation](https://forms.office.com/r/MuLAg4y7dY) by **Thu, Feb 17 at 11:59pm**
 
 - Quiz 02: Wed, Feb 16 (after class) - Fri, Feb 18 at 11:59pm
 
