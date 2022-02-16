@@ -328,7 +328,7 @@ The estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ are the estimates for the mode
 
 --
 
-Use $\hat{\beta}_0$ and $\hat{\beta}_1$ to calculate updated values of $\hat{\theta}_i$ and repeat steps 2 - 5 until convergence.
+Use $\hat{\beta}_0$ and $\hat{\beta}_1$ to calculate updated values of $\hat{\theta}_i$ and repeat steps 2 - 4 until convergence.
 
 ---
 
