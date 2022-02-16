@@ -61,6 +61,20 @@ class: middle, center
 
 - Quiz 02: Wed, Feb 16 (after class) - Fri, Feb 18 at 11:59pm
 
+---
+
+## Quiz 02
+
+- Open Feb 16 after class (check for announcement) and is due Fri, Feb 18 at 11:59pm
+  - The quiz is not timed and will be administered in Gradescope.
+
+- Covers content since Quiz 01
+  - Jan 26 - Feb 16 lectures
+  - BMLR Chapters 4 - 5 (Use Chapter 3 for reference)
+
+- Fill in the blank, multiple choice, short answer questions 
+
+- Open book, open note, open internet (not crowd sourcing sites). You <u>cannot</u> discuss the quiz with anyone else. Please email me if you have questions.
 
 ---
 
@@ -187,7 +201,7 @@ then the canonical link is $b(\lambda) = \log(\lambda)$
 $$P(Y = y) = e^{y\log(\lambda) - \lambda - \log(y!)}$$
 
 --
-`r emo::ji("two")` A linear combination of predictors, $\eta = \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_p x_p$
+`r emo::ji("two")` A linear combination of predictors, $\eta = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_p x_p$
 
 --
 
@@ -294,7 +308,7 @@ $$z_i = \log(\lambda) + \frac{(y_i - \lambda_i)}{\lambda_i}$$
 
 **Working Weights:** Weights applied to the observations at each step of the iteration 
 
-$$W_i = \frac{\theta^2}{Var(Y)} \hspace{5mm} \Rightarrow \hspace{5mm}  W_i = \lambda \text{ for Poisson regression}$$
+$$W_i = \frac{\theta^2}{Var(Y)} \hspace{5mm} \Rightarrow \hspace{5mm}  W_i = \frac{\lambda^2}{\lambda} =  \lambda \text{ for Poisson regression}$$
 
 ---
 
