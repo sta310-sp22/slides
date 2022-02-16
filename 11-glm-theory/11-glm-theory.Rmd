@@ -157,7 +157,7 @@ Recall the form: $f(y;\theta) = e^{[a(y)b(\theta) + c(\theta) + d(y)]}$, where t
 - $a(y) = y$
 - $b(\lambda) = \log(\lambda)$
 - $c(\lambda) = -\lambda$
-- $d(y) = \log(y!)$
+- $d(y) = -\log(y!)$
 
 ---
 
