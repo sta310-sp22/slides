@@ -277,7 +277,7 @@ nminer %>%
 
 Our goal is to use a Poisson regression model to predict the number of noisy miners observed in three 20 minute surveys based on the number of eucalyptus trees.
 
-$$\log(Minearab) = \beta_0 + \beta_1 ~ Euc$$
+$$\log(\lambda_{Minearab}) = \beta_0 + \beta_1 ~ Euc$$
 .center[
 **What are the best estimates of $\beta_0$ and $\beta_1$?**
 ]
