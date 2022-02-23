@@ -1,0 +1,518 @@
+---
+title: "Correlated data"
+date: "02.23.22"
+output:
+  xaringan::moon_reader:
+    #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+    self_contained: true
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "70%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+library(gridExtra)
+library(kableExtra)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+## [Click here for PDF of slides](14-correlated-data.pdf)
+
+---
+
+
+## Announcements
+
+- HW 03 **due Mon, Feb 28 at 11:59pm**
+
+- No office hours Thursday. 
+  - Office hours will resume Friday 2 - 3pm
+  - [Schedule an appointment](https://calendly.com/matackett/meeting) 
+---
+
+## Learning goals 
+
+- Recognize a potential for correlation in a data set
+- Identify observational units at varying levels 
+- Understand issues correlated data may cause in modeling
+- Understand how random effects models can be used to take correlation into account 
+
+---
+
+class: middle, inverse
+
+## Correlated observations 
+
+---
+
+## Examples of correlated data
+
+- In an education study, scores for students from a particular teacher are typically more similar than scores of other students with a different teacher 
+
+--
+
+- In a study measuring depression indices weekly over a month, the four measures for the same patient tend to be more similar than than depression indices from other patients
+
+--
+
+- In political polling, opinions of members from the same household tend to be more similar than opinions of members from another household
+
+--
+
+Correlation among outcomes within the same group (teacher, patient, household) is **intraclass correlation** 
+
+---
+
+## Multilevel data 
+
+- We can think of correlated data as a multilevel structure
+
+  - Population elements are aggregated into groups
+  - There are observational units and measurements at each level
+  
+--
+
+- For now we will focus on data with two levels: 
+
+  - **Level one**: Most basic level of observation 
+  - **Level two**: Groups formed from aggregated level-one observations 
+  
+--
+
+- Example: political polling 
+  - Level one: individual members of household 
+  - Level two: household
+
+---
+
+## Two types of effects
+
+- **Fixed effects**: Effects that are of interest in the study. 
+  - Can think of these as effects whose interpretations would be included in a write up of the study. 
+
+- **Random effects**: Effects we're not interested in studying but whose variability we want to understand 
+  - Can think of these as effects whose interpretations would not necessarily be included in a write up of the study  
+
+---
+
+## Example
+
+Researchers are interested in understanding the effect social media has on opinions about a proposed economic plan. They random select 1000 households and ask each adult in the household how many minutes they spend on social media daily and whether they support the proposed economic plan.
+
+--
+
+  - **daily minutes on social media** is the fixed effect
+  - **household** is the random effect
+
+---
+
+## Practice
+
+.midi[Researchers conducted a randomized controlled study where patients were randomly assigned to either an anti-epileptic drug or a placebo.  For each patient, the number of seizures at baseline was measured over a 2-week period.  For four consecutive visits the number of seizures were determined over the past 2-week period. Patient age and sex along with visit number were recorded.]
+
+.question[
+1. What are the level one and level two observational units? 
+2. What is the response variable and what is its type (normal, Poisson, etc.)?
+3. Describe the within-group variation. 
+4. What are the fixed effects? What are the random effects?
+
+[Click here](https://forms.gle/2z2LQ214dKxtoK427) to submit your response.
+
+]
+
+.footnote[Ex. 1 from Section 7.10.1 in BMLR]
+
+---
+
+class: middle, inverse 
+
+## Teratogen and rat pups 
+
+---
+
+## Data: Teratogen and rat pups
+
+The data are simulated results of an experiment with 24 dams (mother rats) randomly divided into four groups that received different doses of teratogen, a substance that could potentially cause harm to developing fetuses. The four groups are 
+
+  - High dose (3 mg)
+  - Medium dose (2 mg)
+  - Low dose (1 mg)
+  - No dose (Control)
+
+Each dam produces 10 rat pups and the presence of a deformity is noted. 
+
+--
+
+**Goal**: Understand the association between teratogen exposure and the probability a pup is born with a deformity.
+
+---
+
+## Scenario 1: No dose effect
+
+Assume dose has <u>no</u> effect on, $p$, the probability of a pup born with a deformity.
+
+- **Scenario 1a.**: $p = 0.5$ for each dam 
+
+- **Scenario 1b.**: $p \sim Beta(0.5, 0.5)$ (expected value = 0.5)
+
+```{r ch7Seed, include = FALSE}
+set.seed(2)  # to get the same simulated results as reported here
+```
+
+```{r damScenario1, echo = F}
+pi_1a <- rep(0.5, 24)
+count_1a <- rbinom(24, 10, pi_1a)
+
+pi_1b <- rbeta(24,.5,.5)  
+count_1b <- rbinom(24, 10, pi_1b)  
+```
+
+```{r scenario1ProbabilityPlot, fig.align="center",out.width="50%", echo=FALSE, warning=FALSE, message=FALSE}
+theoretical_pi <- tibble(x = 1:250000,
+                         p1 = rbeta(x, 0.5, 0.5))
+
+tibble(x = 1:24, pi_1b) %>%
+  ggplot() +
+    geom_histogram(bins = 5, aes(x = pi_1b, y = ..density..),
+                   color = "black", fill = "blue", alpha = 0.2) + 
+    coord_cartesian(xlim = c(0,1)) +
+    geom_density(data = theoretical_pi, aes(x = p1), 
+                  linetype = 3, color = "blue", lwd = 2) +
+    geom_vline(xintercept = 0.5, color = "red", lwd = 2) +
+    labs(title = "Probability of derformity", 
+         subtitle = "Red = Scenario 1a, Blue dashed line  = Scenario 1b", 
+         x = "Probability of Deformity")
+```
+
+.footnote[From Figure 7.1 in BMLR]
+
+---
+
+class: middle
+
+.question[
+
+1. Would you expect the number of pups with a deformity for dams in Scenario 1a to follow a distribution similar to the binomial distribution with $n=10$ and $p=0.5$? Why or why not?
+
+1. Would you expect the number of pups with a deformity for dams in Scenario 1b to follow a distribution similar to the binomial distribution with $n=10$ and $p=0.5$? Why or why not?
+
+3. Which scenario do you think is more realistic - Scenario 1a or 1b?
+]
+
+---
+
+```{r echo = F, out.width = "65%"}
+scenario_1 <- 
+  tibble(pi_1a, count_1a, pi_1b, count_1b) %>%
+  mutate(phat_1a = count_1a / 10, 
+         phat_1b = count_1b / 10)
+
+hist_1a <- ggplot(data = scenario_1, aes(x = count_1a)) + 
+  geom_histogram(bins = 5, color = "black", fill = "steelblue") +
+  coord_cartesian(xlim = c(0, 10)) +
+  labs(title = "Scenario 1a: Binomial, p = 0.5",
+       x = "Count of deformed pups per dam")
+
+hist_1b <- ggplot(data = scenario_1, aes(x = count_1b)) + 
+  geom_histogram(bins = 5, color = "black", fill = "steelblue") +
+  coord_cartesian(xlim = c(0, 10)) +
+  labs(title = "Scenario 1b: Binomial, p ~ Beta(0.5, 0.5)",
+       x = "Count of deformed pups per dam")
+
+hist_1a / hist_1b
+```
+
+```{r scenario1Summary, echo = F}
+scenario_1 %>% 
+  summarise(mean_1a = mean(count_1a), sd_1a = sd(count_1a),
+            mean_1b = mean(count_1b), sd_1b = sd(count_1b) ) %>%
+  kable()
+```
+
+---
+
+class: middle 
+
+Let's take a look at a binomial and quasibinomial model for Scenarios 1a and 1b.
+
+
+**Complete Scenario 1 of `lecture-14.Rmd`**
+
+[Click here](https://forms.gle/h5vWiaXTdoPn8NbBA) to submit your response.
+
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 10, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+class: middle, inverse
+
+## Scenario 2: Dose effect 
+
+---
+
+## Scenario 2: Dose effect
+
+Now we will consider the effect of the dose of teratogen on the probability of a pup born with a deformity. The 24 pups have been randomly divided into four groups: 
+
+  - High dose (`dose = 3`)
+  - Medium dose (`dose = 2`)
+  - Low dose (`dose = 1`)
+  - No dose (`dose = 0`)
+  
+--
+
+We will assume the true relationship between $p$ and dose is the following: 
+
+$$\log\Big(\frac{p}{1-p}\Big) = -2 + 1.33 ~ dose$$
+
+---
+
+## Scenario 2
+
+**Scenario 2a.**
+
+$$p = \frac{e^{-2 + 1.33 ~ dose}}{1 + e^{-2 + 1.33 ~ dose}}$$
+
+--
+
+**Scenario 2b.**: 
+
+$$p \sim Beta(\frac{2p}{(1-p)}, 2)$$
+
+On average, dams who receive dose $x$ have the same probability of deformed pup as dams with dose $x$ under Scenario 2a. 
+
+---
+
+## Distributions under Scenario 2
+
+```{r secnario2aPCalculations, include=FALSE}
+x <- 0:3
+p_2 <- exp(-2+4/3*x)/(1+exp(-2+4/3*x))
+p_2
+```
+
+```{r echo = F}
+set.seed(1)
+
+dose <- c(rep(0,6),rep(1,6),rep(2,6),rep(3,6))
+
+pi_2a <- exp(-2+4/3*dose)/(1+exp(-2+4/3*dose))
+count_2a <- rbinom(24, 10, pi_2a)
+
+b <- 2
+a <- b*pi_2a / (1-pi_2a)
+pi_2b <- rbeta(24, a, b)
+count_2b <- rbinom(24, 10, pi_2b)  
+```
+
+```{r, scenario2bPlot, fig.align="center", warning=FALSE, message=FALSE, echo = F}
+scenario_2 <- tibble(dose, pi_2a, count_2a, pi_2b, count_2b)
+theoretical_pi <- tibble(x = 1:50000,
+  p1 = rbeta(x, shape1 = 2*p_2[1]/(1-p_2[1]), shape2 = 2),
+  p2 = rbeta(x, shape1 = 2*p_2[2]/(1-p_2[2]), shape2 = 2),
+  p3 = rbeta(x, shape1 = 2*p_2[3]/(1-p_2[3]), shape2 = 2),
+  p4 = rbeta(x, shape1 = 2*p_2[4]/(1-p_2[4]), shape2 = 2))
+
+hist1 <- ggplot() + 
+  geom_histogram(data = scenario_2[1:6,], bins = 5, 
+                 aes(x = pi_2b, y = ..density..),
+                 color = "black", fill = "blue", alpha = 0.2) + 
+  coord_cartesian(xlim = c(0,1)) +
+  geom_density(data = theoretical_pi, aes(x = p1), 
+               linetype = 3, color = "blue", lwd = 2) +
+  geom_vline(xintercept = p_2[1], color = "red", lwd = 2) +
+  labs(title = "Dosage = 0 mg", x = "Probability of Deformity")
+  
+
+hist2 <- ggplot() + 
+  geom_histogram(data = scenario_2[7:12,], 
+                 aes(x = pi_2b, y = ..density..), bins = 5,
+                 color = "black", fill = "blue", alpha = 0.2) +
+  coord_cartesian(xlim = c(0,1)) +
+  geom_density(data = theoretical_pi, aes(x = p2), 
+               linetype = 3, color = "blue", lwd = 2) +
+  geom_vline(xintercept = p_2[2], color = "red", lwd = 2) +
+  labs(title = "Dosage = 1 mg", x = "Probability of Deformity")
+
+hist3 <- ggplot() + 
+  geom_histogram(data = scenario_2[13:18,], 
+                 aes(x = pi_2b, y = ..density..), bins = 5,
+                 color = "black", fill = "blue", alpha = 0.2) +
+  coord_cartesian(xlim = c(0,1)) +
+  geom_density(data = theoretical_pi, aes(x = p3), 
+               linetype = 3, color = "blue", lwd = 2) +
+  geom_vline(xintercept = p_2[3], color = "red", lwd = 2) +
+  labs(title = "Dosage = 2 mg", x = "Probability of Deformity")
+
+hist4 <- ggplot() + 
+  geom_histogram(data = scenario_2[19:24,], 
+                 aes(x = pi_2b, y = ..density..), bins = 5,
+                 color = "black", fill = "blue", alpha = 0.2) +
+  coord_cartesian(xlim = c(0,1)) +
+  geom_density(data = theoretical_pi, aes(x = p4), 
+               linetype = 3, color = "blue", lwd = 2) +
+  geom_vline(xintercept = p_2[4], color = "red", lwd = 2) +
+  labs(title = "Dosage = 3 mg", x = "Probability of Deformity")
+
+hist1 + hist2 + hist3 + hist4 +  plot_layout(nrow = 2, byrow = FALSE)
+```
+
+.footnote[Replicated from Figure 7.3 in BMLR]
+
+---
+
+## Summary statistics under Scenario 2
+
+```{r scenario2Summary, include=FALSE, message=FALSE}
+scenario_2 %>% 
+  summarise(mean_2a = mean(count_2a), sd_2a = sd(count_2a),
+            mean_2b = mean(count_2b), sd_2b = sd(count_2b) )
+```
+
+```{r scenario2Tab, echo=FALSE, message=FALSE}
+scenario2Tab <- scenario_2 %>%
+                  group_by(dose) %>%
+                  summarise(mean_2a_pi = round(mean(pi_2a),3), sd_2a_pi = round(sd(pi_2a),3),
+                            mean_2a_cnt = round(mean(count_2a),3), sd_2a_cnt = round(sd(count_2a),3),
+                            mean_2b_pi = round(mean(pi_2b),3), sd_2b_pi = round(sd(pi_2b),3),
+                            mean_2b_cnt = round(mean(count_2b),3), sd_2b_cnt = round(sd(count_2b),3)) %>%
+                  as.data.frame()
+colnames(scenario2Tab) <- c("Dosage","Mean p", "SD p",
+    "Mean Count", "SD Count", "Mean p", "SD p",
+    "Mean Count", "SD Count")
+kable(scenario2Tab, booktabs = T, 
+    caption="Summary statistics of Scenario 2 by dose.") %>%
+    add_header_above(c(" " = 1, "Scenario 2a" = 4, 
+                       "Scenario 2b" = 4)) %>%
+    kable_styling(latex_options = "scale_down") %>%
+    column_spec(c(4:5,8:9), width = "1cm")
+```
+
+.footnote[From Table 7.2 in BMLR]
+
+---
+
+class: middle 
+
+.question[
+1. In Scenario 2a, dams produced 4.79 deformed pups on average, with standard deviation 3.20. Scenario 2b saw an average of 4.67 with standard deviation 3.58. Why are comparisons by dose more meaningful than these overall comparisons? 
+
+2. We will use binomial and quasibinomial regression to model the relationship between dose and probability of pup born with a deformity. What can you say about the center and the width of the confidence intervals under Scenarios 2a and 2b?  
+  - Which will be similar and why?  
+  - Which will be different and how?
+]
+
+---
+
+## Scenario 2: Estimated odds ratio 
+
+.midi[The estimated effect of dose and the 95% CI from the binomial and quasibinomial models are below:] 
+
+**Scenario 2a**
+
+|               | Odds Ratio | 95% CI         |
+|---------------|-----------------|----------------|
+| Binomial      | 3.536          | (2.604, 4.958) |
+| Quasibinomial | 3.536          | (2.512, 5.186) |
+
+
+**Scenario 2b**
+
+|               | Odds Ratio | 95% CI         |
+|---------------|-----------------|----------------|
+| Binomial      | 4.311          | (3.086, 6.271) |
+| Quasibinomial | 4.311          | (2.735, 7.352) |
+
+---
+
+.question[
+1. Describe how the quasibinomial analysis of Scenario 2b differs from the binomial analysis of the same simulated data. Do confidence intervals contain the true model parameters? Is this what you expected? Why? 
+
+2. Why are differences between quasibinomial and binomial models of Scenario 2a less noticeable than the differences in Scenario 2b?
+]
+
+---
+
+## Preview: Add random effect to model
+
+```{r echo = F}
+scenario2_raw <- read_csv("data/scenario-2-raw-data.csv") %>%
+  mutate(deformity = factor(deformity),
+         dam = factor(dam))
+```
+
+```{r}
+library(lme4)
+random_effect_model <- glmer(deformity ~ dose + (1|dam), 
+                          family = binomial, data = scenario2_raw)
+random_effect_model
+```
+
+---
+
+## Preview: Add random effect 
+
+```{r}
+confint(random_effect_model)
+```
+
+---
+
+
+## Summary 
+
+- The structure of the data set may imply correlation among observations. 
+
+- Correlated observations provide less information than independent observations; we need to account for this difference
+
+- Failing to account for this difference could result in underestimating standard error, thus resulting in overstating significance and the precision of the estimates 
+
+- We showed how we can account for this by incorporating the dispersion parameter or a random effect.
+
+---
+
+## Acknowledgements
+
+The content in the slides is from [BMLR: Chapter 7 - Correlated data](https://bookdown.org/roback/bookdown-BeyondMLR/ch-corrdata.html)
+
+  
