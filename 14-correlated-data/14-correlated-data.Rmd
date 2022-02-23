@@ -86,7 +86,7 @@ class: middle, inverse
 
 --
 
-- In a study measuring depression indices weekly over a month, the four measures for the same patient tend to be more similar than than depression indices from other patients
+- In a study measuring depression indices weekly over a month, the four measures for the same patient tend to be more similar than depression indices from other patients
 
 --
 
@@ -94,7 +94,7 @@ class: middle, inverse
 
 --
 
-Correlation among outcomes within the same group (teacher, patient, household) is **intraclass correlation** 
+Correlation among outcomes within the same group (teacher, patient, household) is called **intraclass correlation** 
 
 ---
 
@@ -122,8 +122,10 @@ Correlation among outcomes within the same group (teacher, patient, household) i
 
 ## Two types of effects
 
-- **Fixed effects**: Effects that are of interest in the study. 
-  - Can think of these as effects whose interpretations would be included in a write up of the study. 
+- **Fixed effects**: Effects that are of interest in the study
+  - Can think of these as effects whose interpretations would be included in a write up of the study
+
+--
 
 - **Random effects**: Effects we're not interested in studying but whose variability we want to understand 
   - Can think of these as effects whose interpretations would not necessarily be included in a write up of the study  
@@ -132,12 +134,12 @@ Correlation among outcomes within the same group (teacher, patient, household) i
 
 ## Example
 
-Researchers are interested in understanding the effect social media has on opinions about a proposed economic plan. They random select 1000 households and ask each adult in the household how many minutes they spend on social media daily and whether they support the proposed economic plan.
+Researchers are interested in understanding the effect social media has on opinions about a proposed economic plan. They randomly select 1000 households. They ask each adult in the household how many minutes they spend on social media daily and whether they support the proposed economic plan.
 
 --
 
-  - **daily minutes on social media** is the fixed effect
-  - **household** is the random effect
+  - daily minutes on social media is the fixed effect
+  - household is the random effect
 
 ---
 
@@ -167,14 +169,14 @@ class: middle, inverse
 
 ## Data: Teratogen and rat pups
 
-The data are simulated results of an experiment with 24 dams (mother rats) randomly divided into four groups that received different doses of teratogen, a substance that could potentially cause harm to developing fetuses. The four groups are 
+Today's data are simulated results of an experiment with 24 dams (mother rats) randomly divided into four groups that received different doses of teratogen, a substance that could potentially cause harm to developing fetuses. The four groups are 
 
   - High dose (3 mg)
   - Medium dose (2 mg)
   - Low dose (1 mg)
   - No dose (Control)
 
-Each dam produces 10 rat pups and the presence of a deformity is noted. 
+Each dam produced 10 rat pups and the presence of a deformity was noted. 
 
 --
 
@@ -186,9 +188,13 @@ Each dam produces 10 rat pups and the presence of a deformity is noted.
 
 Assume dose has <u>no</u> effect on, $p$, the probability of a pup born with a deformity.
 
+--
+
 - **Scenario 1a.**: $p = 0.5$ for each dam 
 
 - **Scenario 1b.**: $p \sim Beta(0.5, 0.5)$ (expected value = 0.5)
+
+--
 
 ```{r ch7Seed, include = FALSE}
 set.seed(2)  # to get the same simulated results as reported here
@@ -214,7 +220,7 @@ tibble(x = 1:24, pi_1b) %>%
     geom_density(data = theoretical_pi, aes(x = p1), 
                   linetype = 3, color = "blue", lwd = 2) +
     geom_vline(xintercept = 0.5, color = "red", lwd = 2) +
-    labs(title = "Probability of derformity", 
+    labs(title = "Probability of deformity", 
          subtitle = "Red = Scenario 1a, Blue dashed line  = Scenario 1b", 
          x = "Probability of Deformity")
 ```
@@ -317,7 +323,7 @@ $$p = \frac{e^{-2 + 1.33 ~ dose}}{1 + e^{-2 + 1.33 ~ dose}}$$
 
 **Scenario 2b.**: 
 
-$$p \sim Beta(\frac{2p}{(1-p)}, 2)$$
+$$p \sim Beta\Big(\frac{2p}{(1-p)}, 2\Big)$$
 
 On average, dams who receive dose $x$ have the same probability of deformed pup as dams with dose $x$ under Scenario 2a. 
 
@@ -501,11 +507,11 @@ confint(random_effect_model)
 
 ## Summary 
 
-- The structure of the data set may imply correlation among observations. 
+- The structure of the data set may imply correlation between observations.
 
-- Correlated observations provide less information than independent observations; we need to account for this difference
+- Correlated observations provide less information than independent observations; we need to account for this reduction in information.
 
-- Failing to account for this difference could result in underestimating standard error, thus resulting in overstating significance and the precision of the estimates 
+- Failing to account for this reduction could result in underestimating standard error, thus resulting in overstating significance and the precision of the estimates.
 
 - We showed how we can account for this by incorporating the dispersion parameter or a random effect.
 
