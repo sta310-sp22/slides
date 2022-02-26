@@ -323,7 +323,7 @@ The **proportional odds model** can be written as the following:
 $$\begin{aligned}&\log\Big(\frac{P(Y\leq 1)}{P(Y > 1)}\Big) = \beta_{01} + \beta_1x_1 + \dots +  \beta_px_p \\
 & \log\Big(\frac{P(Y\leq 2)}{P(Y > 2)}\Big) = \beta_{02} + \beta_1x_1 + \dots +  \beta_px_p \\
 & \dots \\
-& \log\Big(\frac{P(Y\leq J-1)}{P(Y > J-1)}\Big) = \beta_{0J} + \beta_1x_1 + \dots +  \beta_px_p\end{aligned}$$
+& \log\Big(\frac{P(Y\leq J-1)}{P(Y > J-1)}\Big) = \beta_{0{J-1}} + \beta_1x_1 + \dots +  \beta_px_p\end{aligned}$$
 ---
 
 class: middle
@@ -367,7 +367,7 @@ knitr::include_graphics("img/ordinal-model-full.png")
 ```
 
 .question[
-Use the results from both models to describe the effect of triage level (red = urgent, green = non-urgent) on the wait and treatment times in the ED. Note that "green" is the baseline level. Is this what you expected? 
+Use the results from both models to describe the effect of triage level (red = urgent, green = non-urgent) on the wait and treatment times in the ED. Note that "red" is the baseline level. Is this what you expected? 
 ]
 
 
