@@ -385,6 +385,12 @@ class: middle
   - Which will be different and how?
 ]
 
+```{r echo = F}
+library(countdown)
+countdown(minutes = 2, seconds = 00,
+          margin = "1.25%")
+```
+
 ---
 
 ## Scenario 2: Estimated odds ratio 
@@ -415,6 +421,12 @@ class: middle
 
 2. Why are differences between quasibinomial and binomial models of Scenario 2a less noticeable than the differences in Scenario 2b?
 ]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 2, seconds = 00,
+          margin = "1.25%")
+```
 
 ---
 
