@@ -195,7 +195,7 @@ The goal is to understand variability in performance anxiety (`na`) based on per
 
 We will fit the model in two parts: 
 
-`r emo::ji("one")` Fit a separate model for each musician understand the association between performance type (Level One models).
+`r emo::ji("one")` Fit a separate model for each musician understand the association between performance type and anxiety (Level One models).
 
 `r emo::ji("two")`  Then fit a system of models to predict the fitted coefficients in the Level One models based on instrument type (Level Two models).
 
@@ -219,7 +219,7 @@ We'll start with a Level One model to understand the association between perform
 <br> 
 
 .eq[
-$$na_{ij} = a_i + b_i ~ LargeEnsemble_{ij} + \epsilon_i, \hspace{5mm} \epsilon_{ij} \sim N(0,\sigma^2)$$
+$$na_{ij} = a_i + b_i ~ LargeEnsemble_{ij} + \epsilon_{ij}, \hspace{5mm} \epsilon_{ij} \sim N(0,\sigma^2)$$
 ]
 
 .alert[
