@@ -86,7 +86,7 @@ The primary variables we'll use are
 
 - **`na`**: negative affect score on PANAS (the response variable)
 - **`perform_type`**: type of performance (Solo, Large Ensemble, Small Ensemble)
-- **`instrument`**: type of intstrument (Voice, Orchestral, Piano)
+- **`instrument`**: type of instrument (Voice, Orchestral, Piano)
 
 ---
 
