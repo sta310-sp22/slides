@@ -173,7 +173,7 @@ Complete Part 1: Bivariate EDA in `lecture-16.Rmd`.
 
 ```{r echo = F}
 library(countdown)
-countdown(minutes = 8, seconds = 00,
+countdown(minutes = 6, seconds = 00,
           margin = "1.25%")
 ```
 
@@ -267,10 +267,17 @@ Read the code in Part 2: Level One models in `lecture-16.Rmd`.
 
 Suppose a student **only** played in small ensembles/ solos.  
 
-  - What is the estimated intercept for the intercept?  
+  - What is the estimated intercept for this student?  
   - What is the estimated slope for this student?
 
 ]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 00,
+          margin = "1.25%")
+```
+
 
 
 ---
