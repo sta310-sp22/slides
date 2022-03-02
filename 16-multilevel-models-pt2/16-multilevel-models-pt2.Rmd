@@ -60,8 +60,11 @@ class: middle, center
 
 ## Announcements
 
-- Looking ahead to the final project 
+- Tomorrow's lab: article evaluation for mini-project 02
+
+- Looking ahead to the individual final project...
   - Choose a dataset with **correlated observations** and analyze it 
+  - More details after spring break
   
 ---
 
@@ -71,7 +74,7 @@ class: middle, center
  
 - Write multilevel model , including assumptions about variance components, in by-level and composite forms
 
-- Interpret the model parameters, fixed effects and variance components
+- Interpret the model parameters, fixed effects, and variance components
 
 ---
 
@@ -129,7 +132,7 @@ Two ways to approach univariate EDA (visualizations and summary statistics) for 
 p1 <- ggplot(data = music, aes(x = na)) + 
   geom_histogram(fill = "steelblue", color = "black", binwidth = 2) + 
   labs(x = "Individual negative affect", 
-       title = "Individual negative affect scores")
+       title = "Negative affect scores")
 
 p2 <- music %>%
   group_by(id) %>%
@@ -152,12 +155,17 @@ p1 + p2
 - Explore whether subjects at a given level of the predictor tend to have similar mean responses 
 - Explore whether variation in response differs at different levels of a predictor
 
+--
 
 There are two ways to visualize these associations: 
 
 - One plot of individual observations (i.e., treat observations as independent)
 
 - Separate plots of responses vs. predictor for each Level Two observation (lattice plots)
+
+---
+
+class: middle 
 
 .question[
 Complete Part 1: Bivariate EDA in `lecture-16.Rmd`.
@@ -169,8 +177,6 @@ countdown(minutes = 8, seconds = 00,
           margin = "1.25%")
 ```
 
-
-<font color = "red">ADD GOOGLE POLL?</font>
 ---
 
 class: middle, inverse
@@ -185,25 +191,30 @@ The goal is to understand variability in performance anxiety (`na`) based on per
 
 > What is the association between performance type (large ensemble or not) and performance anxiety? Does the association differ based on instrument type (orchestral or not)?  
 
+--
+
 We will fit the model in two parts: 
 
 `r emo::ji("one")` Fit a separate model for each musician understand the association between performance type (Level One models).
 
-`r emo::ji("two")`  Then fit a system of models to predict the fitted coefficients in the Level One models based on instrument type (Level Two model).
+`r emo::ji("two")`  Then fit a system of models to predict the fitted coefficients in the Level One models based on instrument type (Level Two models).
 
 ---
 
 class: middle 
 
 .question[
-<font color = "red"> Number of models at each stage. 
+1. How many Level One models will we fit? 
+2. How many Level Two models will we fit?
+
+[Click here](https://forms.gle/evDkJ64T5wrFYvCfA) to submit your response.
 ]
 
 ---
 
 ## `r emo::ji("one")` Level One models
 
-We'll start with the Level One model to understand the association between performance type and performance anxiety for the $i^{th}$ musician. 
+We'll start with a Level One model to understand the association between performance type and performance anxiety for the $i^{th}$ musician. 
 
 <br> 
 
@@ -215,7 +226,7 @@ $$na_{ij} = a_i + b_i ~ LargeEnsemble_{ij} + \epsilon_i, \hspace{5mm} \epsilon_{
 Add the Level One model to the diagram.
 ]
 
-For now, estimate $a_i$ and $b_i$ using least-squares regression.
+For now, we will estimate $a_i$ and $b_i$ using least-squares regression.
 
 ---
 
@@ -247,10 +258,17 @@ music %>%
 
 **Repeat for all 37 musicians.**
 
-.alert[
-Read the code in Part 2: Level One models. 
+---
 
-<font color = "red">ADD GOOGLE FORM. What happens if a student only played large_ensembles? what is their estimate for the slope? What is their estimate for the intercept?</font>
+class: middle 
+
+.alert[
+Read the code in Part 2: Level One models in `lecture-16.Rmd`. 
+
+Suppose a student **only** played in small ensembles/ solos.  
+
+  - What is the estimated intercept for the intercept?  
+  - What is the estimated slope for this student?
 
 ]
 
@@ -300,13 +318,13 @@ p1 <- ggplot(data = model_stats, aes(x = intercepts)) +
   geom_histogram(fill = "steelblue", color = "black", binwidth = 2) + 
   labs(x = "Fitted intercepts", 
       title  = "Intercepts", 
-      subtitle = "from 37 musicians")
+      subtitle = "from the Level One models")
 
 p2 <- ggplot(data = model_stats, aes(x = slopes)) + 
   geom_histogram(fill = "steelblue", color = "black", binwidth = 2) + 
   labs(x = "Fitted Slopes", 
       title  = "Slopes", 
-      subtitle = "from 37 musicians")
+      subtitle = "from the Level One models")
 
 p1 + p2
 ```
@@ -332,7 +350,8 @@ Note the response variable in the Level Two models are not observed outcomes but
 **See Part 3: Level Two Models in `lecture-16.Rmd`.**
 
 .question[
-<font color = "red">How many observations used to estimate a? b? Make Google form</font>
+How many observations used to estimate a? How many observations are used to estimate b?
+[Click here](https://forms.gle/eusrCrTESmTJM1cP7) to submit your response.
 ]
 
 ---
@@ -454,8 +473,8 @@ This approach uses likelihood-based methods (instead of least squares) to addres
 Plug in the equations for $a_i$ and $b_i$ to get the **composite model** 
 
 .eq[
-$$\begin{aligned}Y_{ij} &= \alpha_0 + \alpha_1 ~ Orchestra_i + \beta_0 ~ LargeEnsemble_{ij} \\ 
-&+ \beta_1 ~ Orchestra_i:LargeEnsemble_{ij}\\
+$$\begin{aligned}Y_{ij} &= (\alpha_0 + \alpha_1 ~ Orchestra_i + \beta_0 ~ LargeEnsemble_{ij} \\ 
+&+ \beta_1 ~ Orchestra_i:LargeEnsemble_{ij})\\
 &+ (u_i + v_i ~ LargeEnsemble_{ij} + \epsilon_{ij})\end{aligned}$$
 ]
 
@@ -490,9 +509,13 @@ Note that we no longer need to estimate $a_i$ and $b_i$ directly as we did earli
 
 - We generally assume that the error terms are normally distributed, e.g. error associated with each performance of a given musician is $\epsilon_{ij} \sim N(0, \sigma^2)$
 
+--
+
 - For the Level Two models, the errors are 
   - $u_i$: deviation of musician $i$ from the mean performance anxiety before solos and small ensembles after accounting for the instrument 
   - $v_i$: deviance of musician $i$ from the mean difference in performance anxiety between large ensembles and other performance types after accounting for instrument
+
+--
 
 - Need to account for fact that $u_i$ and $v_i$ are correlated for the $i^{th}$ musician 
 
@@ -513,7 +536,9 @@ ggplot(aes(x = intercepts, y = slopes)) +
 ```
 
 
+.question[
 Describe what we learn about the association between the slopes and intercepts based on this plot. 
+]
 
 ---
 
@@ -536,8 +561,8 @@ $$\left[ \begin{array}{c}
 where $\sigma^2_u$ and $\sigma^2_v$ are the variance of $u_i$'s and $v_i$'s respectively, and $\sigma_{uv}  = \rho_{uv}\sigma_u\sigma_v$ is covariance between $u_i$ and $v_i$ 
 ]
 
-- What does it mean for $\sigma_{uv} > 0$? 
-- What does it mean for $\sigma_{uv} < 0$? 
+- What does it mean for $\rho_{uv} > 0$? 
+- What does it mean for $\rho_{uv} < 0$? 
 
 ---
 
