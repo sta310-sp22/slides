@@ -1,7 +1,7 @@
 ---
 title: "Multilevel models"
 subtitle: "Estimation + Interpretation"
-date: "03.14.22"
+date: "`r emo::ji('pie')` day 2022"
 output:
   xaringan::moon_reader:
     #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
@@ -60,15 +60,36 @@ class: middle, center
 
 ## Announcements
 
-[ UPDATE ANNOUNCEMENTS]
+- Quiz 03: Wed, Mar 16 - Fri, Mar 18 
+  - Feb 21 - Mar 14 lectures
+
+- DataFest: April 1 - 3 in Penn Pavilion 
+  - [Click here](https://www2.stat.duke.edu/datafest/signup.html) to sign up 
 
 ---
 
 ## Mini-project 02 
 
+[Click here](https://sta310-sp22.github.io/assignments/projects/mini-project-02.html) for project instructions
+
+.vocab2[Updated timeline]
+
+- **Draft for peer review**: due Thu, Mar 24 at 12pm (noon)
+- **Peer reviews**: due Thu, Mar 24 at 11:59pm
+- **Presentation**: due Mon, Mar 28 at 3:30pm
+- **Written report**: due Mon, Mar 28 at 11:59pm
+
 ---
 
 ## Final project 
+
+[Click here](https://sta310-sp22.github.io/assignments/projects/final-project.html) for project instructions
+
+
+.vocab2[Timeline]
+
+- **Round 1 submission (optional)**: Wednesday, April 13 at 11:59pm
+- **Final submission**: Wednesday, April 27 at 11:59pm
 
 ---
 
@@ -79,11 +100,11 @@ class: middle, center
 
 ## Learning goals 
 
-- Fit and interpret multilevel model 
+- Fit and interpret multilevel models 
 
 - Compare maximum likelihood (ML) and restricted maximum likelihood (REML) estimation approaches
 
-- Understand general process for fitting and comparing multilevel modelss
+- Understand general process for fitting and comparing multilevel models
 
 ---
 
@@ -159,20 +180,19 @@ $$\begin{aligned}Y_{ij} &= (\alpha_0 + \alpha_1 ~ Orchestra_i + \beta_0 ~ LargeE
 
 - The **fixed effects** to estimate are $\alpha_0, \alpha_1, \beta_0, \beta_1$
 - The **error terms** are $u_i, v_i, \epsilon_{ij}$
-  - Describe the behavior of the random effects
-
+  - These describe the behavior of the random effects
 --
 
-Note that we no longer need to estimate $a_i$ and $b_i$ (the random effects) directly as we did earlier. 
+When we use the composite model, we no longer need to estimate $a_i$ and $b_i$ directly as we did with the two-stage approach.
 
 ---
 
 ## Notation 
 
-- Greek letters denote the final fixed effect model parameters that will be estimated
+- Greek letters denote the fixed effect model parameters that will be estimated
   - e.g., $\alpha_0, \alpha_1, \beta_0, \beta_1$
   
-- Roman letters denote the preliminary effects at lower levels that will not be estimated directly
+- English letters denote the preliminary effects at lower levels that will not be estimated directly
   - e.g. $a_i, b_i$
 
 - $\sigma$ and $\rho$ denote variance components that will be estimated 
@@ -185,7 +205,7 @@ Note that we no longer need to estimate $a_i$ and $b_i$ (the random effects) dir
 
 - Assume random effects are normally distributed with mean 0 and variance that will be estimated 
 
-- **Level One**: Errors associated with each performance of a given musician are are normally distributed  e.g. error associated with each performance of a given musician is $\epsilon_{ij} \sim N(0, \sigma^2)$
+- **Level One**: Errors associated with each performance of a given musician are are normally distributed, i.e., $\epsilon_{ij} \sim N(0, \sigma^2)$
 
 --
 
@@ -271,14 +291,12 @@ $$\left[ \begin{array}{c}
             \rho_{uv}\sigma_{u}\sigma_v & \sigma_{v}^{2}
           \end{array} \right] \right)$$
           
-where $\sigma^2_u$ and $\sigma^2_v$ are the variances of $u_i$'s and $v_i$'s respectively, $\rho_{uv}$ is the correlation between $u_i$ and $v_i$$ 
+where $\sigma^2_u$ and $\sigma^2_v$ are the variances of $u_i$'s and $v_i$'s respectively, $\rho_{uv}$ is the correlation between $u_i$ and $v_i$ 
 ]
 
-$\sigma_{uv} =  \rho_{uv}\sigma_{u}\sigma_v$
-  
-- covariance between $u_i$ and $v_i$
-- How the error terms vary together
+Covariance:  $\sigma_{uv} =  \rho_{uv}\sigma_{u}\sigma_v$
 
+- Indicates how those terms vary together
 ---
 
 ## Visualizing multivariate normal distribution 
@@ -340,6 +358,8 @@ music_model <- lmer(na ~ orchestra + large_ensemble +
 
 `na ~ orchestra + large_ensemble + orchestra:large_ensemble`: Represents the fixed effects + intercept 
 
+--
+
 `(large_ensemble|id)`: Represents the error terms and associated variance components
   - Specifies two error terms: $u_i$ corresponding to the intercepts, $v_i$ corresponding to effect of large ensemble
   
@@ -353,8 +373,6 @@ Display results using the `tidy` function from the **broom.mixed** package.
 library(broom.mixed)
 tidy(music_model) 
 ```
-
---
 
 - Get fixed effects only 
 
@@ -393,7 +411,20 @@ tidy(music_model) %>% filter(effect == "ran_pars") %>% kable(digits = 3)
 
 ## Interpret the effects 
 
-[SET UP ACTIVITY - split into groups + each group has a google slide]
+- Split into 4 groups. 
+
+- Each group will write the interpretation for one main effect and one variance component. The terms on each slide do not necessarily have a direct correspondence to each other. 
+
+- One person write the group's interpretations on the slide. 
+
+- [Click here](https://docs.google.com/presentation/d/17XvVYSG2NvhS-PJ8dwjdN8OodvmuCLE52r9-aGIJETw/edit?usp=sharing) for the slides.
+
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 6, seconds = 00,
+          margin = "1.25%")
+```
 
 ---
 
@@ -409,14 +440,14 @@ Below are the estimated coefficients and standard errors for four modeling appro
 
 ```{r, include=FALSE}
 Variable <- c("Intercept","Orch","Large","Orch*Large")
-`Independence (OLS)` <-c("15.72(0.36)", "1.79(0.55)", "-0.28(0.79)", "-1.71(1.06)")
-`Two-Stage` <- c("16.28(0.67)", "1.41(0.99)", "-0.77(0.85)", "-1.41(1.20)")
+Independence <-c("15.72(0.36)", "1.79(0.55)", "-0.28(0.79)", "-1.71(1.06)")
+`Two Stage` <- c("16.28(0.67)", "1.41(0.99)", "-0.77(0.85)", "-1.41(1.20)")
 LVCF <- c("15.20(1.25)", "1.45(1.84)", "-", "-")
 Multilevel <- c("15.93(0.64)", "1.69(0.95)", "-0.91(0.85)", "-1.42(1.10)")
 ```
 
 ```{r table3chp8,echo=FALSE}
-table3chp8 <- data.frame(Variable, `Independence (OLS)`, `Two-Stage`, 
+table3chp8 <- data.frame(Variable, `Independence`, `Two Stage`, 
                          LVCF, Multilevel)
 kable(table3chp8, booktabs=T, 
       caption="from BMLR Table 8.3")
@@ -439,6 +470,7 @@ Maximum Likelihood (ML) and Restricted (Residual) Maximum Likelihood (REML) are 
 **Maximum Likelihood (ML)** 
 
 - Jointly estimate the fixed effects and variance components using all the <u>sample data</u>
+- Can be used to draw conclusions about fixed and random effects
 - *Issue*: Fixed effects are treated as known values when estimating variance components
   - Results in biased estimates of variance components (especially when sample size is small)
 
@@ -449,7 +481,7 @@ Maximum Likelihood (ML) and Restricted (Residual) Maximum Likelihood (REML) are 
 **Restricted Maximum Likelihood (REML)**
 
 - Estimate the variance components using the <u>sample residuals</u> not the sample data
-- Accounts for uncertainty in fixed effects estimates, so estimates of variance components are unbiased
+- It is conditional on the fixed effects, so it accounts for uncertainty in fixed effects estimates. This results in unbiased estimates of variance components.
 
 .center[
 .question[
@@ -470,9 +502,11 @@ Example using OLS
   - primary objective is to obtain estimates of the model parameters 
 
 - **ML** (`REML = FALSE`) <u>must</u> be used if you want to compare nested fixed effects models using a likelihood ratio test (e.g., a drop-in-deviance test).
-  - For REML, the goodness-of-fit and likelihood ratio tests can only be used to draw conclusions about variance components the test to draw conclusions about random effects only
+  - For REML, the goodness-of-fit and likelihood ratio tests can only be used to draw conclusions about variance components 
 
-.footnote[.small[Source: Singer, J. D., Willett, J. B., & Willett, J. B. (2003). *Applied longitudinal data analysis: Modeling change and event occurrence*. Oxford university press.]]
+<br> 
+
+.footnote[.small[Source: Singer, J. D. & Willett, J. B. (2003). *Applied longitudinal data analysis: Modeling change and event occurrence*. Oxford university press.]]
 ---
 
 ## Comparing ML and REML
@@ -610,4 +644,4 @@ The content in the slides is from
 - [BMLR: Chapter 8 - Introduction to Multilevel Models](https://bookdown.org/roback/bookdown-BeyondMLR/ch-multilevelintro.html)
   - Sections 8.5 - 8.12
   
- - Singer, J. D., Willett, J. B., & Willett, J. B. (2003). *Applied longitudinal data analysis: Modeling change and event occurrence*. Oxford university press.    
+ - Singer, J. D. & Willett, J. B. (2003). *Applied longitudinal data analysis: Modeling change and event occurrence*. Oxford university press.    
