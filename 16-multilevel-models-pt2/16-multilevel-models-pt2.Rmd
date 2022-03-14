@@ -488,7 +488,7 @@ $$\begin{aligned}Y_{ij} &= (\alpha_0 + \alpha_1 ~ Orchestra_i + \beta_0 ~ LargeE
 --
 
 - The **fixed effects** to estimate are $\alpha_0, \alpha_1, \beta_0, \beta_1$
-- The **random effects** are $u_i, v_i, \epsilon_{ij}$
+- The **error terms** are $u_i, v_i, \epsilon_{ij}$
 
 --
 
