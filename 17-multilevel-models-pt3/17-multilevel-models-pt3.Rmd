@@ -635,6 +635,8 @@ class: middle, center
 .question[
 Open `lecture-17.Rmd`.
 ]
+
+See BMLR Sections 8.6 - 8.11 for full step-by-step analysis.
 ---
 
 ## Acknowledgements
