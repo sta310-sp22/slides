@@ -94,7 +94,30 @@ class: middle, center
 ---
 
 ## Mid-semester feedback
-  
+
+Thank you to everyone who filled out the mid-semester survey! 
+
+.pull-left[
+
+**What has helped with learning** 
+
+- Working through interpretations and code in class
+- HW and projects to extend learning beyond lectures
+
+
+**How can teaching team help with learning** 
+
+- More practice!
+- Use some lab time for review and additional practice
+]
+
+.pull-right[
+**Strategies you're using that have helped with learning**
+
+- Engaging with the textbook
+- Attending office hours
+- Asking questions! 
+]
   
 ---
 
