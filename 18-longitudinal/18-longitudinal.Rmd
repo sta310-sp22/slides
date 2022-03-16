@@ -59,9 +59,10 @@ class: middle, center
 
 ## Announcements
 
-- Quiz 03: Wed, Mar 16 - Fri, Mar 18 
+- Quiz 03: Wed, Mar 16 at 5pm - Sun, Mar 20 at 11:59pm
   - Feb 21 - Mar 14 lectures
-
+  - Chapters 6 - 8 of the textbook 
+  
 - DataFest: April 1 - 3 in Penn Pavilion 
   - [Click here](https://www2.stat.duke.edu/datafest/signup.html) to sign up 
 
