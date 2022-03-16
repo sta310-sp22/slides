@@ -52,7 +52,7 @@ xaringanExtra::use_panelset()
 
 class: middle, center
 
-## [Click here for PDF of slides](17-multilevel-models-pt3.pdf)
+## [Click here for PDF of slides](18-longitudinal.pdf)
 
 ---
 
@@ -122,7 +122,7 @@ Researchers have not definitively determined one method superior to the other
 
 - Use ML estimates to compare models with different fixed effects
 
-- Can get biased estimates of variance when number of groups is small
+- Can get biased estimates of variance components when number of groups is small
 
 .small[Source: [Hierarchical Linear Modeling with Maximum Likelihood, Restricted Maximum Likelihood, and Fully Bayesian Estimation](https://scholarworks.umass.edu/cgi/viewcontent.cgi?article=1353&context=pare) by Peter Boedeker]
 ]
@@ -288,7 +288,7 @@ charter %>%
 
 ## Assess missingness
 
-Missing data is common in longitudinal data. Before starting the analysis, it is important to understand the missing data patterns. Use the `skim` function from the **skimr** R package to get a quick view of the missigness.
+Missing data is common in longitudinal data. Before starting the analysis, it is important to understand the missing data patterns. Use the `skim` function from the **skimr** R package to get a quick view of the missingness.
 
 .midi[
 ```{r}
@@ -341,13 +341,16 @@ charter %>%
 - **Complete case analysis**: Only include schools with complete data for all three years. 
   - Would remove 12.6% of observations in this data. 
 
-- **Last observation carried forward**: Keep the last observation from each group (school in this case) and conduct analysis for independent observations. 
+--
 
+- **Last observation carried forward**: Keep the last observation from each group (school) and conduct analysis for independent observations. 
+
+--
 
 - **Impute missing observations**: "Fill in" values of missing observations using the typical observed trends from groups with similar covariates.   
 
-
-- **Apply multilevel methods**: Estimate patterns using available data recognizing that trends for groups with complete data re more precise than for those with fewer measurements. This is under the condition that the probability of missingness does not depend on unobserved predictors or the response.
+--
+- **Apply multilevel methods**: Estimate patterns using available data recognizing that trends for groups with complete data are more precise than for those with fewer measurements. This is under the condition that the probability of missingness does not depend on unobserved predictors or the response.
 
 ---
 
@@ -355,7 +358,7 @@ class: middle
 
 .center[
 .question[
-What is an advantage of each method? What is an disadvantage?
+What is an advantage of each method? What is a disadvantage?
 ]
 ]
 
@@ -387,7 +390,7 @@ countdown(minutes = 3, seconds = 00,
 
 Given the longitudinal structure of the data, we are able to answer questions at two levels
 
-**Level One (within school)**: How did average math scores within a school change over time? 
+- **Level One (within school)**: How did average math scores for a given school change over time? 
 
 - **Level Two (between schools)**: What is the effect of school-specific covariates on the average math scores in 2008 and the rate of change from 2008 to 2010? 
 
@@ -402,7 +405,7 @@ We can conduct exploratory data analysis at both levels, e.g.,
 class: middle, center
 
 .question[
-Open `lecture-18.Rmd`.
+Conduct exploratory data analysis in `lecture-18.Rmd`.
 ]
 
 See BMLR Section 9.3 for full exploratory data analysis.
@@ -411,9 +414,7 @@ See BMLR Section 9.3 for full exploratory data analysis.
 
 ## Unconditional means model 
 
-Start with the **unconditional means model** a model with no covariates at any level
-
-- Also called the random intercepts model
+Start with the **unconditional means model**, a model with no covariates at any level. This is also called the random intercepts model.
 
 **Level One** : $Y_{ij} = a_{i} + \epsilon_{ij}, \hspace{5mm} \epsilon_{ij} \sim N(0, \sigma^2)$ 
 
@@ -444,22 +445,14 @@ Fit the unconditional means model and calculate the intraclass correlation.
 
 A next step in the model building is the **unconditional growth model**, a  model with Level One predictors but no Level Two predictors. 
 
-The composite model is 
+**Level One**: $Y_{ij} = a_i + b_iYear08_{ij} + \epsilon_{ij}$
 
-$$\begin{aligned}&Y_{ij} = \alpha_0 + \beta_0Year08_Pij + u_i + v_iYear08_{ij} + \epsilon_{ij} \\[10pt]
-&\epsilon_{ij} \sim N(0, \sigma^2) \hspace{1mm} \text{  and  } \hspace{1mm}\left[ \begin{array}{c}
-            u_{i} \\ v_{i}
-          \end{array}  \right] \sim N \left( \left[
-          \begin{array}{c}
-            0 \\ 0
-          \end{array} \right], \left[
-          \begin{array}{cc}
-            \sigma_{u}^{2} & \sigma_{uv} \\
-            \sigma_{uv} & \sigma_{v}^{2}
-          \end{array} \right] \right)\end{aligned}$$
+**Level Two**: 
+  - $a_i = \alpha_0 + u_i$
+  - $b_i = \beta_0 + v_i$
 
 .question[
-- Write the Level One and Level Two models. 
+- Write the composite model.
 - What can we learn from this model? 
 - Fit the unconditional growth model.
 ]
@@ -471,24 +464,38 @@ We can use **Pseudo R<sup>2</sup>** to explain changes in variance components be
 
 - **Note**: This should only be used when the definition of the variance component is the same between the two models 
 
-$$Pseudo R^2 = \frac{\hat{\sigma}_.(Model 1) - \hat{\sigma}_.(Model 2)}{\frac{\hat{\sigma}_.(Model 1)}}$$
+$$\text{Pseudo }R^2 = \frac{\hat{\sigma}_.(\text{Model 1}) - \hat{\sigma}_.(\text{Model 2})}{{\hat{\sigma}_.(\text{Model 1})}}$$
 
 .question[
-Calculate the $Pseudo R^2$ to estimate the change of within school variance between the unconditional means and unconditional growth models.
+Calculate the $\text{Pseudo }R^2$ to estimate the change of within school variance between the unconditional means and unconditional growth models.
 ]
 
 
 ---
 
-## Fit a model 
+## Model with school-level covariate
 
-Model in section 9.6.3
+Fit a model with school-level covariates that takes the following form: 
 
-- Write it out
-- Notice difference in parameters use for sloeps and intercepts - what does this mean 
+**Level One**
 
-- Interpret the coeffcients for the model 
+\begin{equation*}
+Y_{ij}= a_{i} + b_{i}Year08_{ij} + \epsilon_{ij}
+\end{equation*}
 
+**Level Two**
+
+\begin{align*}
+a_{i} & = \alpha_{0} + \alpha_{1}Charter_i + \alpha_{2}urban_i + \alpha_{3}schpctfree_i + u_{i} \\
+b_{i} & = \beta_{0} + \beta_{1}Charter_i + \beta_{2}urban_i + v_{i}
+\end{align*}
+
+.question[
+- Write out the composite model. 
+- Fit the model in R. 
+- Use the model to describe how the average math scores differed between charter and non-charter schools.
+
+]
 
 
 
@@ -499,7 +506,11 @@ Model in section 9.6.3
 
 The content in the slides is from 
  
-- [BMLR: Chapter 8 - Introduction to Multilevel Models](https://bookdown.org/roback/bookdown-BeyondMLR/ch-multilevelintro.html)
-  - Sections 8.5 - 8.12
-  
- - Singer, J. D. & Willett, J. B. (2003). *Applied longitudinal data analysis: Modeling change and event occurrence*. Oxford university press.    
+- [BMLR: Chapter 9 - Two-level Longitudinal Data](https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html)
+  - Sections 9.1 - 9.6.3
+
+ 
+- [Hierarchical Linear Modeling with Maximum Likelihood, Restricted Maximum Likelihood, and Fully Bayesian Estimation](https://scholarworks.umass.edu/cgi/viewcontent.cgi?article=1353&context=pare) by Peter Boedeker
+
+- *Applied longitudinal data analysis: Modeling change and event occurrence*. Oxford university press. by J.D. Singer and J.B. Willett 
+  - Online copy available through Duke library
