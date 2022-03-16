@@ -440,6 +440,7 @@ $$\hat{\rho} = \frac{\text{Between variability}}{\text{Total variability}} = \fr
 Fit the unconditional means model and calculate the intraclass correlation.
 ]
 
+
 ---
 
 ## Acknowledgements
