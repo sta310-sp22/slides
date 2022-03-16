@@ -465,7 +465,6 @@ We can use **Pseudo R<sup>2</sup>** to explain changes in variance components be
 
 - **Note**: This should only be used when the definition of the variance component is the same between the two models 
 
-$$\text{Pseudo }R^2 = \frac{\hat{\sigma}(\text{Model 1}) - \hat{\sigma}(\text{Model 2})}{{\hat{\sigma}(\text{Model 1})}}$$
 
 .question[
 Calculate the $\text{Pseudo }R^2$ to estimate the change of within school variance between the unconditional means and unconditional growth models.
