@@ -476,7 +476,7 @@ Calculate the $\text{Pseudo }R^2$ to estimate the change of within school varian
 
 ---
 
-## Model with school-level covariate
+## Model with school-level covariates
 
 Fit a model with school-level covariates that takes the following form: 
 
