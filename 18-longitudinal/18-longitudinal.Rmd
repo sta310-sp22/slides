@@ -440,6 +440,68 @@ $$\hat{\rho} = \frac{\text{Between variability}}{\text{Total variability}} = \fr
 Fit the unconditional means model and calculate the intraclass correlation.
 ]
 
+---
+
+## Unconditional growth model 
+
+A next step in the model building is the **unconditional growth model**, a  model with Level One predictors but no Level Two predictors. 
+
+**Level One**: $Y_{ij} = a_i + b_iYear08_{ij} + \epsilon_{ij}$
+
+**Level Two**: 
+  - $a_i = \alpha_0 + u_i$
+  - $b_i = \beta_0 + v_i$
+
+.question[
+- Write the composite model.
+- What can we learn from this model? 
+- Fit the unconditional growth model.
+]
+---
+
+## Pseudo $R^2$
+
+We can use **Pseudo R<sup>2</sup>** to explain changes in variance components between two models 
+
+- **Note**: This should only be used when the definition of the variance component is the same between the two models 
+
+$$\text{Pseudo }R^2 = \frac{\hat{\sigma}^2(\text{Model 1})  -  \hat{\sigma}^2(\text{Model 2})}{\hat{\sigma}^2(\text{Model 1})}$$
+
+
+.question[
+Calculate the $\text{Pseudo }R^2$ to estimate the change of within school variance between the unconditional means and unconditional growth models.
+]
+
+
+
+---
+
+## Model with school-level covariate
+
+Fit a model with school-level covariates that takes the following form: 
+
+**Level One**
+
+\begin{equation*}
+Y_{ij}= a_{i} + b_{i}Year08_{ij} + \epsilon_{ij}
+\end{equation*}
+
+**Level Two**
+
+\begin{align*}
+a_{i} & = \alpha_{0} + \alpha_{1}Charter_i + \alpha_{2}urban_i + \alpha_{3}schpctfree_i + u_{i} \\
+b_{i} & = \beta_{0} + \beta_{1}Charter_i + \beta_{2}urban_i + v_{i}
+\end{align*}
+
+.question[
+- Write out the composite model. 
+- Fit the model in R. 
+- Use the model to describe how the average math scores differed between charter and non-charter schools.
+
+]
+
+
+
 
 ---
 
