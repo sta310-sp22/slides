@@ -184,7 +184,7 @@ class: middle
 .question[
 -  The $\text{Pseudo }R^2$ estimating the change in within school variance between the unconditional means and unconditional growth model is about 0.17. What does this value mean?
 
-- Why can't we use $\text{Pseudo }R^2$ .midi[ to understand change in $\hat{\sigma}_u^2$ between the two models? 
+- Why can't we use $\text{Pseudo }R^2$ to understand change in $\hat{\sigma}_u^2$ between the two models? 
 ]
 
 ---
