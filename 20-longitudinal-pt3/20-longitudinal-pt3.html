@@ -854,7 +854,7 @@ margin-bottom: 12px;
 class: center, middle, inverse, title-slide
 
 # Modeling two-level longitudinal data
-## Inference + Covariance structure
+## Inference cont’d
 ### 03.23.22
 
 ---
@@ -869,7 +869,7 @@ class: center, middle, inverse, title-slide
 
 class: middle, center
 
-## [Click here for PDF of slides](20-longitudinal-pt3  .pdf)
+## [Click here for PDF of slides](20-longitudinal-pt3.pdf)
 
 ---
 
@@ -897,8 +897,6 @@ class: middle, center
 - Conduct inference for random effects 
 
 - Conduct inference for fixed effects
-
-- Understand covariance structure of longitudinal data
 
 ---
 
@@ -1064,9 +1062,6 @@ reduced_model &lt;-  lmer(MathAvgScore ~ charter + urban + schPctfree +
 &amp;H_a: \text{at least one of the parameters is not equal to 0}\end{aligned}$$`
 
 *Note*: `\(\rho_{uv} \neq 0 \Rightarrow \sigma_v \neq 0\)`
-
-
-&lt;font color = &quot;red&quot;&gt; Add notes on the type of test we&#39;re conducting, i.e., we&#39;re doing the drop-in-deviance test&lt;/font&gt;
 
 ---
 
@@ -1234,48 +1229,48 @@ confint(reduced_model, method = &quot;boot&quot;, level = 0.95, oldNames = F) %&
 &lt;tbody&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; sd_(Intercept)|schoolid &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 4.312 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 4.855 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 4.264 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 4.857 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; sigma &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 2.846 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 3.114 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 2.869 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 3.104 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 659.356 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 661.489 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 659.417 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 661.293 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; charter &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -4.346 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -1.481 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -4.461 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -1.496 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; urban &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -2.019 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -0.276 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -2.016 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -0.090 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; schPctfree &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -19.538 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -16.120 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -19.371 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -16.072 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; year08 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 1.228 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 1.797 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 1.217 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 1.823 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; charter:year08 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 0.389 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; 1.658 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 0.363 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; 1.638 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style=&quot;text-align:left;&quot;&gt; urban:year08 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -0.897 &lt;/td&gt;
-   &lt;td style=&quot;text-align:right;&quot;&gt; -0.171 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -0.921 &lt;/td&gt;
+   &lt;td style=&quot;text-align:right;&quot;&gt; -0.173 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -1310,15 +1305,6 @@ confint(reduced_model, method = &quot;boot&quot;, level = 0.95, oldNames = F) %&
 **Methods to understand data structure**
 
 - Calculate intraclass correlation coefficient using unconditional means model
-
----
-
-class: middle, inverse
-
-## Covariance structure
-
----
-
 
 ---
 

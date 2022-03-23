@@ -1,6 +1,6 @@
 ---
 title: "Modeling two-level longitudinal data"
-subtitle: "Inference + Covariance structure"
+subtitle: "Inference cont'd"
 date: "03.23.22"
 output:
   xaringan::moon_reader:
@@ -53,7 +53,7 @@ xaringanExtra::use_panelset()
 
 class: middle, center
 
-## [Click here for PDF of slides](20-longitudinal-pt3  .pdf)
+## [Click here for PDF of slides](20-longitudinal-pt3.pdf)
 
 ---
 
@@ -81,8 +81,6 @@ class: middle, center
 - Conduct inference for random effects 
 
 - Conduct inference for fixed effects
-
-- Understand covariance structure of longitudinal data
 
 ---
 
@@ -189,9 +187,6 @@ $$\begin{aligned}&H_0: \sigma_v = \rho_{uv} = 0\\
 &H_a: \text{at least one of the parameters is not equal to 0}\end{aligned}$$
 
 *Note*: $\rho_{uv} \neq 0 \Rightarrow \sigma_v \neq 0$
-
-
-<font color = "red"> Add notes on the type of test we're conducting, i.e., we're doing the drop-in-deviance test</font>
 
 ---
 
@@ -342,15 +337,6 @@ confint(reduced_model, method = "boot", level = 0.95, oldNames = F) %>%
 **Methods to understand data structure**
 
 - Calculate intraclass correlation coefficient using unconditional means model
-
----
-
-class: middle, inverse
-
-## Covariance structure
-
----
-
 
 ---
 
