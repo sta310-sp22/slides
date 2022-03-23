@@ -272,7 +272,7 @@ Go to `lecture-20.Rmd` to test whether `schPctFree` should be included in the cu
 ## Methods to conduct inference for individual coefficients
 
 - Use the t-value $\big(\frac{estimate}{std.error}\big)$ in the model output 
-  - General rule: Cofficients with |t-value| > 2 considered to be statistically significant, i.e., different from 0 
+  - General rule: Coefficients with |t-value| > 2 considered to be statistically significant, i.e., different from 0 
 
 - Calculate confidence intervals using **nonparametric bootstrapping** 
 
@@ -360,4 +360,4 @@ The content in the slides from
 - *Extending the linear model with R*. by Julian Faraway
   - Online copy available through Duke library
 
-- More mathematical details in [*Computational methods for mixed models*](https://cran.r-project.org/web/packages/lme4/vignettes/Theory.pdf) by Douglas Bates (a vingette for the **lme4** R package)
+- More mathematical details in [*Computational methods for mixed models*](https://cran.r-project.org/web/packages/lme4/vignettes/Theory.pdf) by Douglas Bates (a vignette for the **lme4** R package)
