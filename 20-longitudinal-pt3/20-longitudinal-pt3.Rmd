@@ -141,7 +141,7 @@ $$\left[ \begin{array}{c}
 
 **Estimated fixed effects**: $\alpha_0, \alpha_1, \alpha_2, \alpha_3, \beta_0, \beta_1, \beta_2$
 
-**Variance components to estimate**: $\sigma, \sigma^2_u, \sigma^2_v, \rho_{uv}$ (Note: $\sigma_{uv} = \rho_{uv}\sigma_u\sigma_v$
+**Variance components to estimate**: $\sigma, \sigma_u, \sigma_v, \rho_{uv}$ (Note: $\sigma_{uv} = \rho_{uv}\sigma_u\sigma_v$)
 
 ---
 
@@ -157,9 +157,9 @@ $$u_i \sim N(0, \sigma^2_u) \hspace{2mm} \text{ and }\hspace{2mm} \epsilon_{ij} 
 
 --
 
-**Estimated fixed effects**: $\alpha_0, \alpha_1, \alpha_3, \alpha_3, \beta_0, \beta_1, \beta_2$
+**Estimated fixed effects**: $\alpha_0, \alpha_1, \alpha_2, \alpha_3, \beta_0, \beta_1, \beta_2$
 
-**Variance components to estimate**: $\sigma, \sigma^2_u$
+**Variance components to estimate**: $\sigma, \sigma_u$
 
 
 ---
@@ -330,7 +330,7 @@ confint(reduced_model, method = "boot", level = 0.95, oldNames = F) %>%
 ## Summary: Understanding the model
 
 **Methods to understand individual coefficients**
-
+- Likelihood ratio tests
 - Bootstrap confidence intervals
 - Pseudo $R^2$ for variance components (if meaning is unchanged between models)
 
