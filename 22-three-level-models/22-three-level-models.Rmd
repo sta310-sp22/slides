@@ -65,7 +65,9 @@ class: middle, center
 - HW 04 due **Fri, Apr 1** at 11:59pm
 
 - Final project - optional draft due **Fri, Apr 15**, final report due **Wed, Apr 27**
-  
+
+[Click here](https://docs.google.com/presentation/d/1uCKhYKMqVXs5qRfvOUr4H3oIsit-B3Ir_AlZiTmLm6g/edit?usp=sharing) for Google slides for exercises.
+
 ---
 
 ## Learning goals 
@@ -209,7 +211,7 @@ knitr::include_graphics("img/random-effects-modelb.png")
 .question[
 1. Write the composite model. 
 2. Which variables appear to have a statistically significant effect on price? 
-3. Use this model to interpret the effect of bedrooms on the price of houses in Southampton. 
+3. Use this model to interpret the covariate assigned to your group.
 ]
 ]
 
