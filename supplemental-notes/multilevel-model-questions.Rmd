@@ -1,0 +1,33 @@
+---
+title: "Questions about multilevel models"
+output: html_document
+date: "`r Sys.Date()`"
+author: ""
+---
+
+*This document contains answers to some of the frequently asked questions about mutlilevel models submitted in Quiz 03.*
+
+
+### Can multilevel models be used to model nonlinear repsonse variables, e.g., binomial, Poisson, etc.? 
+
+### How do you identify the fixed and random effects from the equation of the composite model? 
+
+(can take a model from the book)
+
+### What are strategies staticians use to determine whether they should use a multilevel model or independence model to analyze a given data set? 
+
+From one student: *"It seems to me that most datasets, especially in the field I'm interested in (public health), will have correlated data, except perhaps when data collection is randomized within one geographic area. Usually, data will be collected for individuals, and groups of individuals will have certain things in common (neighborhood, school, access to resources etc.). Based on the authors' argument, it seems like multilevel models should almost always be used for public health studies, but this doesn't seem to reflect the reality in the literature. So, has this method simply not been sufficiently popularized, or how are biostatisticians deciding whether to create multilevel models?"*
+
+
+### Can you log transform predictor variables in multilevel models? If so, when would we do so? The book mentions that mean-centering is sometimes necessary (for interpretation), which makes me think that perhaps other transformations could be done. 
+
+###  Can Pseudo $R^2$ supposed to guide variable selection for models at each level? Can we use Pseudo $R^2$ to determine whether a fixed effect should be added to the model at a given level? If not, what is the purpose of Pseudo $R^2$?
+
+### What are some reasons/characteristics of data that would lead researchers to choose to have a random intercept, but fixed slopes, or vice versa? Is this common when fitting multilevel models? The authors chose to do this in my group's paper for Project 2, but I haven't seen it done much elsewhere. 
+
+### Why are the standard errors in variable coefficients generally higher when using the restricted maximum likelihood to estimate the fixed effects and variance components of a model compared to when we use the maximum likelihood?
+
+
+
+
+
