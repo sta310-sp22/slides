@@ -365,18 +365,12 @@ $$\hat{\sigma}^2 = 215 \hspace{10mm} \hat{\sigma}^2_{u} = 127 \\
 
 .middle[
 .question[
-Use Model C to write the derivation of $Cov(Y_{ijk}, Y_{ij'k'})$, houses in the same district sold in different time periods. Then calculate $\hat{Cov}(Y_{ijk}, Y_{ij'k'})$. 
+Use Model C to write the derivation of $Cov(Y_{ijk}, Y_{ij'k'})$, houses in the same district sold in different time periods. Then calculate $\hat{Cov}(Y_{ijk}, Y_{ij'k'})$ for two houses each with two bedrooms.
 
 $$\hat{\sigma}^2 = 215 \hspace{10mm} \hat{\sigma}^2_{u} = 127 \\
 \hat{\sigma}^2_{\tilde{u}} = 213 \hspace{10mm}  \hat{\sigma}^2_{\tilde{v}} = 58 \hspace{10mm} \hat{\sigma}_{\tilde{u}\tilde{v}} =  111$$
 ]
 ]
-
-```{r echo = F}
-library(countdown)
-countdown(minutes = 4, seconds = 0,
-          margin = "5%")
-```
 
 ---
 
@@ -399,7 +393,7 @@ Recall, $$Corr(Y_1, Y_2) = \frac{Cov(Y_1, Y_2)}{\sqrt{Var(Y_1)Var(Y_2)}}$$
 .question[
 1. What is the estimated correlation between two houses each with two bedrooms in the same district sold in <u>different</u> time periods?
 
-2. What is the correlation between a house with two bedrooms and one with three bedrooms in the same district sold in <u>different</u> time periods?
+2. What is the estimated correlation between a house with two bedrooms and one with three bedrooms in the same district sold in <u>different</u> time periods?
 
 [Click here](https://forms.gle/AB48iCxomU8Gs5kz8) to submit your response.
 ]
@@ -415,7 +409,7 @@ countdown(minutes = 6, seconds = 0,
 class: middle
 
 .question[
-Which covariance structure do you think is most reasonable for the data? The variance structure imposed by Model B or the one imposed by Model C?
+Which covariance structure do you think is the best fit for the data? The variance structure imposed by Model B or the one imposed by Model C? Why?
 ]
 
 ---
