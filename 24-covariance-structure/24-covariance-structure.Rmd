@@ -1,7 +1,6 @@
 ---
-title: "Modeling data with more than two levels"
-subtitle: "cont'd"
-date: "04.04.22"
+title: "Covariance structure of observations"
+date: "04.06.22"
 output:
   xaringan::moon_reader:
     #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
@@ -53,7 +52,7 @@ xaringanExtra::use_panelset()
 
 class: middle, center
 
-## [Click here for PDF of slides](23-three-level-models-pt2.pdf)
+## [Click here for PDF of slides](24-covariance-structure.pdf)
 
 ---
 
@@ -62,17 +61,10 @@ class: middle, center
 
 - Final project - optional draft due **Fri, Apr 15**, final report due **Wed, Apr 27**
 
-[Click here](https://docs.google.com/presentation/d/1uCKhYKMqVXs5qRfvOUr4H3oIsit-B3Ir_AlZiTmLm6g/edit?usp=sharing) for Google slides for exercises.
 
 ---
 
 ## Learning goals 
-
-- Write form of model for models with more than two levels
-
-- Interpret fixed and random effects at each level 
-
-- See how three-level models are used in data analysis example
 
 - Use the model to understand the covariance structure among observations
 
@@ -104,188 +96,54 @@ knitr::include_graphics("img/figure-2b.png")
 
 ---
 
-class: middle, inverse 
+## Model A (unconditional means model)
 
-## Recap
+$$Y_{ijk} = \alpha_0 + \tilde{u}_i + u_{ij} + \epsilon_{ijk} \\[10pt]
+\tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}}), \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
 
----
+<br> 
 
-## Unconditional means model 
-
-.eq[
-$$Y_{ijk} = \alpha_0 + \tilde{u}_i + u_{ij} + \epsilon_{ijk}$$
-]
-
-.pull-left[
-```{r echo = F, fig.align = "center", out.width = "100%"}
-knitr::include_graphics("img/figure-2b.png")
-```
-]
-
-**Level Three**
-
-$a_{i} = \alpha_0 + \tilde{u}_{i}, \hspace{10mm} \tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}})$
-
-**Level Two**
-
-$a_{ij} = a_i + u_{ij}, \hspace{10mm} u_{ij} \sim N(0, \sigma^2_u)$
-
-
-**Level One**
-
-$Y_{ijk} = a_{ij} + \epsilon_{ijk}, \hspace{10mm} \epsilon_{ijk} \sim N(0, \sigma^2)$
-
+[Click here](https://sta310-sp22.github.io/slides/supplemental-notes/jones1991-models.html#model-a-unconditional-means-model) for model details.
 
 ---
 
-## Model A: Unconditional means model
+## Model B
 
-.pull-left[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/fixed-effects-modela.png")
-```
+$$\begin{aligned}Y_{ijk} = \alpha_0 &+ \beta_1 \text{age}_{ijk} + \beta_2 \text{detached}_{ijk} + \beta_3 \text{bungalow}_{ijk} + \beta_4 \text{terrace}_{ijk} \\ &+ \beta_5 \text{flat}_{ijk}+ \beta_6 
+\text{bedrooms}_{ijk} + \beta_7 \text{central heating}_{ijk}\\ &+ \beta_8 \text{single}_{ijk} + \beta_9 \text{double}_{ijk}\\ &+ [\tilde{u}_i + u_{ij} + \epsilon_{ijk}]\end{aligned}$$
 
 <br>
 
-]
-
-.pull-right[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/random-effects-modela.png")
-```
-
-.alert[
-The overall mean price of houses in this data set is &#163; 58,100
-]
-]
-
-.footnote[Table 1 from Jones (1991)]
-
----
-
-## Model A: Random effects
-
-.pull-left[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/random-effects-modela.png")
-```
-]
-
-.pull-right[
-$$\begin{aligned}&\hat{\rho}_{time} = \frac{169}{397 + 169 + 240} = 0.210 \\[20pt]
-&\hat{\rho}_{district} = \frac{240}{397 + 169 + 240} = 0.298\end{aligned}$$
-]
-
----
-
-class: middle, inverse
-
-## Model with covariates
-
----
-
-## Model B: Add covariates + random intercepts
-
-
-.pull-left[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/fixed-effects-modelb.png")
-```
-
+$$\tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}}), \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
 <br>
 
-]
-
-.pull-right[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/random-effects-modelb.png")
-```
-
-.question[
-1. Write the composite model. 
-2. [Click here](https://docs.google.com/presentation/d/1uCKhYKMqVXs5qRfvOUr4H3oIsit-B3Ir_AlZiTmLm6g/edit?usp=sharing) to interpret the covariate assigned to your group. 
-]
-]
-
-.footnote[Table 1 from Jones (1991)]
+[Click here](https://sta310-sp22.github.io/slides/supplemental-notes/jones1991-models.html#model-b) for model details.
 
 ---
 
-## Model C: Additional random effect
+## Model C
 
-.pull-left[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/fixed-effects-modelc.png")
-```
+$$\begin{aligned}Y_{ijk} = \alpha_0 &+ \beta_1 \text{age}_{ijk} + \beta_2 \text{detached}_{ijk} + \beta_3 \text{bungalow}_{ijk} + \beta_4 \text{terrace}_{ijk} \\ &+ \beta_5 \text{flat}_{ijk}+ \beta_6 
+\text{bedrooms}_{ijk} + \beta_7 \text{central heating}_{ijk} \\ &+ \beta_8 \text{single}_{ijk} + \beta_9 \text{double}_{ijk} \\ &+ [\tilde{u}_i + \tilde{v}_i \text{bedrooms}_{ijk} +  u_{ij} + \epsilon_{ijk}]\end{aligned}$$
 
-<br>
+<br> 
 
-]
+$$\left[ \begin{array}{c}
+            \tilde{u}_{i} \\ \tilde{v}_{i}
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_{\tilde{u}}^{2} & \sigma_{\tilde{u}\tilde{v}} \\
+            \sigma_{\tilde{u}\tilde{v}} & \sigma_{\tilde{v}}^{2}
+          \end{array} \right] \right)
+, \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
 
-.pull-right[
-```{r echo = F, fig.align = "center", out.width = "70%"}
-knitr::include_graphics("img/random-effects-modelc.png")
-```
+<br> 
 
-.question[
+[Click here](https://sta310-sp22.github.io/slides/supplemental-notes/jones1991-models.html#model-c) for model details. 
 
-1. How does this model differ from Model B? 
-2. Write the composite model. 
-3. Write the Level One, Level Two, and Level Three models. 
-]
-]
-
-.footnote[Table 1 from Jones (1991)]
-
----
-
-
-## Visualizing price by district over time
-
-.pull-left[
-```{r echo = F, fig.align  = "center", fig.cap = "Figure 3 from Jones (1991)", out.width = "100%"}
-knitr::include_graphics("img/figure-3.png")
-```
-]
-
-.pull-right[
-.question[
-1. What do you observe from the plot? 
-2. What terms in the model can be understood from the plot? 
-3. How might you use this type of plot to support decisions you make in the analysis?
-
-[Click here](https://docs.google.com/presentation/d/1uCKhYKMqVXs5qRfvOUr4H3oIsit-B3Ir_AlZiTmLm6g/edit?usp=sharing) to submit your group's response.
-]
-]
-
----
-
-## Price by district and bedrooms
-
-.pull-left[
-```{r echo = F, out.width = "100%", fig.align = "center", fig.cap = "Figure 4 from Jones (1991)"}
-knitr::include_graphics("img/figure-4.png")
-```
-]
-
-.pull-right[
-
-.question[
-1. What do you observe from the plot? 
-2. What terms in the model can be understood from the plot? 
-3. How might you use this type of plot to support decisions you make in the analysis?
-
-[Click here](https://docs.google.com/presentation/d/1uCKhYKMqVXs5qRfvOUr4H3oIsit-B3Ir_AlZiTmLm6g/edit?usp=sharing) to submit your group's response. 
-]
-]
-
----
-
-class: middle
-
-.question[
-Based on the output and visualizations, how does our understanding of the effect of bedrooms differ in Model C compared to Model B? 
-]
 
 ---
 
@@ -299,17 +157,17 @@ class: middle, inverse
 
 So far we have discussed...
 
-- the covariance structure between error terms at a given level, e.g. the relationship between $u_i$ and $v_i$ from a Level Two model: 
+- the covariance structure between error terms at a given level, e.g. the distribution of between $\tilde{u}_i$ and $\tilde{v}_i$ from a Level Two model: 
 
 $$\left[ \begin{array}{c}
-            u_{i} \\ v_{i}
+            \tilde{u}_{i} \\ \tilde{v}_{i}
           \end{array}  \right] \sim N \left( \left[
           \begin{array}{c}
             0 \\ 0
           \end{array} \right], \left[
           \begin{array}{cc}
-            \sigma_{u}^{2} & \sigma_{uv} \\
-            \sigma_{uv} & \sigma_{v}^{2}
+            \sigma_{\tilde{u}}^{2} & \sigma_{\tilde{u}\tilde{v}} \\
+            \sigma_{\tilde{u}\tilde{v}} & \sigma_{\tilde{v}}^{2}
           \end{array} \right] \right)$$
 
 -  how to use the intraclass correlation coefficient to get an idea of the average correlation among observations nested in the same Level Two and/or Level Three observations
@@ -318,18 +176,24 @@ $$\left[ \begin{array}{c}
 
 ## Questions we want to answer
 
-Now we want to be able to answer more specific questions about the covariance structure between *observations* at different levels. 
+Now we want to be able to answer more specific questions about the covariance (and correlation) structure of *observations* at different levels. 
+
+- What is the covariance (and correlation) of houses in the same district sold in the same time period? $(Y_{ijk}, Y_{ijk'})$
+
+- What is the covariance (and correlation) of houses in the same district sold in different time periods? $(Y_{ijk}, Y_{ij'k'})$
 
 --
 
-- What is the covariance structure of houses in the same district sold in different time periods? $(Y_{ij}, Y_{ij'})$
+<hr> 
+
+- What is the covariance structure of houses in the same district? 
+- What is the covariance structure of houses in the same district sold in the same time period? 
 
 --
 
-- What is the covariance structure of houses in the same district sold in the same time period? $(Y_{ijk}, Y_{ijk'})$
+<hr>
 
---
-  - How does this structure differ between Model B and Model C in Jones (1991)?
+How do these values differ between Model B and Model C in Jones (1991)?
 
 ---
 
@@ -352,61 +216,247 @@ We will use these properties to define the covariance structure of the observati
 .footnote[.small[from [BMLR: Section 9.7.5](https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html#optionalcov)]]
 ---
 
-## Covariance structure under Model B
-
-Let $Y_{ijk}$ be the sales price for the house $k$ in district $i$ sold in time period $j$, and $x_1, \ldots, x_9$ be the house-level covariates. 
+## Calculating covariances from Model B
 
 .alert[
-$$Y_{ijk} = \alpha_0 + \sum_{i = 1}^{9}\alpha_ix_i + [\tilde{u}_i + u_{ij} + \epsilon_{ijk}]$$
-$$\tilde{u}_i \sim N(0, \sigma_{\tilde{u}}^2), \hspace{5mm} u_{ij} \sim N(0, \sigma^2_{u}), \hspace{5mm} \epsilon_{ijk} \sim N(0, \sigma^2)$$ 
+$$\begin{aligned}Y_{ijk} = \alpha_0 &+ \beta_1 \text{age}_{ijk} + \beta_2 \text{detached}_{ijk} + \beta_3 \text{bungalow}_{ijk} + \beta_4 \text{terrace}_{ijk} \\ &+ \beta_5 \text{flat}_{ijk} + \beta_6 
+\text{bedrooms}_{ijk} + \beta_7 \text{central heating}_{ijk} \\ &+ \beta_8 \text{single}_{ijk} + \beta_9 \text{double}_{ijk}\\ &+ [\tilde{u}_i + u_{ij} + \epsilon_{ijk}]\end{aligned}$$
+
+<br>
+
+$$\tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}}), \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
 ]
 
 Only use the random effects portion of the model in the variance and covariance derivations.
 
 ---
 
-## Variance and covariance derivations
+.middle[
+.question[
+Use Model B to write the derivation of $Var(Y_{ijk})$, the variance of an individual observation. Then calculate $\hat{Var}(Y_{ijk})$. 
+
+$$\hat{\sigma}^2 = 236 \hspace{10mm} \hat{\sigma}^2_{u} = 139
+\hspace{10mm} \hat{\sigma}^2_{\tilde{u}} = 201$$
+]
+]
+
+---
 
 .middle[
 .question[
-Use Model B to write the derivation of $Var(Y_{ijk})$, the variance of an individual observation.
+Use Model B to write the derivation of $Cov(Y_{ijk}, Y_{ijk'})$, the covariance of houses in the same district sold in the same time period. Then calculate $\hat{Cov}(Y_{ijk}, Y_{ijk'})$. 
+
+$$\hat{\sigma}^2 = 236 \hspace{10mm} \hat{\sigma}^2_{u} = 139
+\hspace{10mm} \hat{\sigma}^2_{\tilde{u}} = 201$$
 ]
 ]
 
 ---
-
-## Variance and covariance derivations
 
 .middle[
 .question[
-Use Model B to write the derivation of $Cov(Y_{ijk}, Y_{ijk'})$, the covariance between houses sold in the same time period that are in the same district.
+Use Model B to write the derivation of $Cov(Y_{ijk}, Y_{ij'k'})$, the covariance of houses in the same district sold in different time periods. Then calculate $\hat{Cov}(Y_{ijk}, Y_{ij'k'})$. 
+
+$$\hat{\sigma}^2 = 236 \hspace{10mm} \hat{\sigma}^2_{u} = 139
+\hspace{10mm} \hat{\sigma}^2_{\tilde{u}} = 201$$
+
+[Click here](https://forms.gle/6hYayoj1BM1o2fKh8) to submit your response.
 ]
 ]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
 
 ---
 
-## Variance and covariance derivations
+## Correlation between observations 
+
+.alert[
+Recall, $$Corr(Y_1, Y_2) = \frac{Cov(Y_1, Y_2)}{\sqrt{Var(Y_1)Var(Y_2)}}$$
+]
 
 .question[
-Write the derivation of $Cov(\textbf{Y}_{ij})$, the covariance matrix for houses sold in the same time period that are in the same district. 
+1. What is the estimated correlation between houses in the same district sold in the same time period?
+
+2. What is the estimated correlation between houses in the same district sold in different time periods? 
+]
+
+
+---
+
+## Covariance structure
+
+Write $Cov(\textbf{Y}_{ij})$, the covariance matrix for observations from houses sold in the same time period that are in the same district. 
+
+$$\small{Cov(\textbf{Y}_{ij}) = \left[
+          \begin{array}{ccccc}
+            \tau_1 & & & & \\
+           \tau_{12} & \tau_2 & & & \\
+            \tau_{13} &\tau_{23} &  \tau_3 & \\
+             \vdots & \vdots & \vdots  & \ddots & \\
+            \tau_{1n_{ij}} & \tau_{2n_{ij}} & \tau_{3n_{ij}}&  \ldots & \tau_{n_{ij}}
+          \end{array} \right]}$$
+
+<br> 
+
+where $\tau_{k}^2 = Var(Y_{ijk})$, $\tau_{kk'} = Cov(Y_{ijk}, Y_{ijk'})$, and  $n_{ij}$ is the number of houses sold in the $i^{th}$ district in the $j^{th}$ time period. 
+
+---
+
+## Correlation matrix
+
+.question[
+Write the correlation matrix for houses from the same district that were sold in the same time period.
 ]
 
 ---
 
-## Looking ahead 
+class: middle, inverse
 
-- Calculate the correlation matrix
+## Covariance of observations in Model C
 
-- Data analysis with three-level models 
+---
 
-- Multilevel GLMs
+## Model C
+
+.alert[
+$$\begin{aligned}Y_{ijk} = \alpha_0 &+ \beta_1 \text{age}_{ijk} + \beta_2 \text{detached}_{ijk} + \beta_3 \text{bungalow}_{ijk} + \beta_4 \text{terrace}_{ijk}\\ &+  \beta_5 \text{flat}_{ijk}+ \beta_6 
+\text{bedrooms}_{ijk} + \beta_7 \text{central heating}_{ijk} \\ &+ \beta_8 \text{single}_{ijk} + \beta_9 \text{double}_{ijk}\\ &+ [\tilde{u}_i + \tilde{v}_i \text{bedrooms}_{ijk} +  u_{ij} + \epsilon_{ijk}]\end{aligned}$$
+
+$$\left[ \begin{array}{c}
+            \tilde{u}_{i} \\ \tilde{v}_{i}
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_{\tilde{u}}^{2} & \sigma_{\tilde{u}\tilde{v}} \\
+            \sigma_{\tilde{u}\tilde{v}} & \sigma_{\tilde{v}}^{2}
+          \end{array} \right] \right)
+, \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
+]
+
+---
+
+.middle[
+.question[
+Use Model C to write the derivation of $Var(Y_{ijk})$, the variance of an individual observation. Then calculate $\hat{Var}(Y_{ijk})$ for a house with two bedrooms.
+
+$$\hat{\sigma}^2 = 215 \hspace{10mm} \hat{\sigma}^2_{u} = 127 \\
+\hat{\sigma}^2_{\tilde{u}} = 213 \hspace{10mm}  \hat{\sigma}^2_{\tilde{v}} = 58 \hspace{10mm} \hat{\sigma}_{\tilde{u}\tilde{v}} =  111$$
+]
+]
+
+---
+
+.middle[
+.question[
+Use Model C to write the derivation of $Cov(Y_{ijk}, Y_{ijk'})$, the covariance of houses in the same district sold in the same time period. Then calculate $\hat{Cov}(Y_{ijk}, Y_{ijk'})$ for two houses that each have two bedrooms.
+
+$$\hat{\sigma}^2 = 215 \hspace{10mm} \hat{\sigma}^2_{u} = 127 \\
+\hat{\sigma}^2_{\tilde{u}} = 213 \hspace{10mm}  \hat{\sigma}^2_{\tilde{v}} = 58 \hspace{10mm} \hat{\sigma}_{\tilde{u}\tilde{v}} =  111$$
+]
+]
+
+---
+
+.middle[
+.question[
+Use Model C to write the derivation of $Cov(Y_{ijk}, Y_{ij'k'})$, houses in the same district sold in different time periods. Then calculate $\hat{Cov}(Y_{ijk}, Y_{ij'k'})$. 
+
+$$\hat{\sigma}^2 = 215 \hspace{10mm} \hat{\sigma}^2_{u} = 127 \\
+\hat{\sigma}^2_{\tilde{u}} = 213 \hspace{10mm}  \hat{\sigma}^2_{\tilde{v}} = 58 \hspace{10mm} \hat{\sigma}_{\tilde{u}\tilde{v}} =  111$$
+]
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+## Correlation between observations 
+
+.alert[
+Recall, $$Corr(Y_1, Y_2) = \frac{Cov(Y_1, Y_2)}{\sqrt{Var(Y_1)Var(Y_2)}}$$
+]
+
+.question[
+
+1. What is the estimated correlation between two houses each with two bedrooms in the same district sold in the same time period? 
+
+2. What is the correlation between a house with two bedrooms and one with three bedrooms in the same district sold in the same time period? 
+]
+
+
+---
+
+.question[
+1. What is the estimated correlation between two houses each with two bedrooms in the same district sold in <u>different</u> time periods?
+
+2. What is the correlation between a house with two bedrooms and one with three bedrooms in the same district sold in <u>different</u> time periods?
+
+[Click here](https://forms.gle/AB48iCxomU8Gs5kz8) to submit your response.
+]
+
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 6, seconds = 0,
+          margin = "5%")
+```
+
+---
+class: middle
+
+.question[
+Which covariance structure do you think is most reasonable for the data? The variance structure imposed by Model B or the one imposed by Model C?
+]
+
+---
+
+
+class: middle, inverse
+
+## Alternative covariance structures
+
+---
+
+## Different covariance structures
+
+The standard covariance structure calculated from the multilevel model is useful in most situations. Sometimes, however, there may be a different covariance structure that better fits the data. A few alternatives are
+
+**Unstructured**: Every variance and covariance term for observations with each level is a separate parameter and is uniquely estimated. No patterns among variances or correlations are assumed. Very flexible but requires the estimation of many parameters. 
+
+**Compound Symmetry**: Assume variance is constant across all Level One observations and correlation is constant across all pairs of Level One observations. Restrictive but few parameters to estimate. 
+
+---
+
+## Different covariance structures
+
+**Autoregressive**: Assume constant variance across all time points, but correlation reduces in a systematic way such that closer time points are more correlated than those further apart. 
+
+**Toeplitz**: Similar to autoregressive but there is no imposed structure on the decreased correlation for time periods further apart. 
+
+**Heterogeneous variances**: Allows for equal variances across time points. Requires additional parameters to be estimated to allow for the unequal variances.  
+
+<br>
+
+.small[See ["Fitting Linear Mixed Models in R"](http://staff.pubhealth.ku.dk/~jufo/courses/rm2018/nlmePackage.pdf) for details on R packages and code for multilevel models with a predetermined covariance structure, and [Section 9.7.2 Alternative Covariance Structures]((https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html#alternateerror) in BMLR for more details.]
 
 ---
 
 ## Acknowledgements
 
 - Jones, K. (1991). [Specifying and estimating multi-level models for geographical research](https://sakai.duke.edu/access/content/group/ec265469-bdb3-47a7-beb0-317956b6f86f/jones-1991.pdf). Transactions of the institute of British geographers, 148-159.
+
+- ["Fitting Linear Mixed Models in R"](http://staff.pubhealth.ku.dk/~jufo/courses/rm2018/nlmePackage.pdf) by Brice Ozenne
   
 - Beyond Multiple linear regression 
   - [Section 9.7: Covariance structure among observations](https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html#errorcovariance)
-  - [Chapter 10: Multilevel data with more than two levels](https://bookdown.org/roback/bookdown-BeyondMLR/ch-3level.html)
+  - [Section 10.9: Covariance structure](https://bookdown.org/roback/bookdown-BeyondMLR/ch-3level.html#error-3level)
