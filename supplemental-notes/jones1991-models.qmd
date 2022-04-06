@@ -1,0 +1,137 @@
+---
+title: "Models from *Specifying and Estimating Multi-Level Models for Geographical Research*"
+format:
+  html:
+    self-contained: true
+    toc: true
+    html-math-method: katex
+---
+
+This document contains the equations for the models fitted in the 1991 paper ["Specifying and Estimating Multi-Level Models for Geographical Research"](https://sakai.duke.edu/access/content/group/ec265469-bdb3-47a7-beb0-317956b6f86f/jones-1991.pdf) by Kelvyn Jones ^[These models are used in the March 30, April 04, and April 06 lectures.]. The notation is from [Chapter 10: Multilevel Data with More than Two Levels](https://bookdown.org/roback/bookdown-BeyondMLR/ch-3level.html) in *Beyond Multiple Linear Regression* by Paul Roback and Julie Legler. 
+
+
+## Model A (unconditional means model)
+
+### Composite model 
+
+$$Y_{ijk} = \alpha_0 + \tilde{u}_i + u_{ij} + \epsilon_{ijk} \\[10pt]
+\tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}}), \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
+
+### Model equations at each level 
+
+#### Level Three (district)
+
+$$a_{i} = \alpha_0 + \tilde{u}_{i}, \hspace{5mm} \tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}})$$
+
+#### Level Two (time)
+
+$$a_{ij} = a_i + u_{ij}, \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u)$$
+
+
+#### Level One (house)
+
+$$Y_{ijk} = a_{ij} + \epsilon_{ijk}, \hspace{5mm} \epsilon_{ijk} \sim N(0, \sigma^2)$$
+
+## Model B
+
+### Composite model 
+
+$$\begin{aligned}Y_{ijk} = \alpha_0 &+ \beta_1 \text{age}_{ijk} + \beta_2 \text{detached}_{ijk} + \beta_3 \text{bungalow}_{ijk} + \beta_4 \text{terrace}_{ijk} + \beta_5 \text{flat}_{ijk}\\ &+ \beta_6 
+\text{bedrooms}_{ijk} + \beta_7 \text{central heating}_{ijk} + \beta_8 \text{single}_{ijk} + \beta_9 \text{double}_{ijk}\\ &+ [\tilde{u}_i + u_{ij} + \epsilon_{ijk}]\end{aligned}$$
+
+
+$$\tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}}), \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
+
+### Model equations at each level 
+
+#### Level Three (district)
+
+$$\begin{aligned}&a_{i} = \alpha_0 + \tilde{u}_{i}, \hspace{5mm} \tilde{u}_{i} \sim N(0, \sigma^2_{\tilde{u}}) \\
+&b_{1i} = \beta_1 \\
+&b_{2i} = \beta_2 \\
+&b_{3i} = \beta_3 \\
+&\dots \\
+&b_{9i} = \beta_9 \\\end{aligned}$$
+
+#### Level Two (time)
+
+$$\begin{aligned}&a_{ij} = a_i + u_{ij}, \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u) \\
+&b_{1ij} = b_{1i}\\
+&b_{2ij} = b_{2i} \\
+&b_{3ij} = b_{3i} \\
+&\dots\\
+&b_{9ij} = b_{9i}\end{aligned}$$
+
+
+#### Level One (house)
+
+$$\begin{aligned}Y_{ijk} =  a_{ij} &+ b_{1ij} \text{age}_{ijk} + b_{2ij} \text{detached}_{ijk} + b_{3ij} \text{bungalow}_{ijk} + b_{4ij} \text{terrace}_{ijk} + b_{5ij} \text{flat}_{ijk}\\ 
+&+ b_{6ij} \text{bedrooms}_{ijk}+ b_{7ij} \text{central heating}_{ijk} + b_{8ij} \text{single}_{ijk} + b_{9ij} \text{double}_{ijk}\\ 
+&+ \epsilon_{ijk}
+, \hspace{5mm} \epsilon_{ijk} \sim N(0, \sigma^2)\end{aligned}$$
+
+
+## Model C
+
+
+### Composite model 
+
+$$\begin{aligned}Y_{ijk} = \alpha_0 &+ \beta_1 \text{age}_{ijk} + \beta_2 \text{detached}_{ijk} + \beta_3 \text{bungalow}_{ijk} + \beta_4 \text{terrace}_{ijk} + \beta_5 \text{flat}_{ijk}\\ &+ \beta_6 
+\text{bedrooms}_{ijk} + \beta_7 \text{central heating}_{ijk} + \beta_8 \text{single}_{ijk} + \beta_9 \text{double}_{ijk}\\ &+ [\tilde{u}_i + \tilde{v}_i \text{bedrooms}_{ijk} +  u_{ij} + \epsilon_{ijk}]\end{aligned}$$
+
+$$\left[ \begin{array}{c}
+            \tilde{u}_{i} \\ \tilde{v}_{i}
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_{\tilde{u}}^{2} & \sigma_{\tilde{u}\tilde{v}} \\
+            \sigma_{\tilde{u}\tilde{v}} & \sigma_{\tilde{v}}^{2}
+          \end{array} \right] \right)
+, \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u), \hspace{5mm}\epsilon_{ijk} \sim N(0, \sigma^2)$$
+
+### Model equations at each level 
+
+#### Level Three (district)
+
+$$\begin{aligned}&a_{i} = \alpha_0 + \tilde{u}_{i} \\
+&b_{1i} = \beta_1 \\
+&b_{2i} = \beta_2 \\
+&b_{3i} = \beta_3 \\
+&\dots \\
+&b_{6i} = \beta_6 + \tilde{v}_i \\
+&\dots \\
+&b_{9i} = \beta_9 \\[5pt]
+&\left[ \begin{array}{c}
+            \tilde{u}_{i} \\ \tilde{v}_{i}
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_{\tilde{u}}^{2} & \sigma_{\tilde{u}\tilde{v}} \\
+            \sigma_{\tilde{u}\tilde{v}} & \sigma_{\tilde{v}}^{2}
+          \end{array} \right] \right)
+\end{aligned}$$
+
+#### Level Two (time)
+
+$$\begin{aligned}&a_{ij} = a_i + u_{ij}, \hspace{5mm} u_{ij} \sim N(0, \sigma^2_u) \\
+&b_{1ij} = b_{1i}\\
+&b_{2ij} = b_{2i} \\
+&b_{3ij} = b_{3i} \\
+&\dots\\
+&b_{6ij} = b_{6i} \\
+&\dots \\
+&b_{9ij} = b_{9i}\end{aligned}$$
+
+
+#### Level One (house)
+
+$$\begin{aligned}Y_{ijk} =  a_{ij} &+ b_{1ij} \text{age}_{ijk} + b_{2ij} \text{detached}_{ijk} + b_{3ij} \text{bungalow}_{ijk} + b_{4ij} \text{terrace}_{ijk} + b_{5ij} \text{flat}_{ijk}\\ 
+&+ b_{6ij} \text{bedrooms}_{ijk}+ b_{7ij} \text{central heating}_{ijk} + b_{8ij} \text{single}_{ijk} + b_{9ij} \text{double}_{ijk}\\ 
+&+ \epsilon_{ijk}
+, \hspace{5mm} \epsilon_{ijk} \sim N(0, \sigma^2)\end{aligned}$$
+
+
