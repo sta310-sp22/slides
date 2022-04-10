@@ -5,29 +5,118 @@ date: "`r Sys.Date()`"
 author: ""
 ---
 
-*This document contains answers to some of the frequently asked questions about mutlilevel models submitted in Quiz 03.*
+*This document contains answers to some of the frequently asked questions about multilevel models submitted in Quiz 03.*
 
 
-### Can multilevel models be used to model nonlinear repsonse variables, e.g., binomial, Poisson, etc.? 
+### Can multilevel models be used to model nonlinear repsonse variables, e.g., binomial, Poisson, etc.?
 
-### How do you identify the fixed and random effects from the equation of the composite model? 
+Yes, [chapter 11 in the book](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#objectives) talks about Multilevel Generalized Linear Models, which combine the ideas of generalized linear models like the ones you mention with the multilevel structure. Some teams explored multilevel logistic regression for the second project.
 
-(can take a model from the book)
+### How do you identify the fixed and random effects from the equation of the composite model?
 
-### What are strategies staticians use to determine whether they should use a multilevel model or independence model to analyze a given data set? 
+Let's take the model in [section 9.6.1](https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html#sec:modelc9) as an example.
+
+$$Y_{ij} = \alpha_0 + \beta_0 \text{Year08}_{ij} + \alpha_1\text{Charter}_i + \beta_1 \text{Charter}_i \text{Year08}_{ij} + u_i + v_i\text{Year08}_{ij} + \epsilon_{ij}.$$
+
++ The first thing we can see is that the level one predictor is the one indexed with $ij$ (Year08) and the level two predictor is only indexed with $i$ (Charter).
++ We notice an isolated random effect $u_i$ at level two. Since this random component is not multiplying any predictor, it has to come from a random intercept $a_i = \alpha_0 + u_i$.
++ We see that there is a level two predictor in the model (Charter, note it is only indexed with $i$). Since this level two predictor is not interacting with any level one predictor, it must come from the random intercept component $a_i = \alpha_0 + \alpha_1 \text{Charter} + u_i$.
++ We notice that the level 1 predictor Year08 is multiplying another random effect $v_i$, so this suggests that the model has a random slope for that predictor $b_i = \beta_0 + v_i$.
++ Finally, we see that there is an interaction term between a level one predictor and a level two predictor (Year08 and Charter). This suggests that Charter is playing a role in the model for the random slope $b_i = \beta_0 + \beta_1 \text{Charter}_i + v_i$.
+
+We recover the model for each level.
+
+**Level One**
+$$Y_{ij} = a_i + b_i \text{Year08} + \epsilon_{ij},$$
+**Level Two**
+\begin{align*}
+a_i &= \alpha_0 + \alpha_1 \text{Charter}_i + u_i\\
+b_i &= \beta_0 + \beta_1 \text{Charter}_i + v_i
+\end{align*}
+
+### What are strategies statisticians use to determine whether they should use a multilevel model or independence model to analyze a given data set? 
 
 From one student: *"It seems to me that most datasets, especially in the field I'm interested in (public health), will have correlated data, except perhaps when data collection is randomized within one geographic area. Usually, data will be collected for individuals, and groups of individuals will have certain things in common (neighborhood, school, access to resources etc.). Based on the authors' argument, it seems like multilevel models should almost always be used for public health studies, but this doesn't seem to reflect the reality in the literature. So, has this method simply not been sufficiently popularized, or how are biostatisticians deciding whether to create multilevel models?"*
 
+The [Center for Multilevel Modelling](https://www.bristol.ac.uk/cmm/learning/multilevel-models/what-why.html) at the University of Bristol lists some of the main advantages of multilevel models over independence models:
 
-### Can you log transform predictor variables in multilevel models? If so, when would we do so? The book mentions that mean-centering is sometimes necessary (for interpretation), which makes me think that perhaps other transformations could be done. 
+1. *Correct inferences*: Traditional multiple regression techniques treat the units of analysis as independent observations. One consequence of failing to recognise hierarchical structures is that standard errors of regression coefficients will be underestimated, leading to an overstatement of statistical significance. Standard errors for the coefficients of higher-level predictor variables will be the most affected by ignoring grouping.
+2. *Substantive interest in group effects*: In many situations a key research question concerns the extent of grouping in individual outcomes, and the identification of ‘outlying’ groups. In evaluations of school performance, for example, interest centers on obtaining ‘value-added’ school effects on pupil attainment. Such effects correspond to school-level residuals in a multilevel model which adjusts for prior attainment.
+3. *Estimating group effects simultaneously with the effects of group-level predictors*: An alternative way to allow for group effects is to include dummy variables for groups in a traditional (ordinary least squares) regression model. Such a model is called an analysis of variance or fixed effects model. In many cases there will be predictors defined at the group level, eg type of school (mixed vs. single sex). In a fixed effects model, the effects of group-level predictors are confounded with the effects of the group dummies, ie it is not possible to separate out effects due to observed and unobserved group characteristics. In a multilevel (random effects) model, the effects of both types of variable can be estimated.
+4. *Inference to a population of groups*: In a multilevel model the groups in the sample are treated as a random sample from a population of groups. Using a fixed effects model, inferences cannot be made beyond the groups in the sample.
+
+### Can you log transform predictor variables in multilevel models? If so, when would we do so? The book mentions that mean-centering is sometimes necessary (for interpretation), which makes me think that perhaps other transformations could be done.
+
+Yes. If you look at the model assumptions in the normal multilevel model, we have that $$\epsilon_{ij} \sim \mathcal{N}(0, \sigma^2),$$ so the assumptions are very similar to those in multiple linear regression (including linearity). You can check that the level one residuals are indeed normally distributed with constant variance and apply transformations if there are signs of violated assumptions.
 
 ###  Can Pseudo $R^2$ supposed to guide variable selection for models at each level? Can we use Pseudo $R^2$ to determine whether a fixed effect should be added to the model at a given level? If not, what is the purpose of Pseudo $R^2$?
 
-### What are some reasons/characteristics of data that would lead researchers to choose to have a random intercept, but fixed slopes, or vice versa? Is this common when fitting multilevel models? The authors chose to do this in my group's paper for Project 2, but I haven't seen it done much elsewhere. 
+As mentioned in the book, pseudo R-squared is only meaningful when the variance components have the same interpretation in both models. This means that, for example, you cannot use pseudo R-squared to compare $\sigma^2_u$ when
+
++ Model A: $a_i = \alpha_0 + u_i$
++ Model B: $a_i = \alpha_0 + \alpha_1 x_i + u_i$,
+
+because the interpretation is changing (you are controlling for one level two predictor $x_i$ in model B). Therefore, pseudo R-squared is mostly used to quantify the change in variance at level one associated with $\epsilon_{ij}.$
+
+Also, the authors in [section 8.7.2](https://bookdown.org/roback/bookdown-BeyondMLR/ch-multilevelintro.html#pseudoR2) mention that
+
+*Pseudo R-squared values are not universally reliable as measures of model performance. Because of the complexity of estimating fixed effects and variance components at various levels of a multilevel model, it is not unusual to encounter situations in which covariates in a Level Two equation for, say, the intercept remain constant (while other aspects of the model change), yet the associated pseudo R-squared values differ or are negative. For this reason, pseudo R-squared values in multilevel models should be interpreted cautiously.*
+
+AIC is usually the criterion used for model selection.
+
+### What are some reasons/characteristics of data that would lead researchers to choose to have a random intercept, but fixed slopes, or vice versa? Is this common when fitting multilevel models? The authors chose to do this in my group's paper for Project 2, but I haven't seen it done much elsewhere.
+
+These considerations are usually driven by domain knowledge or by the specific interests of the study. For example, if researchers know from previous work that the effect of a level one predictor is different between level two groups, then a random slope for that coefficient is appropriate. Failing to account for these possible differences can lead to Simpson's paradox as shown in [section 8.11](https://bookdown.org/roback/bookdown-BeyondMLR/ch-multilevelintro.html#multinecessary).
+
+Even though this section only shows an example on random intercepts, you can imagine a scenario in which the slopes in figure 8.15 vary substantially by subject. The plot below shows an artificial example based on the code used to generate figure 8.15.
+
+```{r, message=FALSE, results='hide'}
+library(tidyverse)
+library(lme4)
+
+set.seed(42)
+subject = c(rep(1,10),rep(2,10),rep(3,10),rep(4,10))
+lambda0 = c(rep(10,10),rep(20,10),rep(30,10),rep(40,10))
+lambda1 = c(
+  rep(-6, times = 10), rep(-3, times = 10), rep(-0.3, times = 20)
+  )
+previj = c(1:10,4:13,7:16,10:19)
+eij = rnorm(40,0,1)
+yij = lambda0 + lambda1*previj + eij
+simdata = data.frame(subject=subject,lambda0=lambda0,
+  lambda1=lambda1,previj=previj,eij=eij,yij=yij)
+
+olsreg.sim = lm(yij~previj)
+mlm.sim = lmer(yij ~ previj + (previj|subject), data=simdata)
+ints.sim = fixef(mlm.sim)[1] + ranef(mlm.sim)[[1]][1]
+slopes.sim = fixef(mlm.sim)[2] + ranef(mlm.sim)[[1]][2]
+subj.sim = c("Subject 1", "Subject 2", 
+             "Subject 3", "Subject 4")
+sim1.plot = data.frame(id=subj.sim,
+  ints.sim=ints.sim[[1]],slopes.sim=slopes.sim)
+sim1.plot2 = data.frame(model=c("MLM","LLSR"),
+  int2=c(fixef(mlm.sim)[1],
+  summary(olsreg.sim)$coefficients[1,1]),
+  slp2=c(fixef(mlm.sim)[2],
+  summary(olsreg.sim)$coefficients[2,1]))
+
+ggplot() +  
+  geom_point(data=simdata, aes(x=previj,y=yij)) + 
+  geom_abline(data=sim1.plot, aes(intercept=ints.sim,
+    slope=previj, linetype=id, group=id), 
+    color="dark gray", show.legend=TRUE) +
+  geom_abline(data=sim1.plot2, aes(intercept=int2, slope=slp2, 
+    linetype=model, group=model), size=1, show.legend=TRUE) +
+  theme(legend.title = element_blank()) +
+  scale_x_continuous(name="Previous Performances") +
+  scale_y_continuous(name="Negative Affect")
+```
+
 
 ### Why are the standard errors in variable coefficients generally higher when using the restricted maximum likelihood to estimate the fixed effects and variance components of a model compared to when we use the maximum likelihood?
 
+Maximum likelihood often underestimates variance components. Think about the normal model $$X_i \sim \mathcal{N}(\mu, \sigma^2).$$ If we have a random sample from this model, the maximum likelihood estimator of $\sigma^2$ is $$\hat{\sigma}^2 = \frac{1}{n}\sum_{i=1}^n(X_i - \bar{X})^2,$$ but this estimator is biased.
 
+The unbiased estimator is given by $$\hat{\sigma}^2 = \frac{1}{n-1}\sum_{i=1}^n(X_i - \bar{X})^2.$$ You can see that the maximum likelihood estimator underestimates the true variance (divides by a bigger number). The difference is more dramatic when $n$ is small.
 
-
-
+Roughly speaking, restricted maximum likelihood accounts for similar differences that arise when estimating fixed effects. For a more technical explanation, you can consult section 2.4.2 in [Linear Mixed Models](https://books.google.com/books?hl=en&lr=&id=467ym_ivHMUC&oi=fnd&pg=PA1&dq=linear%20mixed%20models:%20an%20introduction%20with%20applications%20in%20veterinary%20research&ots=la_RiDBVSu&sig=csH-s2JiQ4LupzKLrDhoBK3WUek#v=onepage&q=linear%20mixed%20models%3A%20an%20introduction%20with%20applications%20in%20veterinary%20research&f=false).
