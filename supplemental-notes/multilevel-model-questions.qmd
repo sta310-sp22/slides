@@ -1,11 +1,21 @@
 ---
 title: "Questions about multilevel models"
-output: html_document
+format:
+  html:
+    self-contained: true
+    toc: true
+    html-math-method: katex
 date: "`r Sys.Date()`"
-author: ""
 ---
 
-*This document contains answers to some of the frequently asked questions about multilevel models submitted in Quiz 03.*
+```{r}
+#| include = FALSE
+
+knitr::opts_chunk$set(warning = F, message = F)
+```
+
+
+*This document contains answers to some of the frequently asked questions about multilevel models submitted in Quiz 03. Thank you to Jose Pliego San Martin for writing the responses.*
 
 
 ### Can multilevel models be used to model nonlinear repsonse variables, e.g., binomial, Poisson, etc.?
