@@ -1,0 +1,523 @@
+---
+title: "Multilevel Generalized Linear Models"
+date: "04.11.22"
+output:
+  xaringan::moon_reader:
+    #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+    self_contained: true
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "70%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+library(kableExtra)
+library(lme4)
+library(broom.mixed)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+## [Click here for PDF of slides](25-multilevel-glms.pdf)
+
+---
+
+
+## Announcements
+
+- Quiz 04 open **Tue, Apr 12 - Thu, Apr 14**
+
+- Final project - optional draft due 
+  - **Fri, Apr 15** 
+  - final report due **Wed, Apr 27**
+
+- Please fill out course evaluations! 
+
+- [Click here](https://sta310-sp22.github.io/slides/supplemental-notes/multilevel-model-questions.html) for answers to questions about multilevel models submitted on Quiz 03. Thanks to Jose for putting this document together! 
+
+
+---
+
+## Learning goals 
+
+- Exploratory data analysis for multilevel data with non-normal response variable
+
+- Use a two-stage modeling approach to understand conclusions at each level 
+- Write Level One, Level Two and composite models for mutlilevel GLM
+
+- Fit and interpret multilevel GLM 
+
+---
+
+
+## Data: College Basketball referees
+
+The dataset [`basketball0910.csv`](data/basketball0910.csv) contains data on 4972 fouls in 340 NCAA basketball games from the Big Ten, ACC, and Big East conferences during the 2009-2010 season. We want to use this data to determine if the data from this season support a conclusion from [Anderson and Pierce (2009)](https://www.tandfonline.com/doi/abs/10.1080/02640410902729733) that referees tend to "even out" foul calls in a game. The variables we'll focus on are
+
+- **`foul.home`**: foul was called on home team (1: yes, 0: no)
+- **`foul.diff`**: difference in fouls before current foul was called (home - visitor)
+- **`game`**: Unique game ID number
+- **`visitor`**: visiting team abbreviation 
+- **`home`**: home team abbreviation 
+
+See [BMLR: Section 11.3.1](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#explore-glmm) for full codebook. 
+
+---
+
+## Data: College basketball referees
+
+```{r echo = F}
+basketball <- read_csv("data/basketball0910.csv") %>%
+  select(-1)
+
+basketball %>%
+  slice(1:10) %>%
+  select(game, visitor, hometeam, foul.num, foul.home, foul.vis, foul.diff, foul.type, time) %>%
+  kable(format = "html", digits = 3) 
+```
+
+---
+
+## Modeling approach 
+
+- `foul.home` is a binary response variable (1: foul called on home team, 0: foul called on visiting team)
+    
+    `r emo::ji("white_check_mark")` Use a generalized linear model, specifically one with the logit link function
+
+- Data has a multilevel structure
+  - Covariates at individual foul level and game level 
+
+    `r emo::ji("white_check_mark")` Use a multilevel model 
+    
+We will combine these and fit a **multilevel generalized linear model** with a logit link function 
+
+---
+
+class: middle, inverse
+
+## Exploratory data analysis
+
+---
+
+## Exploratory data analysis
+
+**Univariate**
+
+- Visualizations and summary statistics for Level One and Level Two variables 
+
+**Bivariate** 
+
+- Segmented bar plots or mosaic plots for response vs. categorical predictors 
+
+- Conditional density plot for response vs. quantitative predictors 
+
+- Empirical logit plot for quantitative predictors 
+  - Is relationship reasonably linear? 
+  
+---
+
+class: middle
+
+## Complete *Univariate EDA* in `lecture-25.Rmd`
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 5, seconds = 0,
+          margin = "5%")
+```
+
+
+---
+
+class: middle 
+
+## Complete *Bivariate EDA* in `lecture-25.Rmd`
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
+
+
+---
+
+## Logistic regression 
+
+Start with a logistic regression model treating all observations as independent
+
+Quick analysis to get initial intuition about research question sand important variables, not be used for final conclusions 
+
+```{r echo = F}
+logistic_model  = glm(foul.home ~ foul.diff + score.diff + lead.home + 
+           time + foul.diff:time + lead.home:time, 
+           family = binomial, data = basketball)
+
+tidy(logistic_model) %>%
+  kable(digits = 3)
+```
+
+---
+
+class: middle, inverse 
+
+## Two-stage modeling 
+
+---
+
+## Two-stage modeling
+
+For now, let's fit a model focusing on the question: **Do the data provide evidence that referees tend to "even out" fouls?**
+
+To explore this, we will fit a model with the Level One predictor `foul.diff` using a two-stage modeling approach. 
+
+--
+
+**Two-stage modeling approach** 
+
+- Fit a separate model of the association between `foul.diff` and `foul.home` for each game (Level One models)
+
+
+- Fit models to explain game-to-game variability in the estimated slopes and intercepts (Level Two models)
+
+---
+
+## Model set up
+
+- $Y_{ij}$: 1 if $j^{th}$ foul in Game $i$ was called on home team; 0 otherwise. 
+- $p_{ij}$: True probability the $j^{th}$ foul in Game $i$ was called on home team 
+
+$$Y_{ij} \sim \text{Bernoulli}(p_{ij})$$
+---
+
+## Model Set Up
+
+**Level One models**
+
+$$\log\Big(\frac{p_{ij}}{1 - p_{ij}}\Big) = a_i + b_i ~ \text{foul.diff}_{ij}$$
+**Level Two models**
+
+$$a_i = \alpha_0 + u_i\hspace{20mm} b_i = \beta_0 + v_i$$ 
+
+$$\left[ \begin{array}{c}
+            u_i \\ v_i
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_u^{2} & \sigma_{uv} \\
+            \sigma_{uv} & \sigma_{u}^{2}
+          \end{array} \right] \right)$$
+
+---
+
+## Level One Models
+
+```{r echo = F}
+ngames <- basketball %>% count(game) %>% nrow()
+
+slopes <- rep(NA, ngames)
+intercepts <- rep(NA, ngames)
+
+for(i in 1:ngames){
+  
+level_one_model <- basketball %>%
+    filter(game == i) %>%
+  glm(factor(foul.home) ~ foul.diff, data = ., family = binomial)
+  
+  intercepts[i] <- level_one_model$coefficients[1]
+  slopes[i] <- level_one_model$coefficients[2]
+}
+
+level_one_coef <- tibble(intercept = intercepts, slope = slopes) %>%
+  mutate(game = row_number())
+```
+
+.pull-left[
+```{r echo = F}
+ggplot(data = level_one_coef, aes(x = intercept)) + 
+  geom_histogram(binwidth = 10, color = "black", fill = "steelblue") + 
+  labs(x = "", 
+       title = "Intercepts")
+
+#lm(intercept ~ 1, data = level_one_coef) %>%
+#  tidy() %>%
+#  select(estimate) %>%
+#  kable(digits = 3) 
+
+level_one_coef %>% 
+  summarise(alpha0 = mean(intercept), sigma2_u = var(intercept)) %>%
+  kable(digits = 3)
+```
+]
+
+.pull-right[
+```{r echo = F}
+ggplot(data = level_one_coef, aes(x = slope)) + 
+  geom_histogram(binwidth = 10, color = "black", fill = "steelblue") + 
+  labs(x = "", 
+       title = "Slopes")
+
+#lm(slope ~ 1, data = level_one_coef) %>%
+#  tidy() %>%
+ # select(estimate) %>%
+  #kable(digits = 3)
+
+level_one_coef %>% 
+  summarise(beta0 = mean(slope), sigma2_v = var(slope)) %>%
+  kable(digits = 3)
+```
+]
+
+---
+
+## Number of fouls per game 
+
+```{r echo = F}
+basketball %>%
+  count(game) %>% 
+  ggplot(aes(x = n)) + 
+  geom_histogram(fill = "steelblue", color = "black", binwidth = 2) + 
+  labs(x = "", 
+       title = "Number of first-half  fouls per game")
+```
+
+--
+
+`r emo::ji("warning")` In the two-stage approach, games with 3 fouls are treated with equal weight as games with 20 + fouls
+
+
+---
+
+class: middle, inverse
+
+## Unified multilevel model 
+
+---
+
+## Composite model 
+
+**Composite model**
+
+.eq[
+$$\log\Big(\frac{p_{ij}}{1 - p_{ij}}\Big) = \alpha_0 + \beta_0 ~ \text{foul.diff}_{ij} + [u_i + v_i ~ \text{foul.diff}_{ij}]$$
+$$\left[ \begin{array}{c}
+            u_i \\ v_i
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_u^{2} & \sigma_{uv} \\
+            \sigma_{uv} & \sigma_{u}^{2}
+          \end{array} \right] \right)$$
+          
+]
+
+---
+
+## Fit the model in R
+
+Use the `glmer` function in the **lme4** package to fit multilevel GLMs.
+
+```{r echo = TRUE, warning = TRUE, message = TRUE}
+model1 <- glmer(foul.home ~ foul.diff + (foul.diff|game), 
+                data = basketball, family = binomial)
+```
+
+```{r echo = F}
+tidy(model1) %>% kable(digits = 3)
+```
+
+---
+
+## Boundary constraints 
+
+- The estimates of the parameters $\alpha_0, \beta_0, \sigma_u, \sigma_v, \rho_{uv}$ are those that maximize the likelihood of observing the data
+
+- The fixed effects, e.g., $\alpha_0$ and $\beta_0$, can take any values, but the terms associated with the error terms are constrained to a set of "allowable" values 
+
+$$\sigma_u \geq 0 \hspace{10mm} \sigma_v \geq 0 \hspace{10mm} -1 \leq \rho_{uv} \leq 1$$
+
+--
+
+- Because of these boundaries, a "constrained" search is used to find the MLEs.
+
+--
+
+- The error message `"## boundary (singular) fit"`, means the estimate of one or more terms was set at the maximum (or minimum) allowable value, not the value it would've been if an unconstrained search were allowable
+
+---
+
+## Illustrating boundary constraints
+
+.pull-left[
+
+Contour plots from a hypothetical likelihood $L(\beta_0, \sigma^2)$
+
+<br> 
+
+```{r,boundary,  fig.align="center", out.width="100%",fig.cap = "From BMLR Figure 10.14",echo=FALSE, warning=FALSE, message=FALSE}
+library(mnormt)
+#thr-contour-boundary
+# Diagram to help explain boundary constraints
+b0 <- seq(-4,12,length=51)
+sigma2 <- seq(-8,4,length=51)
+xy <- expand.grid(b0,sigma2)
+
+# Include all points
+Sigma <- matrix(c(12,0,0,6),2,2)
+Mu <- c(4,-2)
+z <- dmnorm(xy, Mu, Sigma)
+zframe <- data.frame(xy, z)
+MLE <- xy[z==max(z),]
+con.1 <- ggplot(data=zframe,aes(x=Var1,y=Var2,z=z)) + 
+  geom_contour(stat="contour",lineend="butt",
+               linejoin="round",linemitre=1,
+               na.rm=FALSE,colour="black") + 
+  labs(x="b0",y="sigma2",title="Unconstrained") + 
+  scale_y_continuous(limits=c(-8,4)) + 
+  geom_abline(intercept=0,slope=0) + 
+  geom_abline(intercept=0,slope=1000)
+
+# Include all points where sigma2 >= 0
+z <- ifelse(xy[,2]<0,0,dmnorm(xy, Mu, Sigma))
+zframe.1 <- zframe[zframe$Var2>=0,]
+MLE <- xy[z==max(z),]
+con.2 <- ggplot(data=zframe.1,aes(x=Var1,y=Var2,z=z)) + 
+  geom_contour(stat="contour",lineend="butt",
+               linejoin="round",linemitre=1,
+               na.rm=FALSE,colour="black") + 
+  scale_y_continuous(limits=c(-8,4)) + 
+  labs(x="b0",y="sigma2",title="Constrained") + 
+  geom_abline(intercept=0,slope=0) + 
+  geom_abline(intercept=0,slope=1000)
+
+con.1 + con.2
+```
+]
+
+.pull-right[
+
+- In the unconstrained search, the likelihood $L(\beta_0, \sigma^2)$ is maximized at $\hat{\beta}_0 = 4, \hat{\sigma}^2 = -2$
+
+- In reality $\hat{\sigma}^2$ must be non-negative, so the search for the MLE is restricted to the region such that $\sigma^2 \geq 0$. 
+
+- The constrained likelihood is maximized at $\hat{\beta}_0 = 4, \hat{\sigma}^2 = 0$
+]
+
+---
+
+## Addressing boundary constraints
+
+Address boundary constraints by reparameterizing the model 
+
+- Remove variance and correlation terms estimated at the boundary 
+
+- Reduce the number of parameters to be estimated by fixing the values of some  
+
+- Apply transformation to covariates, such as centering variables, standardizing variables, or changing units. Extreme values, outliers, or highly correlated covariates can sometimes cause issues with MLEs.
+
+---
+
+## Is it OK to use model that faces boundary constraints?
+
+Best to try to deal with boundary constraints, but you can sometimes leave the model as is if...
+
+- You're not interested in estimating parameters with boundary issues
+
+- Removing the parameters does not impact conclusions about the variables of interest 
+---
+
+**Original model**
+
+```{r echo = F}
+tidy(model1) %>% kable(digits = 3)
+```
+
+.question[
+1. Which term(s) should we remove to try to address boundary constraint? 
+2. Refit the model with these terms removed. 
+3. Which model do you choose? Explain. 
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+## Interpret model coefficients
+
+Interpret the following coefficients in the selected model (if applicable):
+
+- $\hat{\alpha}_0$
+
+- $\hat{\beta}_0$
+
+- $\hat{\sigma}_u$
+
+- $\hat{\sigma}_v$
+
+- $\hat{\rho}_{uv}$
+
+---
+
+## Looking ahead
+
+So far we've only considered random effects within a nested structure, but sometimes we may want to consider random effects that aren't nested. 
+
+- For example, we want to consider a random effect for the home team, but home team is not nested within game (since teams can be the home team for multiple games)
+
+- We will deal with this using **crossed random effects** 
+
+
+---
+
+
+## Acknowledgements
+
+- [BMLR: Section 10.5 - Encountering boundary constraints](https://bookdown.org/roback/bookdown-BeyondMLR/ch-3level.html#sec:boundary)
+
+- [Chapter 11: Multilevel generalized linear models  structure](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html) 
+  - Sections 11.1 - 11.4
+  
+- Anderson, Kyle J., and David A. Pierce. 2009. “Officiating Bias: The Effect of Foul Differential on Foul Calls in NCAA Basketball.” Journal of Sports Sciences 27 (7): 687–94. https://doi.org/10.1080/02640410902729733.
+
