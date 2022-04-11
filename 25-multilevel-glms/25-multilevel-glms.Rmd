@@ -86,7 +86,7 @@ class: middle, center
 
 ## Data: College Basketball referees
 
-The dataset [`basketball0910.csv`](data/basketball0910.csv) contains data on 4972 fouls in 340 NCAA basketball games from the Big Ten, ACC, and Big East conferences during the 2009-2010 season. We want to use this data to determine if the data from this season support a conclusion from [Anderson and Pierce (2009)](https://www.tandfonline.com/doi/abs/10.1080/02640410902729733) that referees tend to "even out" foul calls in a game. The variables we'll focus on are
+The dataset [`basketball0910.csv`](data/basketball0910.csv) contains data on 4972 fouls in 340 NCAA basketball games from the Big Ten, ACC, and Big East conferences during the 2009-2010 season. The goal is to determine whether the data from this season support a conclusion from [Anderson and Pierce (2009)](https://www.tandfonline.com/doi/abs/10.1080/02640410902729733) that referees tend to "even out" foul calls in a game. The variables we'll focus on are
 
 - **`foul.home`**: foul was called on home team (1: yes, 0: no)
 - **`foul.diff`**: difference in fouls before current foul was called (home - visitor)
@@ -241,7 +241,7 @@ $$\left[ \begin{array}{c}
           \end{array} \right], \left[
           \begin{array}{cc}
             \sigma_u^{2} & \sigma_{uv} \\
-            \sigma_{uv} & \sigma_{u}^{2}
+            \sigma_{uv} & \sigma_{v}^{2}
           \end{array} \right] \right)$$
 
 ---
@@ -344,7 +344,7 @@ $$\left[ \begin{array}{c}
           \end{array} \right], \left[
           \begin{array}{cc}
             \sigma_u^{2} & \sigma_{uv} \\
-            \sigma_{uv} & \sigma_{u}^{2}
+            \sigma_{uv} & \sigma_{v}^{2}
           \end{array} \right] \right)$$
           
 ]
@@ -432,11 +432,13 @@ con.1 + con.2
 ```
 ]
 
+--
+
 .pull-right[
 
 - In the unconstrained search, the likelihood $L(\beta_0, \sigma^2)$ is maximized at $\hat{\beta}_0 = 4, \hat{\sigma}^2 = -2$
 
-- In reality $\hat{\sigma}^2$ must be non-negative, so the search for the MLE is restricted to the region such that $\sigma^2 \geq 0$. 
+- In reality $\sigma^2$ must be non-negative, so the search for the MLE is restricted to the region such that $\sigma^2 \geq 0$. 
 
 - The constrained likelihood is maximized at $\hat{\beta}_0 = 4, \hat{\sigma}^2 = 0$
 ]
@@ -447,9 +449,9 @@ con.1 + con.2
 
 Address boundary constraints by reparameterizing the model 
 
-- Remove variance and correlation terms estimated at the boundary 
+- Remove variance and/or correlation terms estimated at the boundary 
 
-- Reduce the number of parameters to be estimated by fixing the values of some  
+- Reduce the number of parameters to be estimated by fixing the values of some parameters
 
 - Apply transformation to covariates, such as centering variables, standardizing variables, or changing units. Extreme values, outliers, or highly correlated covariates can sometimes cause issues with MLEs.
 
