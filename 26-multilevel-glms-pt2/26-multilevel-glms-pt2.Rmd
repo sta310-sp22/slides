@@ -430,6 +430,12 @@ reffect_team <- tibble(team = team_names,
                        reffect_home = reffect_home,
                      reffect_visitor = reffect_visitor)
 ```
+
+```{r}
+reffect_team %>%
+  slice(1:5)
+```
+
 ]
 
 --
@@ -439,7 +445,7 @@ reffect_team <- tibble(team = team_names,
 
 ## Distribution of random home team effects 
 
-```{r}
+```{r out.width = "60%"}
 ggplot(data = reffect_team, aes(x = reffect_home)) + 
   geom_histogram(binwidth = .05, color = "black", fill = "steelblue") + 
   labs(x = "Random home team effects", 
@@ -453,7 +459,7 @@ ggplot(data = reffect_team, aes(x = reffect_home)) +
 .panelset.sideways[
 .panel[.panel-name[Plot]
 
-```{r echo = F}
+```{r echo = F, out.width = "100%"}
 var <- attr(ranef(modelb)$hometeam, "postVar")
 reffect_predict <- tibble(Intercepts = reffect_home,
               SD = 2*sqrt(var[,,1:length(var)]),
@@ -504,6 +510,8 @@ ggplot(data = reffect_predict, aes(fct_reorder(team_names, Intercepts),
 ## Modeling next steps
 
 **Do the data provide evidence that referees tend to "even out" foul calls?**
+
+--
 
 - Adjust for additional covariates (score differential, type of foul, time left in first half)
 
