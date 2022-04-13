@@ -1,0 +1,526 @@
+---
+title: "Multilevel Generalized Linear Models"
+subtitle: "cont'd"
+date: "04.13.22"
+output:
+  xaringan::moon_reader:
+    #mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: "sta310-slides.css"
+    logo: sta310-sticker.png
+    lib_dir: libs/font-awesome
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%" 
+      ratio: "16:9"
+    self_contained: true
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.asp = 0.618, 
+                      fig.retina = 3, 
+                      dpt = 300, 
+                      out.width = "70%",
+                      fig.align = "center")
+
+ggplot2::theme_set(ggplot2::theme_bw(base_size = 16))
+
+colors <- tibble::tibble(green = "#B5BA72")
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(xaringanExtra)
+library(knitr)
+library(patchwork)
+library(viridis)
+library(ggfortify)
+library(kableExtra)
+library(lme4)
+library(broom.mixed)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+class: middle, center
+
+## [Click here for PDF of slides](26-multilevel-glms-pt2.pdf)
+
+---
+
+
+## Announcements
+
+- Quiz 04 open due **Fri, April 15 at 11:59pm**
+
+- Final project - optional draft due 
+  - **Fri, Apr 15 at 11:59pm** 
+  - final report due **Wed, Apr 27 at 11:59pm**
+
+- Please fill out course evaluations! 
+
+- [Click here](https://sta310-sp22.github.io/slides/supplemental-notes/multilevel-model-questions.html) for answers to questions about multilevel models submitted on Quiz 03. Thanks to Jose for putting this document together! 
+
+
+---
+
+## Learning goals 
+
+- Exploratory data analysis for multilevel data with non-normal response variable
+
+- Write One, Level Two and composite models for mutlilevel GLM
+
+- Fit and interpret multilevel GLM 
+
+- Understand crossed random effects and incorporate them in the multilevel model 
+
+---
+
+
+## Data: College Basketball referees
+
+The dataset [`basketball0910.csv`](data/basketball0910.csv) contains data on 4972 fouls in 340 NCAA basketball games from the Big Ten, ACC, and Big East conferences during the 2009-2010 season. The goal is to determine whether the data from this season support a conclusion from [Anderson and Pierce (2009)](https://www.tandfonline.com/doi/abs/10.1080/02640410902729733) that referees tend to "even out" foul calls in a game. The variables we'll focus on are
+
+- **`foul.home`**: foul was called on home team (1: yes, 0: no)
+- **`foul.diff`**: difference in fouls before current foul was called (home - visitor)
+- **`game`**: Unique game ID number
+- **`visitor`**: visiting team abbreviation 
+- **`home`**: home team abbreviation 
+
+See [BMLR: Section 11.3.1](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#explore-glmm) for full codebook. 
+
+---
+
+## Data: College basketball referees
+
+```{r echo = F}
+basketball <- read_csv("data/basketball0910.csv") %>%
+  select(-1)
+
+basketball %>%
+  slice(1:10) %>%
+  select(game, visitor, hometeam, foul.num, foul.home, foul.vis, foul.diff, foul.type, time) %>%
+  kable(format = "html", digits = 3) 
+```
+
+---
+
+## Composite model 
+
+**Composite model**
+
+.eq[
+$$\log\Big(\frac{p_{ij}}{1 - p_{ij}}\Big) = \alpha_0 + \beta_0 ~ \text{foul.diff}_{ij} + [u_i + v_i ~ \text{foul.diff}_{ij}]$$
+$$\left[ \begin{array}{c}
+            u_i \\ v_i
+          \end{array}  \right] \sim N \left( \left[
+          \begin{array}{c}
+            0 \\ 0
+          \end{array} \right], \left[
+          \begin{array}{cc}
+            \sigma_u^{2} & \sigma_{uv} \\
+            \sigma_{uv} & \sigma_{v}^{2}
+          \end{array} \right] \right)$$
+          
+]
+
+---
+
+## Fit the model in R
+
+Use the `glmer` function in the **lme4** package to fit multilevel GLMs.
+
+```{r echo = TRUE, warning = TRUE, message = TRUE}
+model1 <- glmer(foul.home ~ foul.diff + (foul.diff|game), 
+                data = basketball, family = binomial)
+```
+
+```{r echo = F}
+tidy(model1) %>% kable(digits = 3)
+```
+
+---
+
+## Boundary constraints 
+
+- The estimates of the parameters $\alpha_0, \beta_0, \sigma_u, \sigma_v, \rho_{uv}$ are those that maximize the likelihood of observing the data
+
+- The fixed effects, e.g., $\alpha_0$ and $\beta_0$, can take any values, but the terms associated with the error terms are constrained to a set of "allowable" values 
+
+$$\sigma_u \geq 0 \hspace{10mm} \sigma_v \geq 0 \hspace{10mm} -1 \leq \rho_{uv} \leq 1$$
+
+--
+
+- Because of these boundaries, a "constrained" search is used to find the MLEs.
+
+--
+
+- The warning message `"## boundary (singular) fit"`, means the estimate of one or more terms was set at the maximum (or minimum) allowable value, not the value it would've been if an unconstrained search were allowable
+
+---
+
+## Illustrating boundary constraints
+
+.pull-left[
+
+Contour plots from a hypothetical likelihood $L(\beta_0, \sigma^2)$
+
+<br> 
+
+```{r,boundary,  fig.align="center", out.width="100%",fig.cap = "From BMLR Figure 10.14",echo=FALSE, warning=FALSE, message=FALSE}
+library(mnormt)
+#thr-contour-boundary
+# Diagram to help explain boundary constraints
+b0 <- seq(-4,12,length=51)
+sigma2 <- seq(-8,4,length=51)
+xy <- expand.grid(b0,sigma2)
+
+# Include all points
+Sigma <- matrix(c(12,0,0,6),2,2)
+Mu <- c(4,-2)
+z <- dmnorm(xy, Mu, Sigma)
+zframe <- data.frame(xy, z)
+MLE <- xy[z==max(z),]
+con.1 <- ggplot(data=zframe,aes(x=Var1,y=Var2,z=z)) + 
+  geom_contour(stat="contour",lineend="butt",
+               linejoin="round",linemitre=1,
+               na.rm=FALSE,colour="black") + 
+  labs(x="b0",y="sigma2",title="Unconstrained") + 
+  scale_y_continuous(limits=c(-8,4)) + 
+  geom_abline(intercept=0,slope=0) + 
+  geom_abline(intercept=0,slope=1000)
+
+# Include all points where sigma2 >= 0
+z <- ifelse(xy[,2]<0,0,dmnorm(xy, Mu, Sigma))
+zframe.1 <- zframe[zframe$Var2>=0,]
+MLE <- xy[z==max(z),]
+con.2 <- ggplot(data=zframe.1,aes(x=Var1,y=Var2,z=z)) + 
+  geom_contour(stat="contour",lineend="butt",
+               linejoin="round",linemitre=1,
+               na.rm=FALSE,colour="black") + 
+  scale_y_continuous(limits=c(-8,4)) + 
+  labs(x="b0",y="sigma2",title="Constrained") + 
+  geom_abline(intercept=0,slope=0) + 
+  geom_abline(intercept=0,slope=1000)
+
+con.1 + con.2
+```
+]
+
+--
+
+.pull-right[
+
+- In the unconstrained search, the likelihood $L(\beta_0, \sigma^2)$ is maximized at $\hat{\beta}_0 = 4, \hat{\sigma}^2 = -2$
+
+- In reality $\sigma^2$ must be non-negative, so the search for the MLE is restricted to the region such that $\sigma^2 \geq 0$. 
+
+- The constrained likelihood is maximized at $\hat{\beta}_0 = 4, \hat{\sigma}^2 = 0$
+]
+
+---
+
+**Original model**
+
+```{r echo = F}
+tidy(model1) %>% kable(digits = 3)
+```
+
+.question[
+1. Which term(s) should we remove to try to address boundary constraint? 
+2. Refit the model with these terms removed. 
+3. Which model do you choose? Use AIC to help make your choice. 
+]
+
+```{r echo = F}
+library(countdown)
+countdown(minutes = 4, seconds = 0,
+          margin = "5%")
+```
+
+---
+
+## Interpret model coefficients
+
+Interpret the following coefficients in the selected model (if applicable):
+
+- $\hat{\alpha}_0$
+
+- $\hat{\beta}_0$
+
+- $\hat{\sigma}_u$
+
+- $\hat{\sigma}_v$
+
+- $\hat{\rho}_{uv}$
+
+---
+
+## Crossed random effects 
+
+- The Level Two covariates are the home team and visiting team
+
+- There is some evidence in the EDA that there may be differences in the probability of a foul depending on the home team
+
+- We will account for this difference by treating home team and visiting team as random effects in the model 
+
+  - *Issue*: Home and visiting team are not nested within game, since a single home and visiting team can be in multiple games 
+
+- The random effects for game, home team, and visiting team are **crossed random effects** 
+
+---
+
+## Notation 
+
+$Y_{i[gh]j}$: Indicator of whether the $j^{th}$ foul in Game $i$ was called on home team $h$ instead of visiting team $g$ 
+
+$$Y_{i[gh]j} \sim Bernoulli(p_{i[gh]j})$$ 
+
+where $p_{i[gh]j}$ is the true probability a foul  in Game $i$ was called on home team $h$ instead of visiting team $g$ 
+
+---
+
+## Models
+
+**Level One**
+
+$$\log\Big(\frac{p_{i[gh]j}}{1 - p_{i[gh]j}}\Big) = a_i + b_i ~ \text{foul.diff}_{ij}$$
+
+**Level Two** 
+
+$$\begin{aligned}&a_i = \alpha_0 + u_i + v_h + w_g\\
+&\beta_i = \beta_0\end{aligned}$$
+
+<br> 
+
+$$u_i \sim N(0, \sigma^2_u) \hspace{10mm} v_h \sim N(0, \sigma^2_v) \hspace{10mm} w_g \sim N(0, \sigma^2_w)$$
+
+---
+
+## Composite model 
+
+.eq[
+
+$$\log\Big(\frac{p_{i[gh]j}}{1 - p_{i[gh]j}}\Big) = \alpha_0 + \beta_0 ~ \text{foul.diff}_{ij} + [u_i + v_h + w_g]$$
+
+$$u_i \sim N(0, \sigma^2_u) \hspace{10mm} v_h \sim N(0, \sigma^2_v) \hspace{10mm} w_g \sim N(0, \sigma^2_w)$$
+]
+
+--
+
+**Why add additional random effects?** 
+
+- Get more precise estimates of fixed effects 
+
+- Can make comparisons of game-to-game and team-to-team variability
+
+- Can get estimated random effects for each team and use them to compare odds of a foul on the home team for different teams
+
+---
+
+## Model 
+
+```{r}
+model2 <- glmer(foul.home ~ foul.diff + (1|game) + (1|hometeam) + (1 | visitor),
+               data = basketball, family = binomial)
+```
+
+```{r}
+tidy(model2) %>% kable(digits = 3)
+```
+
+---
+
+class: middle 
+
+.question[
+
+About what percent of the variability in the intercepts is due to...
+
+- game-to-game differences?
+- differences among home teams? 
+- differences among visiting teams? 
+
+]
+
+---
+
+## Keep the crossed random effects? 
+
+- Given a large proportion of the variability in the intercepts is explained by game-to-game differences, we can assess if the random effects for home team and visiting team are providing useful information. 
+
+- To do so, we will compare the following models
+
+```{r warning = FALSE, message = FALSE}
+modela <-  glmer(foul.home ~ foul.diff + (1|game), 
+                 data = basketball, family = binomial)
+
+modelb <- glmer(foul.home ~ foul.diff + (1|game) + (1 | hometeam) + (1|visitor), 
+                data = basketball, family = binomial)
+```
+
+.question[
+Write the null and alternative hypotheses to test these models.
+]
+
+---
+
+## Keep the crossed random effects? 
+
+**Likelihood ratio test using** ${\color{#87037B}\chi^2}$ **distribution** (potentially unreliable when testing variance components)
+
+```{r}
+anova(modela, modelb, test = "Chisq") %>% kable(digits = 3)
+```
+
+<br> 
+
+--
+
+**Parametric bootstrap** (long computational time!)
+
+---
+
+## Keep the crossed random effects? 
+
+**AIC or BIC**
+
+```{r}
+glance(modela) %>% kable(digits = 3)
+glance(modelb) %>% kable(digits = 3)
+``` 
+
+---
+
+## Estimated random effects for each team 
+
+- We will use  `model B` with (crossed random effects) to get the estimated random effect for each team. 
+
+- These are **empirical Bayes estimates** ("shrinkage estimates"). 
+  - Combine individual-specific information with information from all teams
+  - "Shrinks" the individual estimates toward the group averages
+
+<br> 
+
+.footnote[.small[See [On the Use of Empirical Bayes Estimates
+as Measures of Individual Traits](https://sakai.duke.edu/access/content/group/ec265469-bdb3-47a7-beb0-317956b6f86f/empirical-bayes.pdf)] for more detail on empirical Bayes estimates.]
+
+---
+
+## Estimated random effects for each team 
+
+We can get these effects using the **`ranef`** function in the lmer R package. 
+
+.small[
+```{r}
+reffect_game <- ranef(modelb)$game %>% select(`(Intercept)`) %>% pull()
+reffect_home <- ranef(modelb)$hometeam %>% select(`(Intercept)`) %>% pull()
+reffect_visitor <- ranef(modelb)$visitor %>% select(`(Intercept)`) %>% pull()
+team_names <- rownames(ranef(modelb)$visitor)
+reffect_team <- tibble(team = team_names, 
+                       reffect_home = reffect_home,
+                     reffect_visitor = reffect_visitor)
+```
+]
+
+--
+
+
+---
+
+## Distribution of random home team effects 
+
+```{r}
+ggplot(data = reffect_team, aes(x = reffect_home)) + 
+  geom_histogram(binwidth = .05, color = "black", fill = "steelblue") + 
+  labs(x = "Random home team effects", 
+       title = "Random home team effects from Model B") 
+```
+
+---
+
+## Estimated home random effects by team
+
+.panelset.sideways[
+.panel[.panel-name[Plot]
+
+```{r echo = F}
+var <- attr(ranef(modelb)$hometeam, "postVar")
+reffect_predict <- tibble(Intercepts = reffect_home,
+              SD = 2*sqrt(var[,,1:length(var)]),
+              team_names = reffect_team$team)
+
+ggplot(data = reffect_predict, aes(fct_reorder(team_names, Intercepts), Intercepts)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0) + 
+  geom_errorbar(aes(ymin = Intercepts - SD,
+                    ymax = Intercepts + SD),
+                width=0,color="black") + 
+  labs(title = "Estimated random home team effects", 
+       x = "Home teams", 
+       y = "Estimated random effects") + 
+ theme(axis.text.y = element_text(size = 7)) + 
+  coord_flip()
+```
+]
+
+.panel[.panel-name[Code]
+
+.small[
+```{r eval = F}
+var <- attr(ranef(modelb)$hometeam, "postVar")
+reffect_predict <- tibble(Intercepts = reffect_home,
+              SD = 2*sqrt(var[,,1:length(var)]),
+              team_names = reffect_team$team)
+
+ggplot(data = reffect_predict, aes(fct_reorder(team_names, Intercepts), 
+                                   Intercepts)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0) + 
+  geom_errorbar(aes(ymin = Intercepts - SD,
+                    ymax = Intercepts + SD),
+                width=0,color="black") + 
+  labs(title = "Estimated random home team effects", 
+       x = "Home teams", 
+       y = "Estimated random effects") + 
+ theme(axis.text.y = element_text(size = 7)) + 
+  coord_flip()
+```
+]
+]
+]
+
+---
+
+## Modeling next steps
+
+**Do the data provide evidence that referees tend to "even out" foul calls?**
+
+- Adjust for additional covariates (score differential, type of foul, time left in first half)
+
+- Hypothesize that the effect of foul differential may depend on other covariates, so consider potential interaction terms with foul differential
+
+- Consider other random effects associated with game, home team, and visiting team
+
+See [Section 11.7: A final model for examining referee bias](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html#sec:finalmodel-glmm) for final model chosen by the authors. 
+
+---
+
+## Acknowledgements
+
+- [BMLR: Section 10.5 - Encountering boundary constraints](https://bookdown.org/roback/bookdown-BeyondMLR/ch-3level.html#sec:boundary)
+
+- [Chapter 11: Multilevel generalized linear models  structure](https://bookdown.org/roback/bookdown-BeyondMLR/ch-GLMM.html) 
+  - Sections 11.1 - 11.4
+  
+- Anderson, Kyle J., and David A. Pierce. 2009. “Officiating Bias: The Effect of Foul Differential on Foul Calls in NCAA Basketball.” Journal of Sports Sciences 27 (7): 687–94. https://doi.org/10.1080/02640410902729733.
+
